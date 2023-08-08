@@ -1,0 +1,499 @@
+---
+title: "Factors associated with coverage of deworming in Kenya."
+author: "CEMA"
+date: "2023-08-01"
+output: 
+  bookdown::html_document2: default
+  bookdown::pdf_document2: default
+  bookdown::word_document2: default
+toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+
+
+# Introduction
+
+We have been given a dataset which contains monthly data for children <5 years, disaggregated at a county level for the period January 2021 to June 2023.
+
+The dataset contains the following variables:
+
+- Period (months from January 2021 to June 2023)
+- County (the 47 counties in Kenya)
+- Total number of children dewormed (Total Dewormed)
+- Number of children <5 years with acute malnutrition (Acute Malnutrition)
+- Number of children stunted (0-6 months, 6-23 months, 24-59 months)
+- Number of children <5 years with diarrhea (Diarrhea cases)
+- Number of children who are underweight (0-6 months, 6-23 months, 24-59 months)
+
+We would like to first explore the data before we formulate a research question.
+
+\newpage
+
+# Data Loading and Exploration
+
+The data was obtained from the link. The data initially contained 1,410 observations (rows) and 11 variables (columns). 
+
+
+```{r}
+## There are two ways of importing packages- you can either use 'pacman' package which automatically installs the packages if they do not exist in the computer
+
+# Importing Packages
+library(pacman)
+p_load(
+  tidyverse,
+  scales,
+  MASS,
+  naniar,
+  knitr,
+  kableExtra,
+  summarytools,
+  sf,
+  corrplot,
+  recipes,
+  caret
+)
+
+
+# The second option of importing packages is using the library() or require() function
+library(tidyverse) # this is for importing several packages
+library(sf) # this is for importing spatial data (shapefiles)
+
+# Importing the data
+data <- read_csv("https://raw.githubusercontent.com/cema-uonbi/internship_task/main/data/cema_internship_task_2023.csv")
+
+```
+
+The columns contain county level data on some health indicators for children below 5 years. Specifically,these are:
+- Number of children dewormed 
+- Number of children with acute malnutrition
+- Number of children stunted
+- Number of children underweight
+
+The first thing we need to do is combine the data on stunting and underweight into one column for children <5 years, and change the period column to a date:
+
+```{r}
+
+combined_data <- data%>%
+  rowwise() %>%
+  mutate(stunted=sum(c_across(contains("stunted")),na.rm=T)) %>% # sum the stunted cases per row
+  mutate(underweight=sum(c_across(contains("Underweight")),na.rm=T)) %>% # sum the underweight cases per row
+  mutate(period=my(period)) %>% # change the date to a format that R understands
+  mutate(county=str_remove(county, "County")) %>% # remove the redundant word "County"
+  mutate(county=trimws(county))%>%  # remove white space
+  janitor::clean_names() %>% ## clean the column names
+  dplyr::select(period, county, total_dewormed, acute_malnutrition, diarrhoea_cases, stunted, underweight)%>%
+  ungroup() # remove the grouping by row
+
+# sometimes, conflicts happen when you have functions of the same name in different packages. There are many ways of avoiding the conflict. One of the ways is by specifying the package name before the function, such as janitor::clean_names()
+```
+
+
+## Missing Values
+
+Table \@ref(tab:table1) represents the total number of missing values per column of the data while figure \@ref(fig:figure1) represents a Missing Data Matrix plot. The variable representing the number of children with Acute malnutrition exhibited the most missing values, making it the variable with the highest data gaps. Following this, the variable concerning stunted growth in children aged 0 to 6 months had the second-highest number of missing values. 
+
+```{r table1}
+
+# This line of code sums up the number of observations that have missing values per column. 
+# Type ?is.na() in your console and read more about it.
+
+missing_counts <- colSums(is.na(combined_data))
+
+# We then create a dataframe with the number of missing values for every column, and arrange it in descending order
+columns_with_missing <- data.frame(Column = names(missing_counts[missing_counts > 0]),
+             Missing_Values = missing_counts[missing_counts > 0]) %>%
+  arrange(desc(Missing_Values)) %>%
+  rename("Missing values"="Missing_Values")
+
+# remove the column names
+row.names(columns_with_missing) <- c()
+
+# create a table to show the number of missing observations in every column (variable)
+knitr::kable(columns_with_missing, caption = "Number of missing values in each column") 
+
+```
+
+
+According to the table, only the variable "acute malnutrition" had 355 missing values. Further investigation revealed that certain counties had no records of Acute Malnutrition across the 30-month period (spanning from January 2021 to June 2023). Specifically, Elgeyo Marakwet, Kericho, and Lamu counties each had 30 missing values in the "Acute Malnutrition" variable, indicating a lack of data on Acute Malnutrition for these counties (Table \@ref(tab:table2)). Thus, imputing the missing values with measures like mean, median, or mode for this counties deemed impractical.
+
+
+```{r table2}
+
+combined_data  %>%
+  group_by(county) %>%
+  summarize(Missing_Values = sum(is.na(acute_malnutrition))) %>%
+  arrange(desc(Missing_Values)) %>%
+  filter(Missing_Values > 10) %>%
+  kable(caption = "Counties with the leading missing values in Acute Malnutrition")
+
+```
+
+
+The presence of missing values in the dataset could carry various implications depending on the specific county. For instance, in certain counties, these missing values might indicate that no observation was recorded or that the actual count was zero. As stated earlier, some counties exhibited missing values across all months, suggesting a complete absence of data for those particular counties. We then decided to drop the column "acute malnutrition".
+
+
+
+```{r}
+
+# Dropping Acute Malnutrition column
+combined_data1 <- combined_data %>%
+  dplyr::select(-acute_malnutrition) # we are unselecting the column using the minus sign infront of the column name
+
+
+```
+
+
+
+## Descriptive Statistics
+
+Table \@ref(tab:table3) represents the descriptive statistics of the first four continuous variables in the data. We can see that among the three health syndromes or conditions, diarrhea has the highest number of cases (>2500) per year. Of the three years, 2023 had the highest number of health syndromes or conditions reported, and equally the highest number of children <5 years who were dewormed.
+
+```{r table3}
+
+descriptive_stats1 <- combined_data1 %>%
+  mutate(year=str_sub(period, 1,4)) %>% # create a column with the period rounded off to a year
+  group_by(year)%>%
+  dplyr::summarise(mean_dewormed=mean(total_dewormed),
+           mean_diarrhoea= mean(diarrhoea_cases),
+            mean_stunted=mean(stunted),
+            mean_underweight=mean(underweight)) %>% # calculate the mean cases per year
+  mutate(across(contains("mean"), round)) # round off the mean values to integers
+
+#Table 1
+descriptive_stats1 %>%
+  kable(digits = 2, caption = "Annual average number of cases reported and treatment administered among children <5 years in Kenya between 2021 to 2023", col.names = c("Year", "Dewormed", "Diarrhea", "Stunted", "Underweight"))
+
+```
+
+
+\newpage
+
+# Data Visualization
+
+We now visualise the trend in the average number of cases reported every month from January 2021 to June 2023, and the treatment data (deworming). The deworming data, (brown points), is interpreted using the secondary y axis on the right. We observe an overall increasing trend in the reported cases of diarrhea, stunting and underweight, and also in the number of children dewormed. 
+
+
+```{r, fig.width=14, fig.height=8, message=F}
+
+descriptive_stats2 <- combined_data1 %>%
+  group_by(period)%>%
+  dplyr::summarise(avg_dewormed=mean(total_dewormed),
+           mean_diarrhoea= mean(diarrhoea_cases),
+            mean_stunted=mean(stunted),
+            mean_underweight=mean(underweight)) %>% # calculate the mean cases per year
+  mutate(across(contains("mean"), round)) %>% # round off the mean values to integers
+  pivot_longer(contains("mean"), names_to="cases", values_to="values") %>% # change the data to a long format
+  mutate(cases=recode(cases,"mean_diarrhoea"="Diarrhea", 
+        
+         "mean_stunted"="Stunted",
+         "mean_underweight"="Underweight")) %>%
+   ungroup() # always good practice to ungroup data
+
+
+ggplot(descriptive_stats2, # plot the cases first, without the treatment data
+       aes(x=period))+geom_smooth(aes(y=values, color=cases))+geom_point(aes(y=values, color=cases))+ # plot for both the line and point graphs
+ theme_bw()+ # choose the theme
+  geom_smooth(aes(y=avg_dewormed/10), color="#a65628")+ # add the deworming data as a secondary axis
+  geom_point(aes(y=avg_dewormed/10), color="#a65628")+ # add the points to showcase the deworming data
+  scale_y_continuous(sec.axis=sec_axis(~.*10, name="Number of children <5 years who were dewormed"))+
+  theme(axis.title.y.right = element_text(color = "#a65628"))+ # add a secondary axis
+  scale_x_date(date_breaks = "3 months", date_labels= "%b-%Y")+ # change the date breaks to three months (x axis), and the labels
+  labs(x="Date (month-Year)", y="Number of syndromes or cases reported in children <5 years", color="")+# change the labels for the x and y axis, together with the legend title.
+  scale_color_brewer(palette = "Paired") # change the color palette
+
+  
+```
+
+## Choropleth map
+
+
+This section showcases the prevalence of various malnutrition conditions in Kenya through an interactive choropleth map. The map allows users to hover over each county to access detailed information on specific health indicators. For an optimal viewing experience, it is recommended to knit the document in HTML format. 
+
+Figure \@ref(fig:figure1) represents a choropleth map showing the various variables in the data set. First the data was grouped according to counties and then the sum was obtained. Also, the shape file was imported and was arranged according to the alphabetical order of the county column so that the shape file can be arranged as the original data. Then the geometry column was added.
+
+
+```{r}
+
+descriptive_stats3 <- combined_data1 %>%
+  mutate(year=str_sub(period, 1,4)) %>%
+  group_by(year, county)%>%
+  dplyr::summarise(mean_dewormed=mean(total_dewormed),
+           mean_diarrhoea= mean(diarrhoea_cases),
+            mean_stunted=mean(stunted),
+            mean_underweight=mean(underweight)) %>% # calculate the mean cases per year
+  mutate(across(contains("mean"), round)) %>% # round off the mean values to integers
+  pivot_longer(contains("mean"), names_to="cases", values_to="values") %>% # change the data to a long format
+  mutate(cases=recode(cases,"mean_diarrhoea"="Diarrhea", 
+         "mean_dewormed"="Dewormed",
+         "mean_stunted"="Stunted",
+         "mean_underweight"="Underweight")) %>%
+  ungroup() # always good practice to ungroup data
+
+
+
+# Importing the shape file
+# To ensure your shapefile reads, download all the files in the shapefile data and store them in the same folder. If you only download the .shp file, the shapefile will not open.
+county_shapefile <- st_read("shapefiles/county.shp")
+
+# Combine the shapefile dataset with the dataframe containing county data using the unique identifier between the two datasets which is the county name.
+county_data <- full_join(county_shapefile, descriptive_stats3, by=c("Name"="county")) 
+
+
+
+```
+
+
+When we plot the data, we are not able to see the county differences due to the unfavourable scale we have due to the high number of children dewormed. To unmask the differences, we use breaks to categorise the data.
+
+```{r,fig.width=14, fig.height=8}
+
+ggplot(county_data, aes(fill=values))+
+  geom_sf()+facet_grid(year~cases)+theme_void()+
+  scale_fill_gradient2(low="#ffeda0", high="#b10026")+ # add a color gradient 
+  ggsn::north(county_shapefile) # add the North symbol in the data
+
+
+
+
+
+
+```
+
+
+There are many methods of choosing breaks, but for this data, we will use quantiles.
+
+```{r}
+# Add breaks into the data
+library(classInt) # package for choosing breaks
+breaks <- classIntervals(county_data$values, n=5, style = "quantile")
+
+breaks
+
+
+# we now add breaks to the data
+county_data <- county_data%>%
+  mutate(values_brks=case_when(
+    (values<433)~ "< 432",
+    (values>432 & values<=1014) ~ "432 - 1014",
+    (values>1014 & values<=2254) ~ "1015 - 2254",
+    (values>2254 & values<=5877) ~ "2254 - 5877",
+    (values>5877) ~ ">5877"
+  ))
+
+# relevel the categories
+county_data$values_brks <- fct_relevel(county_data$values_brks, "< 432","432 - 1014", "1015 - 2254","2254 - 5877",">5877" )
+
+
+ggplot(county_data, aes(fill=values_brks))+
+  geom_sf()+facet_grid(year~cases)+theme_void()+
+  scale_fill_brewer(palette="YlOrRd")+
+  labs(fill="Average number of children <5 years")
+
+
+
+
+```
+
+We observe that:
+- There has been a relatively high number of children dewormed in the country, except in the Coastal and Western region.
+- A high number of stunting and underweight cases is observed in the arid and semi-arid areas.
+
+To further explore these differences, we would then calculate the number of cases observed per 100,000 children to help us have a standard way of comparing the counties. This is mainly calculated using the population data together with the number of observed cases.
+
+
+
+## Research question
+
+From our exploratory data analysis, we have observed cases of diarrhea, stunting and underweight, and relatively high number of children dewormed in the different counties and years. We would then want to assess: 
+- **what are the factors associated with coverage of deworming in Kenya?** Here, we will use a mixed effects model to answer the question.
+
+But first, we need to include the population data to be able to calculate the coverage of deworming in every county, and the incidence of cases per 100,000 children <5 years.
+
+```{r}
+# We will include the 2019 Kenya census data which has an R package
+
+library(rKenyaCensus)
+population <- V3_T2.3 %>%
+  mutate(Age=as.numeric(Age)) %>%
+  filter(Age<5 & Age>1 & SubCounty%in%"ALL") %>% # calculate the proportion of children dewormed, which targets children above 1 year
+  mutate(deworm=sum(Total)) %>%
+  ungroup() %>%
+  filter(Age<5 & SubCounty%in%"ALL") %>%
+  group_by(County) %>%
+  mutate(Total=sum(Total)) %>%
+  ungroup() %>%
+  dplyr::select(County, Total, deworm) %>%
+  distinct() %>%
+  mutate(County=str_to_title(County)) %>%
+  mutate(County=recode(County, "Elgeyo-Marakwet"="Elgeyo Marakwet", "Murang'a"="Muranga", "Taita/ Taveta"="Taita Taveta", "Tharaka-Nithi"="Tharaka Nithi")) #recoding the names that are different from the dataset above which contains the number of cases. To check if there are differences in the unique columns, you may use this code: setdiff(population$County, county_data$Name)
+
+
+# model dataset
+model_data <- combined_data1 %>%
+  full_join(population, by=c("county"="County")) %>%
+  mutate(total_dewormed=total_dewormed/deworm*100000, # calculate the coverage per 100,000
+         diarrhoea_cases=diarrhoea_cases/Total*100000, # calculate the incidence per 100,000
+         stunted=stunted/Total*100000, # calculate the incidence per 100,000
+         underweight=underweight/Total*100000)%>% # calculate the incidence per 100,000
+  mutate_at(vars(total_dewormed, diarrhoea_cases, stunted, underweight), round) # round off
+```
+
+Start with visualizing our data- we observe similar trends
+
+```{r, fig.width=16, fig.height=7}
+
+model_EDA <- model_data %>%
+  group_by(period)%>%
+  dplyr::summarise(avg_dewormed=mean(total_dewormed),
+           mean_diarrhoea= mean(diarrhoea_cases),
+            mean_stunted=mean(stunted),
+            mean_underweight=mean(underweight)) %>% # calculate the mean cases per year
+  mutate(across(contains("mean"), round)) %>% # round off the mean values to integers
+  pivot_longer(contains("mean"), names_to="cases", values_to="values") %>% # change the data to a long format
+  mutate(cases=recode(cases,"mean_diarrhoea"="Diarrhea", 
+        
+         "mean_stunted"="Stunted",
+         "mean_underweight"="Underweight")) %>%
+   ungroup() # always good practice to ungroup data
+
+
+ggplot(model_EDA, # plot the cases first, without the treatment data
+       aes(x=period))+geom_smooth(aes(y=values, color=cases))+geom_point(aes(y=values, color=cases))+ # plot for both the line and point graphs
+ theme_bw()+ # choose the theme
+  geom_smooth(aes(y=avg_dewormed/10), color="#a65628")+ # add the deworming data as a secondary axis
+  geom_point(aes(y=avg_dewormed/10), color="#a65628")+ # add the points to showcase the deworming data
+  scale_y_continuous(sec.axis=sec_axis(~.*10, name="Number of children <5 years who were dewormed"))+
+  theme(axis.title.y.right = element_text(color = "#a65628"))+ # add a secondary axis
+  scale_x_date(date_breaks = "3 months", date_labels= "%b-%Y")+ # change the date breaks to three months (x axis), and the labels
+  labs(x="Date (month-Year)", y="Number of syndromes or cases reported in children <5 years", color="")+# change the labels for the x and y axis, together with the legend title.
+  scale_color_brewer(palette = "Paired") # change the color palette
+
+```
+
+```{r,fig.width=16, fig.height=14}
+model_EDA2 <- model_data %>%
+  mutate(year=str_sub(period, 1,4)) %>%
+  group_by(year, county)%>%
+  dplyr::summarise(mean_dewormed=mean(total_dewormed),
+           mean_diarrhoea= mean(diarrhoea_cases),
+            mean_stunted=mean(stunted),
+            mean_underweight=mean(underweight)) %>% # calculate the mean cases per year
+  mutate(across(contains("mean"), round)) %>% # round off the mean values to integers
+  pivot_longer(contains("mean"), names_to="cases", values_to="values") %>% # change the data to a long format
+  mutate(cases=recode(cases,"mean_diarrhoea"="Diarrhea", 
+         "mean_dewormed"="Dewormed",
+         "mean_stunted"="Stunted",
+         "mean_underweight"="Underweight")) %>%
+  ungroup() # always good practice to ungroup data
+
+
+
+# Importing the shape file
+# To ensure your shapefile reads, download all the files in the shapefile data and store them in the same folder. If you only download the .shp file, the shapefile will not open.
+county_shapefile <- st_read("shapefiles/county.shp")
+
+# Combine the shapefile dataset with the daraframe containing county data using the uning the unique identifier among the two datasets which is the county name.
+county_data1 <- full_join(county_shapefile, model_EDA2, by=c("Name"="county")) 
+
+# Add breaks into the data
+library(classInt) # package for choosing breaks
+breaks <- classIntervals(county_data1$values, n=5, style = "quantile")
+
+breaks
+
+
+# we now add breaks to the data
+county_data1 <- county_data1%>%
+  mutate(values_brks=case_when(
+    (values<410)~ "< 410",
+    (values>409 & values<=1129) ~ "410 - 1129",
+    (values>1129 & values<=2052) ~ "1130 - 2052",
+    (values>2052 & values<=4920) ~ "2052 - 4920",
+    (values>4920) ~ ">4920"
+  ))
+
+# relevel the categories
+county_data1$values_brks <- fct_relevel(county_data1$values_brks, "< 432","432 - 1014", "1015 - 2254","2254 - 5877",">5877" )
+
+
+ggplot(county_data1, aes(fill=values_brks))+
+  geom_sf()+facet_grid(year~cases)+theme_void()+
+  scale_fill_brewer(palette="YlOrRd")+
+  labs(fill="Average number of children <5 years per 100,000")
+
+```
+
+We now go ahead to the statistical model. Our outcome variable is coverage of deworming. 
+We will need to check if the data is skewed. There are many ways to do this- in our case we will use a histogram
+
+```{r, message=F, fig.wigth=14, fig.height=8}
+
+ggplot(model_data, aes(total_dewormed))+
+  geom_histogram()+theme_bw()
+
+```
+
+We observe that our data is skewed. We will then use a negative binomial model.
+
+
+We first conduct univariable model analysis.
+
+```{r, message=F}
+library(pglm)
+model1a<-  pglm(total_dewormed~diarrhoea_cases, data=model_data, index=c("period", "county"), family=negbin,model="within")
+
+cbind(round(exp(model1a$estimate),5), round(exp(confint(model1a)),5))
+summary(model1a)
+```
+```{r, message=F}
+
+model1b<-  pglm(total_dewormed~stunted, data=model_data, index=c("period", "county"), family=negbin,model="within")
+
+cbind(round(exp(model1b$estimate),5), round(exp(confint(model1b)),5))
+summary(model1b)
+```
+
+```{r, message=F}
+
+model1c<-  pglm(total_dewormed~underweight, data=model_data, index=c("period", "county"), family=negbin,model="within")
+
+cbind(round(exp(model1c$estimate),5), round(exp(confint(model1c)),5))
+summary(model1c)
+```
+
+We observe that the confidence intervals of the results from the univariable models are between one, show the independent variables have a $P$ value of less than 0.2 hence we will include them all in the multivariable model.
+
+```{r, message=F}
+## multivariable model
+model1<-  pglm(total_dewormed~diarrhoea_cases+stunted+underweight, data=model_data, index=c("period", "county"), family=negbin,model="within")
+
+
+model1_results <- cbind(round(exp(model1$estimate),5), round(exp(confint(model1)),5)) 
+model1_results<- data.frame(model1_results)
+model1_results$names <- rownames(model1_results)
+names(model1_results) <- c("IRR", "low_ci", "high_ci", "names")
+
+# remove the results for the intercept
+model1_results1 <- model1_results%>%
+  filter(names!="(Intercept)") %>%
+  mutate(names=str_to_title(names))
+ggplot(model1_results1, aes(x=names, y=IRR))+
+  geom_errorbar(aes(ymin=low_ci, ymax=high_ci), size=1)+
+  coord_flip()+theme_bw()+geom_hline(yintercept = 1, linetype=2, color="red")+
+  labs(y="Incidence Rate Ratios", x="", color="")+
+  theme(text=element_text(size=16, face="bold"))+scale_color_brewer(palette="Set1")
+  
+
+```
+
+From these analysis, we may observe that the coverage of deworming was significantly associated (though weakly) with:
+- An increased risk in stunted cases per 100,000
+- A decreased risk in diarrhea cases per 100,000
+
+There is no association between deworming and the incidence of underweight in children.
+
+The result of an increased risk in stunting may be explained by the fact that these children may already be stunted by the time they are enrolled into the deworming program (as deworming starts from 2 years) and the effect of the intervention may not be seen in a short term period.
