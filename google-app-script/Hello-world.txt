@@ -1,0 +1,9 @@
+So in this first class i will show you how to print a hellow world from google appscript in your google sheet.
+first make sure you have lauched your appscript and type in the follwong code into the myfunction code in there
+
+var message = "HELLO WORLD";
+SpreadsheetApp.getUi().alert(message);
+
+after adding this execute.
+from your javascript you should remmember that this code creates a var named message and the ui reads it from the alert function.
+
