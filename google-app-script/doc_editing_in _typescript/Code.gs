@@ -16,3 +16,9 @@ function myFunction3(){
   const para = body.appendParagraph('HELLO NARUTO');
   Logger.log(doc);
 }
+function myFunction4(){
+  const id = '17cs6__YjeMF47HeVmTLtl_XMh9DYVpg4fF5BqrNIL1I';
+  const doc = DocumentApp.openById(id);
+  const body = doc.getBody();
+  const para = body.appendParagraph("HELLO THIS IS KAKAROT")
+}
