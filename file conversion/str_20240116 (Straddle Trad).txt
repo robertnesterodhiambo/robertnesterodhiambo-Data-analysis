@@ -1,0 +1,78 @@
+STRADDLE BUYING STATISTICS
+
+Column Headings:
+  Symb:    underlying symbol (futures begin with @; indices begin with $).
+  Price:   closing price of underlying.
+  Strad:   offering price of straddle.
+  50:      projected PCT price change in Strad if Symb's implied volatility returns
+               to its 50th percentile in 30 days.
+  Days:    time remaining in straddle's life.
+  %ile:    current percentile of Symbol's implied volatility.
+  Prob:    Monte Carlo probability of underlying EVER hitting breakevens at any
+               time during the straddle's life.
+  Visual:  two numbers: "actual"/"percent"
+            Actual is the frequency in actual history that Symb has moved a
+                   distance equal to the straddle price in Days time.
+            Percent is the frequency in actual history that Symb has moved by
+                   a percentage amount equal to Strad/Price in Days time.
+  Visual2: two numbers again; same interpretation as above, except now they
+             apply to moves of 1.2 times the initial Strad price.
+
+  20240116
+Symb   Price  Strad   50 Days  Strike       Vty %ile Prob   Visual   Visual*1.2
+AB     32.94   4.75   -5  132  35.00Jul    0.24   15  91%   98%/ 95%   92%/ 82% 
+AB     32.94   5.14    7  197  35.00Oct    0.24   15  94%  100%/ 99%   98%/ 91% 
+AEHR   17.29   7.40    1  112  17.50Jun    0.76   10  81%   92%/ 89%   86%/ 77% 
+AEHR   17.29   7.39   11  132  17.50Jul    0.76   10  86%   91%/ 95%   86%/ 83% 
+AEHR   17.29  10.20   -0  197  17.50Oct    0.76   10  75%   99%/ 92%   96%/ 85% 
+ALHC    7.34   2.90   -1  152   7.50Aug    0.62   18  86%   81%/ 80%   80%/ 77% 
+AMLP   43.13   2.46   93  132  43.00Jul    0.09   12  84%  100%/100%   97%/100% 
+AMZA   35.63   2.87   58  112  36.00Jun    0.13    7  78%   95%/ 97%   79%/ 89% 
+ANSS  327.42  41.97   28  112 330.00Jun    0.38    0  99%   90%/ 92%   79%/ 87% 
+APG    31.50   4.64   38  132  30.00Jul    0.29   18  90%   91%/100%   78%/100% 
+AXNX   68.34   5.10  311  132  67.50Jul    0.50    1 100%  100%/100%  100%/100% 
+BND    72.94   2.55   41  112  73.00Jun    0.06   17  77%   86%/ 86%   77%/ 76% 
+CCL    17.03   5.51   15  197  17.00Oct    0.46    9  84%   81%/ 99%   78%/ 88% 
+CPA    92.54  19.20   20  152  95.00Aug    0.29   20  77%   95%/100%   81%/ 95% 
+CR    113.39  13.70   56  112 115.00Jun    0.19   12  79%   94%/100%   84%/ 93% 
+DGRW   70.24   3.04   69   87  70.00May    0.09    9  81%   91%/ 93%   84%/ 87% 
+GATX  117.78  12.39   43  112 120.00Jun    0.17    9  78%   94%/ 95%   89%/ 93% 
+GREK   37.99   3.94   31  112  38.00Jun    0.22    8  93%   94%/100%   84%/100% 
+GXO    57.51  10.70   33  132  57.50Jul    0.28   10  78%   93%/ 94%   78%/ 89% 
+HSBC   37.95   3.30   30  112  38.00Jun    0.19    8  93%   96%/ 97%   88%/ 91% 
+HTGC   16.95   1.75   21  132  17.00Jul    0.19   18  91%  100%/100%  100%/100% 
+IGIB   51.55   2.05   21  132  52.00Jul    0.07    9  87%   85%/ 86%   79%/ 79% 
+JEPI   55.16   1.49   38  112  55.00Jun    0.05    6  88%   98%/ 98%   96%/ 96% 
+JEPI   55.16   1.59   45  132  55.00Jul    0.05    6  90%  100%/100%   98%/ 99% 
+JNPR   37.35   1.40  289  132  37.00Jul    0.37    0 100%  100%/100%  100%/100% 
+MANU   21.20   2.30   72  112  21.00Jun    0.21    0  86%   98%/100%   89%/100% 
+MT     26.15   3.89   29  112  26.00Jun    0.29   11  89%   94%/ 93%   84%/ 79% 
+NVDS   24.59   7.29   -7  112  25.00Jun    0.48   11  78%   99%/ 86%   97%/ 81% 
+OPRX   14.88   4.85   -7  112  15.00Jun    0.63   15  88%   99%/ 96%   90%/ 77% 
+PD     26.10   5.69   51  152  25.00Aug    0.46    8  97%   95%/ 97%   87%/ 87% 
+PRFT   66.49  13.80    9  132  65.00Jul    0.33    7  82%   92%/ 85%   82%/ 75% 
+PRFT   66.49  18.20    9  217  65.00Nov    0.33    7  79%   99%/ 97%   96%/ 80% 
+RELL   10.09   2.75   -6  112  10.00Jun    0.56   10  91%  100%/ 93%   96%/ 80% 
+RICK   62.69  14.20   35  152  65.00Aug    0.31   18  78%   97%/ 90%   89%/ 82% 
+SAR    23.15   2.15   -4   87  22.50May    0.24    1  94%   98%/ 96%   94%/ 88% 
+SAR    23.15   2.90   -1  152  22.50Aug    0.24    1  93%  100%/ 95%   91%/ 80% 
+SG     10.15   3.65   10  132  10.00Jul    0.62   17  85%   99%/ 97%   96%/ 90% 
+SGRY   31.72   8.61   15  112  30.00Jun    0.53   15  88%   96%/ 95%   84%/ 83% 
+SIBN   18.81   5.19   21  132  20.00Jul    0.43    6  85%   95%/100%   80%/ 90% 
+SOXS    6.08   2.21    7   87   6.00May    0.76   17  84%  100%/ 92%   99%/ 81% 
+SPLG   55.88   3.23   64  112  56.00Jun    0.11   16  88%   93%/ 96%   86%/ 91% 
+SPLG   55.88   4.38   59  177  56.00Sep    0.11   16  81%   97%/100%   87%/ 99% 
+SPTL   27.98   1.95    4   87  28.00May    0.14   19  86%   90%/ 84%   81%/ 76% 
+TBF    23.11   2.15   -3  112  23.00Jun    0.18    5  90%   79%/ 80%   76%/ 77% 
+TBT    33.01   5.30    5  112  33.00Jun    0.31   15  89%   82%/ 86%   79%/ 79% 
+TBT    33.01   5.84   14  152  33.00Aug    0.31   15  91%   91%/ 92%   87%/ 87% 
+TDCX    6.50   2.04   35  132   7.50Jul    0.71    0  99%  100%/100%  100%/ 95% 
+WFG    85.10  12.10    9   87  85.00May    0.33   15  91%   90%/ 96%   75%/ 83% 
+X      47.23   4.22  181  112  47.00Jun    0.42    0 100%  100%/100%  100%/100% 
+YY     30.32   6.10   20   87  30.00May    0.38    4  79%   92%/ 91%   79%/ 76% 
+YY     30.32   8.20   25  152  30.00Aug    0.38    4  76%   95%/ 94%   84%/ 79% 
+-----------
+@LCZ  181.68  16.58    0  232 182.00  0.17   48  99%   93%/ 97%   77%/ 94% 
+@WZ   632.80 116.75   17  222 630.00  0.32   13  98%  100%/100%  100%/ 94% 
+JEPI   55.16   1.49   38  112  55.00Jun    0.05    6  91%   98%/ 98%   96%/ 96% 
+JEPI   55.16   1.59   45  132  55.00Jul    0.05    6  91%  100%/100%   98%/ 99% 
