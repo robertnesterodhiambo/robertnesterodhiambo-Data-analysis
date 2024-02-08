@@ -1,0 +1,13 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+# install.packages("devtools")
+#devtools::install_github("dashee87/footballR")
+library("footballR")
+```
+
