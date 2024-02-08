@@ -11,3 +11,22 @@ output:
 library("footballR")
 ```
 
+
+```{r}
+footballR::fdo_leagueCodes
+```
+
+
+```{r}
+# Install and load the football package
+install.packages("football")
+library(football)
+
+# Get match data for a specific league and season
+matches <- football::get_match_data(competition = "Premier League", season = 2021)
+
+# View the first few rows of the match data
+head(matches)
+
+```
+
