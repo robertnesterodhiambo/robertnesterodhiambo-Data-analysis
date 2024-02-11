@@ -1,32 +1,40 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
+#   *Outlier*
+
+Step 1: Sort the data in ascending order:
+40, 40, 40, 45, 45, 45, 50, 50, 50, 55, 55, 60, 60, 65, 65, 70, 70, 85, 90, 120
+
+Step 2: Calculate the first quartile (Q1):
+Since we have 20 data points, Q1 is the median of the first half of the sorted data.
+
+Q1 = Median of (40, 40, 40, 45, 45, 45, 50, 50, 50, 55) = 45
+
+Step 3: Calculate the third quartile (Q3):
+Similarly, Q3 is the median of the second half of the sorted data.
+
+Q3 = Median of (60, 60, 65, 65, 70, 70, 85, 90, 120) = 70
+
+Step 4: Calculate the interquartile range (IQR):
+IQR = Q3 - Q1 = 70 - 45 = 25
+
+Step 5: Determine the lower and upper bounds for outliers:
+Lower bound = Q1 - 1.5 * IQR
+Upper bound = Q3 + 1.5 * IQR
+
+Lower bound = 45 - 1.5 * 25 = 45 - 37.5 = 7.5
+Upper bound = 70 + 1.5 * 25 = 70 + 37.5 = 107.5
+
+Step 6: Identify any values that fall outside these bounds:
+From the sorted data, we see that 120 is the only value greater than the upper bound of 107.5.
+
+Therefore, the outlier in the sample is 120. All other values fall within the bounds and are not considered outliers.
 
 
-```{r}
-# install.packages("devtools")
-#devtools::install_github("dashee87/footballR")
-library("footballR")
-```
+```{r, echo=FALSE}
+# Sample data
+sample_data <- c(70, 45, 60, 50, 65, 40, 90, 55, 40, 50, 85, 40, 50, 65, 45, 60, 55, 45, 120, 70)
 
-
-```{r}
-footballR::fdo_leagueCodes
-```
-
-
-```{r}
-# Install and load the football package
-install.packages("football")
-library(football)
-
-# Get match data for a specific league and season
-matches <- football::get_match_data(competition = "Premier League", season = 2021)
-
-# View the first few rows of the match data
-head(matches)
+# Create a boxplot
+boxplot(sample_data, main="Boxplot of Sample Data", ylab="Values", col="skyblue", border="black")
 
 ```
 
