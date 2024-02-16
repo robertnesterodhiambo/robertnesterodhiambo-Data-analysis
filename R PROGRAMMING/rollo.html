@@ -352,28 +352,119 @@ display: none;
 </div>
 
 
-<div id="outlier" class="section level1">
-<h1><em>Outlier</em></h1>
-<p>Step 1: Sort the data in ascending order: 40, 40, 40, 45, 45, 45, 50,
-50, 50, 55, 55, 60, 60, 65, 65, 70, 70, 85, 90, 120</p>
-<p>Step 2: Calculate the first quartile (Q1): Since we have 20 data
-points, Q1 is the median of the first half of the sorted data.</p>
-<p>Q1 = Median of (40, 40, 40, 45, 45, 45, 50, 50, 50, 55) = 45</p>
-<p>Step 3: Calculate the third quartile (Q3): Similarly, Q3 is the
-median of the second half of the sorted data.</p>
-<p>Q3 = Median of (60, 60, 65, 65, 70, 70, 85, 90, 120) = 70</p>
-<p>Step 4: Calculate the interquartile range (IQR): IQR = Q3 - Q1 = 70 -
-45 = 25</p>
-<p>Step 5: Determine the lower and upper bounds for outliers: Lower
-bound = Q1 - 1.5 * IQR Upper bound = Q3 + 1.5 * IQR</p>
-<p>Lower bound = 45 - 1.5 * 25 = 45 - 37.5 = 7.5 Upper bound = 70 + 1.5
-* 25 = 70 + 37.5 = 107.5</p>
-<p>Step 6: Identify any values that fall outside these bounds: From the
-sorted data, we see that 120 is the only value greater than the upper
-bound of 107.5.</p>
-<p>Therefore, the outlier in the sample is 120. All other values fall
-within the bounds and are not considered outliers.</p>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAAA3lBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZpAAZrY6AAA6OgA6Ojo6OmY6ZmY6ZpA6ZrY6kLY6kNtmAABmADpmOgBmOjpmZjpmZmZmZpBmkLZmkNtmtrZmtttmtv+HzuuQOgCQZgCQZjqQZmaQZraQkGaQkJCQkLaQkNuQtraQttuQtv+Q2/+2ZgC2Zjq2kDq2kGa2tpC2tra2ttu225C227a229u22/+2///bkDrbkGbbtmbbtpDbtrbb25Db27bb29vb2//b/7bb/9vb////tmb/25D/27b/29v//7b//9v///9ueO5oAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3dcWMTx7rYYTmBYiDkQsl1OIVS0vY03EDAaUkIcOy0GIL0/b9QtZJsr7SymH09I83az/PHITjyWvJ59xetdjUaTQAIGe36DgAMlYACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgF47n/ZHbd/e/efHjFv/8mC6zb1fvnazd//osc3xq9vNRu/+r84dPXp2Z/4YHv3V6172kPiAGift3+venR9/T/mmXr8JaiOg185KQJt9/XG+rSf15v3D0f30TZ7d4ZsrAX3XfiT3knLVXzSgjRtfvU/9fhNUR0CvnW5ARxl34oTefH7W6yfOtjhza/lfvFz5z0BS5Hq7TEBHo83/aer5m6A+AnrtrAtovvgk9OZFv2SfZ2n5e96uPohv/ojd5c0uF9DRk03f0PM3QX0E9NqZBfSsCH+/XPfkLi5/QN+eFn7c/UGjbx83L34ePcz7IDo/p0dAFxk/nr1u+5XvFNDBE9BrZzmgi70427O3QgFdfflzuVaTcd4H0RYM6OT0KfKmqgvo4AnotbMa0NW/X87WArq8lfnrEhuPl4PiAZ3fxU3fKqCDJ6DXztqAtnb7o2fNwee3954v/j4/Vl58w9uzFyPfzos1v8To7umNO71Z3Vr7dcI1vdt08+Xnci+WvjR+2m7R369mVzft3X30sXXr6b0az/7F4t6+/2H6z3fObpL2gI6e7c++a91lU6sBnVf9ojvV/U107za1E9BrZzWgJ0vP8D49PNurbzxv3WB+i3kSZv84783ZlUSnV+ws96a7tY0B3XzzNQEd/du61Px5fpps7x/nt9775c/WBVGfT3/W6Z1NeUCfn55t+fvuT14N6Lzqi19t5051fhNr7ja1E9BrZ+1roKdPk5ZPbd9v3aL5y7wI8++d3fLg/LaLLS71Zs3WNgX0KzdfDuji3+x1r/9c9xhmAb1z/tWb/zqv1SJ5CQ9o6QKGr7wse/aLm3+he6dWfxNrf/VUTkCvneWAHj1t7/WrF+LMd+Px6W1OWl+84Cqidm/WbW1DQL928+WAnl8eOrr7z/YB9cplWvO79WL13nYf5dcfUOtHdu/PZE1Azy4gWHenVn4Ta+82tRPQa2fNdaDftA9XR3vNS3DzQ9mlZ1635v968cxr0ZvmUHtxNHz/bBPt3nS3dsGpk4tufsFJpJU3Tp6/KDnbfHMAPr9b860sAvr9X5Pxr4tvufHm9AfNN/71BzQ/KfT442T88jR73XvULt/J2c3W3qml38T6W1A5Ab12ugH9T+1TLUuHrsu1vN3es+dfmv/78fnT2E5vulu7IKAX3fyigK4+ZVy8KNm6A61T82evQpz9c2vj7YPsDQ+o/eR6duPVp6AXB3T9nWr/Ji64BZUT0GtnzTPQxRmbebZO03bSCtr4/OTJ8qulT1rbXKnMhVtbH9ALb35hQNvnnGbpmj+PHn/46c6t1ibPA9p+sXNxz1vN++oDOmlFc/bV1cPsDc9A196ppd/E+ltQOQG9dta9lbN1xuYsAEtXBnUX9HjbvvH5bVd6s25r6wN64c0vDmhzUdFSQVeCthrQ9tPpxW1bLwh/9QEt5e7pqHuYvSGga+/Uxv+UCOggCOi1s3QSaXz8av9sL19J1dKVlovj5fNmLN/4Rbc3F25tfTYuvPmmgE4d/Y/by/8ZWBif/ovzgC4eS7tzqwHd8IBaz8JPrTsLtjGgy3dq3W9i5RZUTkCvnbUX0s/KsfLC3tJfF/m4v/7fngdqJaDrtrYhoOtu/pWANt4/mwft9FafX/1w/jR7fUAXN10N6IYHtCagKw9iw1n4tXdq9Tex5hZUTkCvnc5bN892800BXRzDrzwDrSSgp1e4z+/du+XXKHYd0PkX1t2p5d/E2ltQOQG9djoBPTvQ3HAIf1aP5ddAd3gIf/z6p9ut0+Dnj2qxTOidH3/7vyuvgSYE9KuH8JsucN/wTqS1d2rpN7H+FlROQK+diwO67jzOYj8+v2Ro6Sx835NI5zFLOon05OwHdQK6uvzS2c+dn79/fva1fgFNPYm01sXvhV9/p9pbvOAWVE5Ar531h/BnVyuuvYypdeZ++TrQnV3G1H5T1Nnfm3itXlvZL6CbHtBXX0tYDej5S6Dr71T7yxfcgsoJ6LWzGtD5/jrb77vXss+bs7iu/H+33rez6M382svWserGC+nnW0u+kP7W+Q/qdGtpjajWlfftA+1WEpMDuuEBtRdXOtn77tGbtVE/D+i70ekPveBOtX4TF92CygnotbMc0PH71mru80Rc8G7K6S59vpjd+XVNjy985+NFW5tfk/n75Oiv7v1Kfyvn4uffezNp1oE7uxZrsd7J47O19nsGdNMDmr+F6ftppf/cX3en2gEdLy5RnX3nBXeq9Zu46BZUTkCvnbUX0i+V8tyT1nfcWrMaU9s8J533O3a2dv7llWehm27eDeiak+K31m2ldfF+UkA3PKDV39za98KvfRDr71T7N3HBLaicgF47awN62oJ1a6q13hi+uh7ojfM3UyYuZ9e+A6uNWH/zi156/LL8Rs6l4C3caX7S+Zn/hIBufkAnS7+69efBli1us/5OtX8TF9yCygnotbMmoK0Phn/fWtN4kcH2QhwrK9Lf/H/PTm+8dkHlNVubnH8ecacRa29+4bmb8av2Izlbg/jsHfJ7j8/fsZ58GdPmB/S51dfuJxZv+Fz4tXdq6TdxwS2om4BeOysB3bvz3fOlOn3+af6pGm8Wf28tSH924Ny6aHT2wRgXf6TH6tZmZt/z7XfPJx1rbr7p5Pf7Z/NFku/82NrW+F3zxW+bF1PPztL0uA508wOaf+bI3t3na+7Q8gJ7d5c+9mPdnVr+TVxwC6omoMQkvUFoSK7cA2ILBJSYK9ebK/eA2AIBJebK9ebKPSC2QECJuXK9uXIPiC0QUGKuXG+u3ANiCwSUmCvXmyv3gNgCASXmyvXmyj0gtkBAiblyvblyD4gtEFCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgqHtDx8YfDw8Pfjj+W/kEAW1Y2oEfPRufuvSn6swC2rGRAPz8cLbvxS8GfBrBlBQN6st9E887B3O3mL3tP+m1iBJBN9sqVC+iXB9NgPm994f00qN/80WcTu/5tA1dL5soVDOjbTi6bpN7vs4kC/8EArq0BBXT8dDRaPWA/GY1u9jkbL6BAPgMK6PTpZud4fd3XNhFQIB8BBQgaUECnh/B7q1ctOYQHdmdAAZ286NSyeVn0Vp9NCCiQz5AC+ml/WtDfW1/4PO1n50npRgIK5DOkgDbXMU2LefDzYeP1/Er6XlcxCSiQ0aACOnm3v3IR697jfhsQUCCfYQV0Mn7VTujeo74rMgkokM/AAjo1Pjp8dXBw8OjwTWA9OwEF8hleQC9FQIF8BBQgSEABggYW0PGrH+5898/zFz+9lZP8Si1UxtUzrID+ub9y9l1Aya7cUo9cOYMK6NuzyT59S6eAkttZOBWUrxpSQJu3ct54fnz8svlznk0BJbNWNk0LXzOkgL49febZfLbcvKACSmbtETEufMWAAtpakb75x1lLBZTMBJQeBhTQdixP17HbHNBtfAQUV4yA0sNAA3r6cXICSmYCSg9DDWhzRmnvF4fw5Cag9DCggK58KufJaPTN7wJKZgJKDwMKaHMW/tbyX7/5PwJKXi5joochBbS5DvTeX+d/fzF7UVNAycqF9KQbUkBn70Rq9/KlgJKfM44kG1RAm4/0WOpl8xEfAkpm+kmqYQV0Mn7/49I69OOX+wIK7MjAAnpZAgrkI6AAQQIKECSgAEECChAkoABBAgoQNKCANivYreE6UGBHBBQgaEABnX0UkoAC1RhSQGcrgt6/1BYEFMhnUAFdXVO5PwEF8hlWQHt/hMcqAQXyGVhAmw/yuMxBvIAC+QwtoNOD+Ms8BRVQIJ+hBXTy6eDgP+LfLaBAPoML6OUIKJCPgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKEDQAAM6Pv5weHj42/HHwPcKKJDP0AJ69Gx07t6bvt8uoEA+wwro54ejZTd+6bcBAQXyGVRAT/abaN45mLvd/GXvSa8tCCiQz5AC+uXBNJjPW194Pw3qN3/02YSAAvkMKaBvO7lsknq/zyYEFMhnQAEdPx2NVg/YT0ajm33OxgsokM+AAjp9utk5Xl/3tU0EFMhHQAGCBhTQ6SH83upVSw7hgd0ZUEAnLzq1bF4WvdVnEwIK5DOkgH7anxb099YXPk/72XlSupGAAvkMKaDNdUzTYh78fNh4Pb+SvtdVTAIKZDSogE7e7a+8lXPvcb8NCCiQz7ACOhm/aid071HfFZkEFMhnYAGdGh8dvjo4OHh0+Cawnp2AAvkML6CXIqBAPgIKEDTAgFqRHqjD0AJqRXqgGsMKqBXpgYoMKqBWpAdqMqSAWpEeqMqQAmpFeqAqAwqoFemBugwooP0XVB6tUereAdePgAIEDSigVqQH6jKggFqRHqjLkAJqRXqgKkMKqBXpgaoMKqBWpAdqMqyAWpEeqMjAAjqxIj1QjeEF9FIEFMhHQAGCBBQgSEABggQUIEhAAYIEFCBoQAFtlp9fo9dneggokI+AAgQNKKDdDzUWUGCXhhTQ2fKf/VZfWiWgQD6DCujaz5XrRUCBfIYV0K98BtLXCSiQz8AC2nwI0mUO4gUUyGdoAZ0exF/mKaiAAvkMLaCTTwcH/xH/bgEF8hlcQC9HQIF8BBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggSUgRldJbv+ZXJJAsqw7Dp5ee36t8klCSh0GRSSCCh0GRSSCCh0GRSSCCh0GRSSCCh0GRSSCCh0GRSSCCh0GRSSCCh0GRSSCChAkIACBAkoQJCAAgQJKECQgAIECShAkIBCl0EhiYBCl0EhiYBCl0EhiYBCl0EhiYBCl0EhiYBCl0EhyXYD+m5/NLr3e+6f2IP9giQGhSRbCuj7h9/8MZm8nX2S694vuX9kOvsFSQwKSbYT0Gk5pwH9tD//LOympTtivyCJQSHJVgLalHNazVlGx09Ho/u5f2Yy+wWQz1YCOi3nzY+TJp23JpOT2f/uiIAC+WwjoNNyNq97Ns9Dn0wmXx7s8BheQIF8thHQRTLfzs8fCShwRWwxoC/mp48EFLgithfQxUugzZH8zY+5f2gqAQXy2dJroKMnpy+BNk9EnUQCroJtnYW/8ea/zY7gx7+O5h3dDQEliUEhyVYCOj2Gn7k//6fdPQG1X5DGoJBkO+9Emr8H6ebHWUC/39kroPYLEhkUkmzpvfDj9wc/vpn++eU/33uT+wf2Yb8giUEhieXsoMugkERAocugkGR7Af378PC3j5PxX7l/Xi/2C5IYFJJsK6Dvbs/Xsfvy4IYFlameQSHJlgL68nQh0C8PLKhM/QwKSba2oPLoxv/cX7yhc3fv5LRfABltbUHlx9Mnn80iIvP3de6KgAL5bCWg87e/zwNqQWXgqtjigsqLgFqNCbgitrge6CKg1gMFrggBBQhyCA8QtK2TSPfPAvrWSSSqZ1BIspWAniyuoW8CemJBZepnUEiylYA2137uPW8COluQ3oX01M6gkGQ770Q6XZJ+xls5qZ5BIcm2FlR+etZPi4lQP4NCkq0tZ/f5WbMe016GBenHxx8ODw9/O468EGC/IIlBIcnQFlQ+etZ6MaB/je0XJDEoJBlWQD8/HC270fP1VPsFSQwKSQYV0JPZh3veOZi7PTsj1e+SKPsFSQwKSbbyTqSfDpb9GLuOqTmXv/e89YX3+6Oebwu1XwD5bOm98MuC74V/2/nOZsv3e905AQWyGVBA1y3FfNLzsnwBBfLZymugfx+fev1stPf4OPbJnOuWceq7tJOAAvls/STSp/3R49iGBRSoy/bPwr+NvpdzsSreEofwwO5sP6DTp6DB5exedGrZvCzaa2MCCuSz/YDGV6RvPtzzZvud9J+f9l2aREBJYlBIspNnoNGP9Hg7u3T+4OfDxuv5lfS9rmKyX5DGoJBkF6+BxhcEfbe/ckHUXs8TUvYLkhgUkmw5oOPjZkXl+Ed6jF+1E7r3qG+J7RckMSgk2cWF9JdbUXl8dPjq4ODg0eGbwPNY+wVJDApJdhDQvofdl7gra2zrZzNoBoUkWwnoD3fO3X0Uex9S6K4IKDEGhSSDWs5uyfjot/4ptl+QxKCQZGgB/XB4OLsSdL608t4/en67/YIkBoUkwwro/DKmmx8XSyuPel8RZb8A8hlUQN8uqnlrtrTyfE36fpdECSiQT9mAdlYCvcx6oLO3ct74+fX04P3fF+9Aaora6zM9BBTIZ0gBXSwmMvuM+VtnX7KYCLAjhQPavoCpdSnT5VakPzm/Fn/6pNRydsCODOg10LNlnFrrOVlQGdgdAQUIGlBAz1aknx63O4SnKINCkp0E9Di2nN3pGaPpn6fLgL51EokSDApJthTQ8euDU3duR8/Cn0zD+f3x8cvR6M75c1GXMVGAQSHJdgJ6sp/jMqbZU8/Z24/+Nd3evcPDZ73fimS/IIlBIclWAvppZSH5e8EV6ccv5+vh/XL2nqS+LbZfkMSgkGQrAW1yd+/1g9Hef3n1cNq/Xgfdy45+unN3tgz9n/uhFNsvSGJQSLKNgDZXwN+fHYA/udxHIi1t9MNPBz/3Xs/OfkESg0KSLa1I35zzeTvL6Nn7iXbCfkESg0KSLQW0eanyZH7J0cllPlTusuwXJDEoJNliQBcXvU//luUYPsR+AeSzpddAm4Auytn33ZdZCSiQz1bOwr+YvQZ63lEBBa6CbV3G1LzsOT8Nf5LpNHyIgAL5bCWgzbrKzQcZjUbfvPnXAyeRgKthS2/lnL1laLaU/Oh8NeQdEFAgny0tJvL+4ezlz/lnET/O/SPTCSiQz5aXs3t/cPCo99uHMhJQkhgUkhQO6C5juY79giQGhSSlP5XzxvPc278U+wVJDApJyn+s8d73FT0NtV+QxKCQZCufC//t451d+LnCfkESg0KS0ieRjn5YrKH8e+6fE2K/IIlBIUn5s/Djd7freRpqvyCJQSHJVi5j+vvlfiVPQ+0XJDEoJNnWdaCLQ/ldPw21X5DEoJBkexfSnx7K33uT+yf2YL8A8tnqO5EWh/J7j6zGBFwBW34r5+To2SU+F/7yBBTIZ9sBnYxf3RZQ4ErYbkDH72frMQkocBVsM6DvF2fid/cSqIACGW0toLMXP3d+LaiAAvlsJ6Cfn82vpN/52kwCShKDQpItBPTvV/N61rAsk/2CJAaFJKUD2px0n7m7y+vnz9gvSGJQSFI2oGcfI7fD80ZL7BckMSgk2cZ6oLtfQ+SM/YIkBoUkxQN643klTz5n7BckMSgkKRzQ/77780ZL7BckMSgk2fpbOXfLfkESg0ISAYUug0ISAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElDoMigkEVDoMigkEVDoMigkEVDoMigkEVDoMigkEVDoMigkEVDoMigkEVDoMigkEVDoMigkEVCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAGFLoNCEgGFLoNCEgGFLoNCEgGFLoNCEgGFLoNCEgGFLoNCEgGFLoNCEgGFLoNCEgGFLoNCEgEFCBJQgCABBQgSUIAgASWXEZXa9WRcYQJKJruuBBfb9WxcXQJKJqPRf6VKpr4cASUTAa2VqS9HQMlEQGtl6ssRUDIR0FqZ+nIElEwEtFamvhwBJRMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTAS0Vqa+HAElEwGtlakvR0DJREBrZerLEVAyEdBamfpyBJRMBLRWpr4cASUTAa2VqS9HQMlEQGtl6ssRUDIR0FqZ+nIElEwEtFamvhwBJRMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTAS0Vqa+HAElEwGtlakvR0DJREBrZerLEVAyEdBamfpyBJRMBLRWpr4cASUTAa2VqS9HQMlEQGtl6ssRUDIR0FqZ+nIElEwEtFamvhwBJRMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTAS0Vqa+HAElEwGtlakvR0DJREBrZerLGWBAx8cfDg8Pfzv+GPheo1SOgNbK1JcztIAePRudu/em77cbpXIEtFamvpxhBfTzw9GyG7/024BRKkdAa2XqyxlUQE/2m2jeOZi73fxl70mvLRilcgS0Vqa+nCEF9MuDaTCft77wfhrUb/7oswmjVI6A1srUlzOkgL7t5LJJ6v0+mzBK5QhorUx9OQMK6PjpaLR6wH4yGt3sczbeKJUjoLUy9eUMKKDTp5ud4/V1X9vEKJUjoLUy9eUIKJkIaK1MfTkDCuj0EH5v9aolh/D1ENBamfpyBhTQyYtOLZuXRW/12YRRKkdAa2XqyxlSQD/tTwv6e+sLn6f97Dwp3cgolSOgtTL15QwpoM11TNNiHvx82Hg9v5K+11VMAlqQgNbK1JczqIBO3u2vvJVz73G/DRilcgS0Vqa+nGEFdDJ+1U7o3qO+KzIZpXIEtFamvpyBBXRqfHT46uDg4NHhm8B6dkapHAGtlakvZ3gB7WG0xq7v09UloLUy9eUIKJkIaK1MfTmDDejfHyLH8EapHAGtlakvZ2ABPfph9s7N03NJN55/9TuWGaVyBLRWpr6cQQV0/Gy+oF3zBqSF7/s9CzVK5QhorUx9OUMK6Kyb04DO/tw7ODhonob2eiengBYkoLUy9eUMKaAn017+28f5n7M3II1/9VbOeghorUx9OUMK6ItFN1+cP+98YTGRaghorUx9OQMK6JcH86ebp382Pu1bzq4WAlorU1/OsAI6OwXfXkTZgsr1ENBamfpyBhjQ8VMBrZGA1srUlzOggJ59qNyL80N4K9LXQ0BrZerLGVBAzz7W+NP+6Zmjpqk+1rgSAlorU1/OkALafAr8jWZF+renlzG9dBlTPQS0Vqa+nCEFdHLSXDl/9+fj41+nJX30+tm+FekrIqC1MvXlDCqgs09FWtavnwJakIDWytSXM6yArqxIbzGRmghorUx9OQML6NTfrw9+uDN198efLWdXEwGtlakvZ3gBvRSjVI6A1srUlyOgZCKgtTL15QgomQhorUx9OQJKJgJaK1NfjoCSiYDWytSXI6BkIqC1MvXlCCiZCGitTH05AkomAlorU1+OgJKJgNbK1JcjoGQioLUy9eUIKJkIaK1MfTkCSiYCWitTX46AkomA1srUlyOgZCKgtTL15QgomQhorUx9OQJKJqsfFkA9dj0bV5eAksmuI8HFdj0bV5eAksmuI8HFdj0bV5eAksmuI8HFdj0bV5eAksmuI8HFdj0bV5eAksmuI8HFdj0bV5eAkonLmGpl6ssRUDIR0FqZ+nIElEwEtFamvhwBJRMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTAS0Vqa+HAElEwGtlakvR0DJREBrZerLEVAyEdBamfpyBJRMBLRWpr4cASUTAa2VqS9HQMlEQGtl6ssRUDIR0FqZ+nIElEwEtFamvhwBJRMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTAS0Vqa+HAElEwGtlakvR0DJREBrZerLEVAyEdBamfpyBJRMBLRWpr4cASUTAa2VqS9HQMlEQGtl6ssRUDIR0FqZ+nIElEwEtFamvhwBJRMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTAS0Vqa+HAElEwGtlakvR0DJREBrZerLEVAyEdBamfpyBJRMBLRWpr4cASUTAa2VqS9HQMlEQGtl6ssRUDIR0FqZ+nIElEwEtFamvhwBJRMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTAS0Vqa+HAElEwGtlakvR0DJREBrZerLEVAyEdBamfpyBJRMBLRWpr4cASUTAa2VqS9HQMlEQGtl6ssRUDIR0FqZ+nIElEwEtFamvhwBJc7NCzMAAAXySURBVBMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTAS0Vqa+HAElEwGtlakvR0DJREBrZerLEVAyEdBamfpyBJRMBLRWpr4cASUTAa2VqS9HQMlEQGtl6ssRUDIR0FqZ+nIElEwEtFamvhwBJRMBrZWpL0dAyURAa2XqyxFQMhHQWpn6cgSUTEZUa9ezcXUJKJnsOhJcbNezcXUJKHQZFJIIKHQZFJIIKHQZFJIIKECQgAIECShAkIACBAkoQJCAAgQJKECQgEKXQSGJgEKXQSGJgEKXQSGJgEKXQSGJgEKXQSGJgEKXQSGJgEKXQSHJAAM6Pv5weHj42/HHwPfaL0hiUEgytIAePWt9UMG9N32/3X5BEoNCkmEF9PPDlc96ufFLvw3YL4B8BhXQk/0mmncO5m43f9l70msLAgrkM6SAfnkwDebz1hfeT4P6zR99NiGgQD5DCujbTi6bpN7vswkBBfIZUEDHT0ej1QP2k9HoZp+z8QIK5DOggE6fbnaO19d9bRMBBfIRUICgAQV0egi/t3rVkkN4ijAoJBlQQCcvOrVsXha91WcT9guSGBSSDCmgn/anBf299YXP0352npRuZL8giUEhyZAC2lzHNC3mwc+HjdfzK+l7XcVkvyCNQSHJoAI6ebe/8lbOvcf9NmC/IIlBIcmwAjoZv2ondO9R3xWZ7BckMSgkGVhAp8ZHh68ODg4eHb4JrGdnvyCJQSHJ8ALaw2iNXd8nLmvd/6uDtetfJpckoAzLthNX1q5/m1zScAM6/nD4W++DeBML5DPcgPZ9F+eMgAL5CChA0JAC+vdx29E0oG+mf/7VZxMCCuQzoIA2qyevYTUmYEcEFCBoQAGdvZFz7+DUv++P9r6b/vmj5eyA3RhSQGerL904XY7JSSRgxwYV0Mnkz+nTzn/M/1FAgR0bWEAnnx+ergkqoMCODS2gk/Gvi0XsBBTYscEFdDL5NH0Seu+jgAK7NsCATsYvp09CnwsosGNDDOj8gqbv9gUU2KlhBnR2QVPPa+hnBBTIZ6ABnV3QJKDATg02oJPPP/V7E9KMgAL5DDegIQIK5COgAEECChAkoABB1y6gAPlkb1TuDea06182cLVkb1TuDQJcFwIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEH/H++MHWgGEkvnAAAAAElFTkSuQmCC" width="672" /></p>
+<div id="question3" class="section level1">
+<h1>question3</h1>
+<ol style="list-style-type: decimal">
+<li><p><code>clear all</code>: This command clears all existing data and
+variable definitions from memory. It essentially resets Stata to an
+empty state, removing any previously loaded datasets and variables. It
+ensures that the workspace is clean before proceeding with any new
+analyses.</p></li>
+<li><p><code>capture log close</code>: This command captures any output
+generated during the current session and writes it to a log file. The
+<code>capture</code> prefix suppresses any error messages that may occur
+if the log file is already open. The <code>log close</code> part of the
+command closes the log file, finalizing the logging process. Logging
+output is helpful for documenting analyses and keeping a record of
+commands and results.</p></li>
+<li><p><code>cd</code>: This command changes the current working
+directory in Stata. The working directory is the location where Stata
+looks for files, including datasets and log files. By using the
+<code>cd</code> command, you can specify a new working directory to
+ensure that Stata accesses files from the correct location.</p></li>
+<li><p><code>log using</code>: This command starts a new log file and
+directs all subsequent output to that file. It allows you to capture and
+save the results of your Stata session, including commands and output,
+for later reference or reporting. The <code>using</code> option
+specifies the name of the log file to create or append to.</p></li>
+<li><p><code>import excel</code>: This command imports data from an
+Excel spreadsheet into Stata. It allows you to read data from Excel
+files and convert it into Stata format for analysis. You can specify
+various options such as sheet names, cell ranges, and variable names to
+customize the import process according to the structure of your Excel
+data.</p></li>
+</ol>
+</div>
+<div id="question-5-ii" class="section level1">
+<h1>question 5 (ii)</h1>
+<p>// Load dataset from Stata format use “WorldBankData.dta”, clear</p>
+<div id="question-6" class="section level2">
+<h2>question 6</h2>
+<p>di “Number of observations: `obs_count’” Number of observations:
+217</p>
+</div>
+<div id="ii-what-is-the-unique-identifier-for-this-data" class="section level2">
+<h2>(ii) What is the unique identifier for this data?</h2>
+<p>Unique identifier: 201821.5831.18922812060.6997.560e+106.1601772</p>
+</div>
+<div id="iii-how-many-variables-are-there-in-the-data" class="section level2">
+<h2>(iii) How many variables are there in the data?</h2>
+<p>Number of variables: 217</p>
+</div>
+<div id="iv-how-many-string-variables-are-all-of-these-string-variables-categorical-discuss." class="section level2">
+<h2>(iv) How many string variables? Are all of these string variables
+categorical? Discuss.</h2>
+<p>Number of string variables: 0</p>
+</div>
+</div>
+<div id="question-7" class="section level1">
+<h1>question 7</h1>
+<div id="i-to-describe-the-dataset-and-obtain-information-about-its-variables-you-can-use-two-main-commands-in-stata-describe-and-summarize." class="section level2">
+<h2>(i) To describe the dataset and obtain information about its
+variables, you can use two main commands in Stata: <code>describe</code>
+and <code>summarize</code>.</h2>
+<ul>
+<li><p><code>describe</code>: This command provides a comprehensive
+overview of the dataset, including the number of observations, the
+number of variables, variable names, variable types, and variable
+labels. It also includes the storage type and format of each
+variable.</p></li>
+<li><p><code>summarize</code>: This command provides summary statistics
+for numeric variables in the dataset, including the number of
+non-missing observations, mean, standard deviation, minimum, and maximum
+values.</p></li>
+</ul>
+<p>These commands differ in their output. <code>describe</code> provides
+more detailed information about the dataset as a whole, including
+variable labels and storage types, while <code>summarize</code> focuses
+on summary statistics for numeric variables only.</p>
+</div>
+<div id="ii" class="section level2">
+<h2>(ii)</h2>
+<p>To obtain basic summary statistics for the dataset, you can use the
+<code>summarize</code> command. This command provides summary statistics
+such as mean, median, minimum, and maximum values for numeric variables.
+You can specify which variables you want to summarize, or if no
+variables are specified, it will summarize all numeric variables in the
+dataset.</p>
+</div>
+</div>
+<div id="question-8" class="section level1">
+<h1>question 8</h1>
+<div id="ii-1" class="section level2">
+<h2>ii)</h2>
+<table style="width:50%;">
+<colgroup>
+<col width="8%" />
+<col width="41%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><pre><code>    CountryName</code></pre></td>
+</tr>
+<tr class="even">
+<td>4 5 28 40 50 62 66 70 76 78 80 95 104 115 131 141 147 179 184 190
+211 213 215</td>
+<td>American Samoa Andorra British Virgin Islands Channel Islands Cuba
+Eritrea Faroe Islands French Polynesia Gibraltar Greenland Guam Isle of
+Man Korea, Dem. People’s Rep. Liechtenstein Monaco New Caledonia
+Northern Mariana Islands South Sudan St. Martin (French part) Syrian
+Arab Republic Venezuela, RB Virgin Islands (U.S.) Yemen, Rep.</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 

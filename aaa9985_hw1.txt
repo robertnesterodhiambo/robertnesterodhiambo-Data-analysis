@@ -1,0 +1,325 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\ROBERT\3D Objects\git hub\robertnesterodhiambo-Data-analysis\aaa9985_hw1.txt
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}16 Feb 2024, 04:13:34
+{txt}
+{com}. 
+. // Load Excel dataset into Stata
+. import excel "WorldBankData.xlsx", firstrow
+{res}{txt}
+{com}. 
+. 
+. 
+. // question 3
+. 
+. // Explanation of housekeeping commands:
+. 
+. // 1. clear all: 
+. //    Clears all data from memory in Stata. Removes any existing datasets, macros, and other objects.
+. //    Ensures a clean slate for starting analysis to avoid conflicts or issues from previous data or commands.
+. 
+. 
+. 
+. // 2. capture log close:
+. //    Closes any open log files in Stata. The "capture" keyword suppresses error messages if no log file is open.
+. //    Important before starting a new logging session to prevent appending to existing logs or overwriting them unintentionally.
+. 
+. 
+. 
+. // 3. cd:
+. //    Changes the current directory in Stata to the specified directory.
+. //    Sets the working directory where data and do-file are located, ensuring Stata knows where to find files for reading and writing.
+. 
+. 
+. // 4. log using:
+. //    Starts logging Stata output to a file. The "using" option specifies the filename for the log file,
+. //    and "replace" overwrites any existing log file with the same name.
+. //    Logging is useful for keeping track of commands executed, results obtained, and any errors encountered during analysis.
+. 
+. 
+. 
+. // 5. import excel:
+. //    Imports data from an Excel file into Stata. Reads data from the specified Excel file and creates a Stata dataset.
+. //    The "firstrow" option indicates that the first row of the Excel file contains variable names.
+. 
+. 
+. // question 4
+. // Rename variables using wildcards
+. rename *Laborforce* flfp
+{res}{txt}
+{com}. rename *GDPgrowth* GDPgr
+{res}{txt}
+{com}. rename *GDPpercap* GDPpc
+{res}{txt}
+{com}. rename GDPPPPconstant2017internat GDP
+{res}{txt}
+{com}. rename *Manufactur* ManufVA
+{res}{txt}
+{com}. 
+. //// Drop the TimeCode variable
+> drop TimeCode
+{txt}
+{com}. 
+. // question 5
+. 
+. // Convert the dataset to Stata format and save it
+. save "aaa9985_hw1.dta", replace
+{txt}file aaa9985_hw1.dta saved
+
+{com}. 
+. // Message confirming the save
+. di "Dataset saved as WorldBankData.dta in the working directory."
+{res}Dataset saved as WorldBankData.dta in the working directory.
+{txt}
+{com}. 
+. // ii
+. // Load dataset from Stata format
+. use "aaa9985_hw1.dta", clear
+{txt}
+{com}. 
+. // question 6
+. 
+. // (i) How many observations are in the dataset?
+. local obs_count = _N
+{txt}
+{com}. di "Number of observations: `obs_count'"
+{res}Number of observations: 217
+{txt}
+{com}. 
+. // (ii) What is the unique identifier for this data?
+. ds, has(type numeric)
+{txt}{col 1}Time{col 10}flfp{col 19}GDPgr{col 28}GDPpc{col 37}GDP{col 46}ManufVA
+
+{com}. di "Unique identifier: " `r(varlist)'
+{res}Unique identifier: 201821.5831.18922812060.6997.560e+106.1601772
+{txt}
+{com}. 
+. // (iii) How many variables are there in the data?
+. 
+. local var_count = _N
+{txt}
+{com}. di "Number of variables: `var_count'"
+{res}Number of variables: 217
+{txt}
+{com}. 
+. // (iv) How many string variables? Are all of these string variables categorical? Discuss.
+. // Count the number of string variables
+. local str_count = 0
+{txt}
+{com}. foreach var of varlist _all {c -(}
+{txt}  2{com}.     if strpos("`: variable label `var''", "str") > 0 {c -(}
+{txt}  3{com}.         local ++str_count
+{txt}  4{com}.     {c )-}
+{txt}  5{com}. {c )-}
+{txt}
+{com}. di "Number of string variables: `str_count'"
+{res}Number of string variables: 0
+{txt}
+{com}. 
+. // question 8
+. 
+. //i
+.  // Check for missing observations in the GDP variable
+. summarize GDP, detail
+
+          {txt}GDP, PPP (constant 2017 international $)
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res} 1.18e+08       4.65e+07
+{txt} 5%    {res} 9.05e+08       1.18e+08
+{txt}10%    {res} 2.56e+09       2.32e+08       {txt}Obs         {res}        194
+{txt}25%    {res} 2.00e+10       2.49e+08       {txt}Sum of Wgt. {res}        194
+
+{txt}50%    {res} 7.72e+10                      {txt}Mean          {res} 6.45e+11
+                        {txt}Largest       Std. Dev.     {res} 2.28e+12
+{txt}75%    {res} 3.58e+11       5.30e+12
+{txt}90%    {res} 1.23e+12       8.81e+12       {txt}Variance      {res} 5.21e+24
+{txt}95%    {res} 3.04e+12       2.01e+13       {txt}Skewness      {res} 7.352563
+{txt}99%    {res} 2.01e+13       2.12e+13       {txt}Kurtosis      {res} 62.76092
+{txt}
+{com}. 
+. //ii
+. // List countries with missing GDP values
+. list CountryName if missing(GDP)
+{txt}
+     {c TLC}{hline 27}{c TRC}
+     {c |} {res}              CountryName {txt}{c |}
+     {c LT}{hline 27}{c RT}
+  4. {c |} {res}           American Samoa {txt}{c |}
+  5. {c |} {res}                  Andorra {txt}{c |}
+ 28. {c |} {res}   British Virgin Islands {txt}{c |}
+ 40. {c |} {res}          Channel Islands {txt}{c |}
+ 50. {c |} {res}                     Cuba {txt}{c |}
+     {c LT}{hline 27}{c RT}
+ 62. {c |} {res}                  Eritrea {txt}{c |}
+ 66. {c |} {res}            Faroe Islands {txt}{c |}
+ 70. {c |} {res}         French Polynesia {txt}{c |}
+ 76. {c |} {res}                Gibraltar {txt}{c |}
+ 78. {c |} {res}                Greenland {txt}{c |}
+     {c LT}{hline 27}{c RT}
+ 80. {c |} {res}                     Guam {txt}{c |}
+ 95. {c |} {res}              Isle of Man {txt}{c |}
+104. {c |} {res}Korea, Dem. People's Rep. {txt}{c |}
+115. {c |} {res}            Liechtenstein {txt}{c |}
+131. {c |} {res}                   Monaco {txt}{c |}
+     {c LT}{hline 27}{c RT}
+141. {c |} {res}            New Caledonia {txt}{c |}
+147. {c |} {res} Northern Mariana Islands {txt}{c |}
+179. {c |} {res}              South Sudan {txt}{c |}
+184. {c |} {res} St. Martin (French part) {txt}{c |}
+190. {c |} {res}     Syrian Arab Republic {txt}{c |}
+     {c LT}{hline 27}{c RT}
+211. {c |} {res}            Venezuela, RB {txt}{c |}
+213. {c |} {res}    Virgin Islands (U.S.) {txt}{c |}
+215. {c |} {res}              Yemen, Rep. {txt}{c |}
+     {c BLC}{hline 27}{c BRC}
+
+{com}. 
+. // QUESTION 9
+. //  i )Calculate average and standard deviation of female labor force participation
+. summarize flfp, meanonly
+{txt}
+{com}. 
+. // Calculate standard deviation of female labor force participation
+. summarize flfp
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 8}flfp {c |}{res}        187    50.48052    14.56098      5.945      83.12
+{txt}
+{com}. scalar sd_flfp = r(sd)
+{txt}
+{com}. 
+. // Display mean and standard deviation of female labor force participation
+. di "Mean of female labor force participation: " r(mean)
+{res}Mean of female labor force participation: 50.480524
+{txt}
+{com}. di "Standard deviation of female labor force participation: " scalar(sd_flfp)
+{res}Standard deviation of female labor force participation: 14.560981
+{txt}
+{com}. 
+. // ii)Calculate median GDP per capita
+. summarize GDPpc, detail
+
+      {txt}GDP per capita, PPP (constant 2017 international
+                             $)
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res} 854.6475       740.4482
+{txt} 5%    {res} 1563.544       854.6475
+{txt}10%    {res} 2185.576       1048.246       {txt}Obs         {res}        194
+{txt}25%    {res} 5089.778       1193.273       {txt}Sum of Wgt. {res}        194
+
+{txt}50%    {res} 14125.88                      {txt}Mean          {res} 21952.66
+                        {txt}Largest       Std. Dev.     {res} 22568.51
+{txt}75%    {res} 31739.26       91461.62
+{txt}90%    {res} 52349.29       98280.04       {txt}Variance      {res} 5.09e+08
+{txt}95%    {res} 64696.49       114164.5       {txt}Skewness      {res} 1.758448
+{txt}99%    {res} 114164.5       128220.3       {txt}Kurtosis      {res} 6.725829
+{txt}
+{com}. 
+. 
+. // Calculate average and standard deviation of female labor force participation
+. // for countries with GDP per capita below the median
+. summarize flfp if GDPpc < r(p50), meanonly
+{txt}
+{com}. 
+. // Calculate average and standard deviation of female labor force participation
+. // for countries with GDP per capita above the median
+. summarize flfp if GDPpc > r(p50), meanonly
+{txt}
+{com}. 
+. // iii)
+. // Calculate the median GDP per capita
+. summarize GDPpc, detail
+
+      {txt}GDP per capita, PPP (constant 2017 international
+                             $)
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res} 854.6475       740.4482
+{txt} 5%    {res} 1563.544       854.6475
+{txt}10%    {res} 2185.576       1048.246       {txt}Obs         {res}        194
+{txt}25%    {res} 5089.778       1193.273       {txt}Sum of Wgt. {res}        194
+
+{txt}50%    {res} 14125.88                      {txt}Mean          {res} 21952.66
+                        {txt}Largest       Std. Dev.     {res} 22568.51
+{txt}75%    {res} 31739.26       91461.62
+{txt}90%    {res} 52349.29       98280.04       {txt}Variance      {res} 5.09e+08
+{txt}95%    {res} 64696.49       114164.5       {txt}Skewness      {res} 1.758448
+{txt}99%    {res} 114164.5       128220.3       {txt}Kurtosis      {res} 6.725829
+{txt}
+{com}. scalar median_GDPpc = r(p50)
+{txt}
+{com}. 
+. // Create a new variable indicating GDP per capita below or above the median
+. gen GDPpc_below_median = (GDPpc < median_GDPpc)
+{txt}
+{com}. gen GDPpc_above_median = (GDPpc > median_GDPpc)
+{txt}
+{com}. 
+. // Calculate average and standard deviation of female labor force participation
+. // for countries with GDP per capita below the median
+. summarize flfp if GDPpc_below_median
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 8}flfp {c |}{res}         90    49.57177    17.26736     11.422      83.12
+{txt}
+{com}. di "Average flfp for countries with GDP per capita below the median: " r(mean)
+{res}Average flfp for countries with GDP per capita below the median: 49.571767
+{txt}
+{com}. di "Standard deviation of flfp for countries with GDP per capita below the median: " r(sd)
+{res}Standard deviation of flfp for countries with GDP per capita below the median: 17.267358
+{txt}
+{com}. 
+. // Calculate average and standard deviation of female labor force participation
+. // for countries with GDP per capita above the median
+. summarize flfp if GDPpc_above_median
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 8}flfp {c |}{res}         97     51.3237    11.52734      5.945      71.58
+{txt}
+{com}. di "Average flfp for countries with GDP per capita above the median: " r(mean)
+{res}Average flfp for countries with GDP per capita above the median: 51.323701
+{txt}
+{com}. di "Standard deviation of flfp for countries with GDP per capita above the median: " r(sd)
+{res}Standard deviation of flfp for countries with GDP per capita above the median: 11.527343
+{txt}
+{com}. 
+. // question 10
+. 
+. //i 
+. // Draw histogram of female labor force participation
+. histogram flfp, title("Histogram of Female Labour Force Participation") saving(hist_flfp.png, replace)
+{txt}(bin={res}13{txt}, start={res}5.945{txt}, width={res}5.9365385{txt})
+{res}{txt}(file hist_flfp.png saved)
+
+{com}. 
+. // ii)
+. // Scatter plot of female labor force participation against manufacturing value added
+. scatter flfp ManufVA, title("Scatter Plot of Female Labour Force Participation vs Manufacturing Value Added") saving(scatter_flfp_ManufVA.png, replace)
+{res}{txt}(file scatter_flfp_ManufVA.png saved)
+
+{com}. //iii)
+. // Calculate the correlation coefficient between female labor force participation and manufacturing value added
+. pwcorr flfp ManufVA
+
+             {txt}{c |}     flfp  ManufVA
+{hline 13}{c +}{hline 18}
+        flfp {c |} {res}  1.0000 
+     {txt}ManufVA {c |} {res} -0.0960   1.0000 
+{txt}
+{com}. 
+. 
+. 
+. 
+. 
+. 
+. 
+{txt}end of do-file
+
+{com}. 
