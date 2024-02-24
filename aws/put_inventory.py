@@ -1,9 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify
 import mysql.connector
 
 app = Flask(__name__)
 
-# Establish a connection to your MySQL database
+# Establish a connection to the MySQL database
 connection = mysql.connector.connect(
     host="falode3368-1.ch6kyu62mcnp.us-east-1.rds.amazonaws.com",
     user="Falode",
@@ -11,20 +11,16 @@ connection = mysql.connector.connect(
     database="cis3368DB"
 )
 
-# PUT /api/inventory/<int:id>
-@app.route('/api/inventory/<int:id>', methods=['PUT'])
-def update_stock(id):
-    data = request.json
-    cursor = connection.cursor(dictionary=True)
-    query = "UPDATE inventory SET stock = %s WHERE id = %s"
-    cursor.execute(query, (data['stock'], id))
+# API endpoint to update the stock of a tire
+@app.route('/api/inventory/<int:tire_id>', methods=['PUT'])
+def update_stock(tire_id):
+    data = request.get_json()
+    new_stock = data['stock']
+    cursor = connection.cursor()
+    cursor.execute("UPDATE inventory SET stock = %s WHERE id = %s", (new_stock, tire_id))
     connection.commit()
-    affected_rows = cursor.rowcount
     cursor.close()
-    if affected_rows > 0:
-        return jsonify({"message": "Stock updated"}), 200
-    else:
-        return jsonify({"error": "Tire not found"}), 404
+    return jsonify({'message': 'Stock updated'})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5003)  # Run the app on port 5003
+    app.run(debug=True)
