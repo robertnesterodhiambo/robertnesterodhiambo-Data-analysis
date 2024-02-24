@@ -11,16 +11,16 @@ connection = mysql.connector.connect(
     database="cis3368DB"
 )
 
-# API endpoint to update the stock of a tire
+# API endpoint to update the stock of a specific tire
 @app.route('/api/inventory/<int:tire_id>', methods=['PUT'])
-def update_stock(tire_id):
+def update_tire_stock(tire_id):
     data = request.get_json()
     new_stock = data['stock']
     cursor = connection.cursor()
     cursor.execute("UPDATE inventory SET stock = %s WHERE id = %s", (new_stock, tire_id))
     connection.commit()
     cursor.close()
-    return jsonify({'message': 'Stock updated'})
+    return jsonify({'message': 'Tire stock updated successfully'})
 
 if __name__ == '__main__':
     app.run(debug=True)
