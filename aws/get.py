@@ -12,40 +12,26 @@ config = {
 app = Flask(__name__)
 connection = mysql.connector.connect(**config)
 
-@app.route('/api/coupon', methods=['POST'])
-def add_coupon():
+@app.route('/api/calculate', methods=['GET'])
+def calculate_total():
     try:
-        # Parse JSON payload from request body
-        data = request.json
-        code = data.get('code')
-        discount = data.get('discount')
+        # Get the code and amount from request headers
+        code = request.headers.get('code')
+        amount = request.headers.get('amount')
 
-        # Check if a coupon with the same discount percentage already exists
+        # Check if the code exists in the database
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM coupon WHERE discount = %s", (discount,))
-        existing_coupon = cursor.fetchone()
+        cursor.execute("SELECT discount FROM coupon WHERE code = %s", (code,))
+        coupon = cursor.fetchone()
 
-        if existing_coupon:
-            return jsonify({'message': 'Coupon with the same discount percentage already exists.'}), 409
+        if not coupon:
+            return jsonify({'error': 'Code does not exist in the database.'}), 404
 
-        # Insert the new coupon record
-        cursor.execute("INSERT INTO coupon (code, discount) VALUES (%s, %s)", (code, discount))
-        connection.commit()
+        # Calculate the total price after discount
+        discount = coupon[0]
+        total_price = float(amount) * (1 - discount / 100)
 
-        return jsonify({'message': 'Coupon added successfully.'}), 201
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        cursor.close()
-
-@app.route('/api/coupon', methods=['GET'])
-def get_coupons():
-    try:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM coupon")
-        records = cursor.fetchall()
-        coupons = [{'id': record[0], 'code': record[1], 'discount': float(record[2])} for record in records]
-        return jsonify(coupons)
+        return jsonify({'total_price': total_price}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     finally:
