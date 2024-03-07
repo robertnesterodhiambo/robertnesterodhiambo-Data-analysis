@@ -1,54 +1,61 @@
 from flask import Flask, request, jsonify
+import mysql.connector
 
 app = Flask(__name__)
 
-# Pre-configured username and password
-username = "admin"
-password = "password"
+# Establish a connection to the MySQL database
+connection = mysql.connector.connect(
+    host="falode3368-1.ch6kyu62mcnp.us-east-1.rds.amazonaws.com",
+    user="Falode",
+    password="1QAZ2wsx",
+    database="cis3368DB"
+)
 
-# Login endpoint
-@app.route('/login', methods=['POST'])
-def login():
-    auth = request.authorization
-    if not auth or not auth.username or not auth.password:
-        return jsonify({"message": "Authentication required"}), 401
-
-    if auth.username == username and auth.password == password:
-        return jsonify({"message": "Login successful"}), 200
+# Function to execute SQL queries
+def execute_query(query, data=None, commit=False):
+    cursor = connection.cursor(dictionary=True)
+    if data:
+        cursor.execute(query, data)
     else:
-        return jsonify({"message": "Invalid username or password"}), 401
+        cursor.execute(query)
+    if commit:
+        connection.commit()
+    if query.strip().lower().startswith('select'):
+        result = cursor.fetchall()
+    else:
+        result = {"message": "Operation successful"}
+    cursor.close()
+    return result
 
-# Generic CRUD endpoints for all tables
+# CRUD endpoints for Facility table
+@app.route('/facility', methods=['GET'])
+def get_all_facilities():
+    query = "SELECT * FROM Facility"
+    return jsonify(execute_query(query))
 
-# GET all rows from a table
-@app.route('/<table>', methods=['GET'])
-def get_all(table):
-    # Add your code to retrieve data from the database table
-    return jsonify({"message": "Get all records from table: " + table})
+@app.route('/facility/<int:id>', methods=['GET'])
+def get_facility(id):
+    query = "SELECT * FROM Facility WHERE id = %s"
+    return jsonify(execute_query(query, (id,)))
 
-# GET a specific row by ID from a table
-@app.route('/<table>/<int:id>', methods=['GET'])
-def get_by_id(table, id):
-    # Add your code to retrieve data from the database table
-    return jsonify({"message": "Get record with ID {} from table: {}".format(id, table)})
+@app.route('/facility', methods=['POST'])
+def add_facility():
+    data = request.json
+    query = "INSERT INTO Facility (name) VALUES (%s)"
+    return jsonify(execute_query(query, (data['name'],), commit=True))
 
-# POST a new row to a table
-@app.route('/<table>', methods=['POST'])
-def add_row(table):
-    # Add your code to insert data into the database table
-    return jsonify({"message": "Add new record to table: " + table})
+@app.route('/facility/<int:id>', methods=['PUT'])
+def update_facility(id):
+    data = request.json
+    query = "UPDATE Facility SET name = %s WHERE id = %s"
+    return jsonify(execute_query(query, (data['name'], id), commit=True))
 
-# PUT (update) a row in a table
-@app.route('/<table>/<int:id>', methods=['PUT'])
-def update_row(table, id):
-    # Add your code to update data in the database table
-    return jsonify({"message": "Update record with ID {} in table: {}".format(id, table)})
+@app.route('/facility/<int:id>', methods=['DELETE'])
+def delete_facility(id):
+    query = "DELETE FROM Facility WHERE id = %s"
+    return jsonify(execute_query(query, (id,), commit=True))
 
-# DELETE a row from a table
-@app.route('/<table>/<int:id>', methods=['DELETE'])
-def delete_row(table, id):
-    # Add your code to delete data from the database table
-    return jsonify({"message": "Delete record with ID {} from table: {}".format(id, table)})
+# Add similar CRUD endpoints for Classroom, Teacher, and Child tables...
 
 if __name__ == '__main__':
     app.run(debug=True)
