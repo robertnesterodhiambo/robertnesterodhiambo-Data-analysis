@@ -31,6 +31,11 @@ Please download the datasets from the provided links to analyze the machine lear
 
 Contributions to this project are welcome! Whether it's adding new features, improving existing functionality, or fixing bugs, feel free to contribute. Please follow the guidelines outlined in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Images
+
+![Visualization](path/to/visualization_image.png)
+![Uncertainty Analysis](path/to/uncertainty_analysis_image.png)
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
