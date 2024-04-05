@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comment Overview</title>
+<style>
+  /* CSS styles for the page */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+  }
+  .comments-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  .comment {
+    margin-bottom: 10px;
+  }
+  .button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s;
+  }
+  #loadButton {
+    background-color: #007bff;
+  }
+  #loadButton:hover {
+    background-color: #0056b3;
+  }
+  #sortButton {
+    background-color: #28a745;
+  }
+  #sortButton:hover {
+    background-color: #218838;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Comment Overview</h1>
+  <button id="loadButton" class="button">Load</button>
+  <button id="sortButton" class="button">Sort</button>
+  <ul id="commentsList" class="comments-list"></ul>
+</div>
+
+<script>
+document.getElementById("loadButton").addEventListener("click", function() {
+  fetch("https://dummyjson.com/comments")
+    .then(response => response.json())
+    .then(data => {
+      const comments = data.comments.slice(0, 10); // Get the first 10 comments
+      displayComments(comments);
+    })
+    .catch(error => {
+      console.error("Error fetching comments:", error);
+    });
+});
+
+document.getElementById("sortButton").addEventListener("click", function() {
+  const commentsList = document.getElementById("commentsList");
+  const comments = Array.from(commentsList.children);
+  comments.sort((a, b) => {
+    const usernameA = a.textContent.split(":")[0];
+    const usernameB = b.textContent.split(":")[0];
+    return usernameA.localeCompare(usernameB);
+  });
+  comments.forEach(comment => commentsList.appendChild(comment));
+});
+
+function displayComments(comments) {
+  const commentsList = document.getElementById("commentsList");
+  commentsList.innerHTML = ""; // Clear existing comments
+  comments.forEach(comment => {
+    const listItem = document.createElement("li");
+    listItem.classList.add("comment");
+    listItem.textContent = `${comment.user.username}: ${comment.body}`;
+    commentsList.appendChild(listItem);
+  });
+}
+</script>
+</body>
+</html>
