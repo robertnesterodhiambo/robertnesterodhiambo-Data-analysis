@@ -59,36 +59,43 @@
 
 <script>
 document.getElementById("loadButton").addEventListener("click", function() {
-  fetch("https://dummyjson.com/comments")
-    .then(response => response.json())
+  // When the "Load" button is clicked, this function is executed
+  fetch("https://dummyjson.com/comments") // Fetch comments from the API endpoint
+    .then(response => response.json()) // Parse the JSON response
     .then(data => {
       const comments = data.comments.slice(0, 10); // Get the first 10 comments
-      displayComments(comments);
+      displayComments(comments); // Display the comments on the page
     })
     .catch(error => {
-      console.error("Error fetching comments:", error);
+      console.error("Error fetching comments:", error); // Log any errors that occur during fetching
     });
 });
 
 document.getElementById("sortButton").addEventListener("click", function() {
-  const commentsList = document.getElementById("commentsList");
-  const comments = Array.from(commentsList.children);
+  // When the "Sort" button is clicked, this function is executed
+  const commentsList = document.getElementById("commentsList"); // Get the comments list element
+  const comments = Array.from(commentsList.children); // Convert the comments list to an array
   comments.sort((a, b) => {
-    const usernameA = a.textContent.split(":")[0];
+    // Sort the comments alphabetically by username
+    const usernameA = a.textContent.split(":")[0]; // Extract username from comment text
     const usernameB = b.textContent.split(":")[0];
-    return usernameA.localeCompare(usernameB);
+    return usernameA.localeCompare(usernameB); // Compare usernames for sorting
   });
+  // Re-append the sorted comments to the comments list
   comments.forEach(comment => commentsList.appendChild(comment));
 });
 
 function displayComments(comments) {
-  const commentsList = document.getElementById("commentsList");
-  commentsList.innerHTML = ""; // Clear existing comments
+  // Function to display comments on the page
+  const commentsList = document.getElementById("commentsList"); // Get the comments list element
+  commentsList.innerHTML = ""; // Clear existing comments from the list
   comments.forEach(comment => {
-    const listItem = document.createElement("li");
-    listItem.classList.add("comment");
+    // Loop through each comment
+    const listItem = document.createElement("li"); // Create a list item element
+    listItem.classList.add("comment"); // Add "comment" class to the list item
+    // Set the text content of the list item to username and comment body
     listItem.textContent = `${comment.user.username}: ${comment.body}`;
-    commentsList.appendChild(listItem);
+    commentsList.appendChild(listItem); // Append the list item to the comments list
   });
 }
 </script>
