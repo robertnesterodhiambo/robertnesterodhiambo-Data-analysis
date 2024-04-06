@@ -1,0 +1,11 @@
+To run the provided code in Eclipse, follow these steps:
+
+1. Open Eclipse and create a new Java project.
+2. Inside the project, create a new Java class file named `OSPropertiesPanel`.
+3. Copy and paste the provided code into the `OSPropertiesPanel.java` file.
+4. Save the file.
+
+Once you've done that, you should be able to run the program by right-clicking on the `OSPropertiesPanel.java` file in the Eclipse Package Explorer, then selecting "Run As" > "Java Application".
+
+This will execute the program, displaying the main frame titled "OS Properties" with the OS properties panel. When you close the main frame, a blinking panel with the specified text will be displayed in a separate frame.
+
