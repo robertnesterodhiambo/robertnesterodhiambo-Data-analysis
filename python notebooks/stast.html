@@ -7539,7 +7539,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7547,9 +7547,467 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Load the following libraries so that they can be applied in the subsequent code blocks</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+
+<span class="c1"># Run this code. It will create a csv file containing a random sample of 300 respondents. You will answer the questions below based on this sample.</span>
+
+<span class="c1"># Look at the code below. Now replace 'Name.csv' with your actual name (e.g., 'Sara.csv'). The code will generate a csv file that you need to submit in the zip folder as secondary file.</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'Name.csv'</span><span class="p">)</span>        <span class="c1"># replace Name with your own name</span>
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="n">original_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://raw.githubusercontent.com/DanaSaleh1003/IDS-103-Spring-2024/main/mental_health_finaldata_1.csv"</span><span class="p">)</span>
+    <span class="n">df1</span><span class="o">=</span><span class="n">original_data</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">df1</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'Dana.csv'</span><span class="p">)</span>                   
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'Dana.csv'</span><span class="p">)</span>             
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'Dana.csv'</span><span class="p">)</span>                    
+
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[ ]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Unnamed: 0</th>
+<th>Age</th>
+<th>Gender</th>
+<th>Occupation</th>
+<th>Days_Indoors</th>
+<th>Growing_Stress</th>
+<th>Quarantine_Frustrations</th>
+<th>Changes_Habits</th>
+<th>Mental_Health_History</th>
+<th>Weight_Change</th>
+<th>Mood_Swings</th>
+<th>Coping_Struggles</th>
+<th>Work_Interest</th>
+<th>Social_Weakness</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>197</td>
+<td>20-25</td>
+<td>Female</td>
+<td>Business</td>
+<td>1-14 days</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Low</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<th>1</th>
+<td>709</td>
+<td>30-Above</td>
+<td>Female</td>
+<td>Business</td>
+<td>31-60 days</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Medium</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<th>2</th>
+<td>337</td>
+<td>20-25</td>
+<td>Female</td>
+<td>Corporate</td>
+<td>1-14 days</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>High</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<th>3</th>
+<td>515</td>
+<td>30-Above</td>
+<td>Female</td>
+<td>Corporate</td>
+<td>1-14 days</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>High</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<th>4</th>
+<td>540</td>
+<td>20-25</td>
+<td>Male</td>
+<td>Housewife</td>
+<td>1-14 days</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Medium</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Load the following libraries so that they can be applied in the subsequent code blocks</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="n">column_titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Growing_Stress"</span>  <span class="p">,</span><span class="s2">"Quarantine_Frustrations"</span>  <span class="p">,</span><span class="s2">"Changes_Habits"</span> <span class="p">,</span><span class="s2">"Mental_Health_History"</span><span class="p">,</span> <span class="s2">"Weight_Change"</span> <span class="p">,</span><span class="s2">"Mood_Swings"</span><span class="p">,</span> <span class="s2">"Coping_Struggles"</span><span class="p">,</span><span class="s2">"Work_Interest"</span><span class="p">,</span><span class="s2">"Social_Weakness"</span><span class="p">]</span>
+
+<span class="c1"># Randomly select 2 variables</span>
+<span class="n">selected_columns</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">column_titles</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="c1"># Print the 2 variables that were randomly selected</span>
+<span class="n">variable_1</span><span class="p">,</span> <span class="n">variable_2</span> <span class="o">=</span> <span class="n">selected_columns</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Variable 1:"</span><span class="p">,</span> <span class="n">variable_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Variable 2:"</span><span class="p">,</span> <span class="n">variable_2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Variable 1: Quarantine_Frustrations
+Variable 2: Mood_Swings
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Question 1a</strong>.
+Is each of these two variables independent of being <strong>female</strong>? Explain your reasoning. Make sure to include a two-way table for each of these two variables with gender, and show all your calculations to support your answers.</p>
+<hr/>
+<p>In conclusion, based on the chi-square test results, neither Quarantine_Frustrations nor Mood_Swings show a significant association with being female. Therefore, we cannot reject the null hypothesis of independence for both variables.</p>
+<hr/>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Contingency table for variable_1</span>
+<span class="n">contingency_table_1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">variable_1</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">'Gender'</span><span class="p">])</span>
+
+<span class="c1"># Contingency table for variable_2</span>
+<span class="n">contingency_table_2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">variable_2</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">'Gender'</span><span class="p">])</span>
+
+<span class="c1"># Perform chi-square test of independence for variable_1</span>
+<span class="n">chi2_stat_1</span><span class="p">,</span> <span class="n">p_value_1</span><span class="p">,</span> <span class="n">dof_1</span><span class="p">,</span> <span class="n">expected_1</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2_contingency</span><span class="p">(</span><span class="n">contingency_table_1</span><span class="p">)</span>
+
+<span class="c1"># Perform chi-square test of independence for variable_2</span>
+<span class="n">chi2_stat_2</span><span class="p">,</span> <span class="n">p_value_2</span><span class="p">,</span> <span class="n">dof_2</span><span class="p">,</span> <span class="n">expected_2</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2_contingency</span><span class="p">(</span><span class="n">contingency_table_2</span><span class="p">)</span>
+
+<span class="c1"># Print contingency tables</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Contingency Table for"</span><span class="p">,</span> <span class="n">variable_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">contingency_table_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Contingency Table for"</span><span class="p">,</span> <span class="n">variable_2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">contingency_table_2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="c1"># Print chi-square test results</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Chi-Square Test Results for"</span><span class="p">,</span> <span class="n">variable_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Chi-square statistic:"</span><span class="p">,</span> <span class="n">chi2_stat_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"P-value:"</span><span class="p">,</span> <span class="n">p_value_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Chi-Square Test Results for"</span><span class="p">,</span> <span class="n">variable_2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Chi-square statistic:"</span><span class="p">,</span> <span class="n">chi2_stat_2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"P-value:"</span><span class="p">,</span> <span class="n">p_value_2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Contingency Table for Quarantine_Frustrations
+Gender                   Female  Male
+Quarantine_Frustrations              
+No                           55    37
+Yes                         115    93
+
+
+Contingency Table for Mood_Swings
+Gender       Female  Male
+Mood_Swings              
+High             58    37
+Low              54    38
+Medium           58    55
+
+
+Chi-Square Test Results for Quarantine_Frustrations
+Chi-square statistic: 0.35759753476898815
+P-value: 0.5498435400541952
+
+
+Chi-Square Test Results for Mood_Swings
+Chi-square statistic: 2.2103212430523347
+P-value: 0.3311576869168636
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Question 1b</strong>.
+Is there a relationship between the two variables returned by the code? Explain your reasoning. Make sure you include a two-way table, a stacked bar graph, and all your probability calculations in your answer.</p>
+<hr/>
+<p>Based on the conditional probabilities, there seems to be a weak relationship between Quarantine_Frustrations and Mood_Swings. However, the relationship is not very strong, as indicated by the marginal probabilities and the relatively small differences in conditional probabilities between the categories of the two variables. Further analysis or additional variables may be needed to better understand the relationship between these factors.</p>
+<hr/>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Create a two-way contingency table for the two variables</span>
+<span class="n">contingency_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">variable_1</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">variable_2</span><span class="p">])</span>
+
+<span class="c1"># Calculate marginal probabilities</span>
+<span class="n">marginal_probability_variable_1</span> <span class="o">=</span> <span class="n">contingency_table</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">contingency_table</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">marginal_probability_variable_2</span> <span class="o">=</span> <span class="n">contingency_table</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">contingency_table</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+<span class="c1"># Calculate conditional probabilities</span>
+<span class="n">conditional_probability_variable_2_given_variable_1</span> <span class="o">=</span> <span class="n">contingency_table</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">contingency_table</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">conditional_probability_variable_1_given_variable_2</span> <span class="o">=</span> <span class="n">contingency_table</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">contingency_table</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Print contingency table and probabilities</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Contingency Table:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">contingency_table</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Marginal Probability of"</span><span class="p">,</span> <span class="n">variable_1</span><span class="p">,</span> <span class="s2">":"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">marginal_probability_variable_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Marginal Probability of"</span><span class="p">,</span> <span class="n">variable_2</span><span class="p">,</span> <span class="s2">":"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">marginal_probability_variable_2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Conditional Probability of"</span><span class="p">,</span> <span class="n">variable_2</span><span class="p">,</span> <span class="s2">"given"</span><span class="p">,</span> <span class="n">variable_1</span><span class="p">,</span> <span class="s2">":"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">conditional_probability_variable_2_given_variable_1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Conditional Probability of"</span><span class="p">,</span> <span class="n">variable_1</span><span class="p">,</span> <span class="s2">"given"</span><span class="p">,</span> <span class="n">variable_2</span><span class="p">,</span> <span class="s2">":"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">conditional_probability_variable_1_given_variable_2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Contingency Table:
+Mood_Swings              High  Low  Medium
+Quarantine_Frustrations                   
+No                         32   30      30
+Yes                        63   62      83
+
+Marginal Probability of Quarantine_Frustrations :
+Quarantine_Frustrations
+No     0.306667
+Yes    0.693333
+dtype: float64
+
+Marginal Probability of Mood_Swings :
+Mood_Swings
+High      0.316667
+Low       0.306667
+Medium    0.376667
+dtype: float64
+
+Conditional Probability of Mood_Swings given Quarantine_Frustrations :
+Mood_Swings                  High       Low    Medium
+Quarantine_Frustrations                              
+No                       0.347826  0.326087  0.326087
+Yes                      0.302885  0.298077  0.399038
+
+Conditional Probability of Quarantine_Frustrations given Mood_Swings :
+Mood_Swings                  High       Low    Medium
+Quarantine_Frustrations                              
+No                       0.336842  0.326087  0.265487
+Yes                      0.663158  0.673913  0.734513
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Question 1c</strong>.
+Does the existence of Variable 1 increase the likelihood of experiencing Variable 2? If so, by how much? Explain your reasoning. Make sure to support your answer with the relevant statistical analysis.</p>
+<hr/>
+<p>The existence of Quarantine_Frustrations (Variable 1) appears to moderately increase the likelihood of experiencing Medium Mood_Swings (Variable 2). However, it slightly decreases the likelihood of experiencing High or Low Mood_Swings. Overall, the influence of Quarantine_Frustrations on Mood_Swings is not uniform across all categories of Mood_Swings.</p>
+<hr/>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Conditional Probability of Variable 2 given Variable 1</span>
+<span class="n">conditional_probability_variable_2_given_variable_1</span> <span class="o">=</span> <span class="n">contingency_table</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">contingency_table</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Calculate the difference in conditional probabilities between Yes and No for Variable 1</span>
+<span class="n">difference_in_probabilities</span> <span class="o">=</span> <span class="n">conditional_probability_variable_2_given_variable_1</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'Yes'</span><span class="p">]</span> <span class="o">-</span> <span class="n">conditional_probability_variable_2_given_variable_1</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'No'</span><span class="p">]</span>
+
+<span class="c1"># Print the difference in probabilities</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Difference in Conditional Probabilities:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">difference_in_probabilities</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Difference in Conditional Probabilities:
+Mood_Swings
+High     -0.044941
+Low      -0.028010
+Medium    0.072952
+dtype: float64
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Question 1d</strong>.
+Look back at your <strong>answers to Questions 1a-c</strong>. Now use what you learned to answer the following question:</p>
+<p>Imagine ZU wanted to use the insights from this research to improve its mental health support program. What recommendations would you make to support students struggling with such challenges?</p>
+<hr/>
+<p>By tailoring mental health support programs to address the specific needs and challenges identified in the analysis, ZU can better support students struggling with quarantine-related frustrations and mood swings, ultimately fostering a healthier and more resilient campus community</p>
+<hr/>
 </div>
 </div>
 </div>
