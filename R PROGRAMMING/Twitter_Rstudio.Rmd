@@ -1,0 +1,17 @@
+
+```{r}
+# Download file with Spatial analyses
+download.file("https://raw.githubusercontent.com/statnmap/blog_tips/master/2018-07-14-introduction-to-mapping-with-sf-and-co.R",
+destfile = "test-spatial.R")
+# Install missing dependencies 
+# This may take some time. Packages will be built from source if not installed with Ubuntu binaries.
+install.packages("attachment")
+deps <- attachment::att_from_rscript("test-spatial.R")
+attachment::install_if_missing(deps)
+# Run the script
+source("test-spatial.R")
+# Show interactive outputs
+m
+tmap_leaflet(tm)
+mapView(departements_L93)
+```
