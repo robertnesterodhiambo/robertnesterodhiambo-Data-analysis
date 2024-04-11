@@ -7560,14 +7560,14 @@ a.anchor-link {
 <span class="c1"># Look at the code below. Now replace 'Name.csv' with your actual name (e.g., 'Sara.csv'). The code will generate a csv file that you need to submit in the zip folder as secondary file.</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'Name.csv'</span><span class="p">)</span>        <span class="c1"># replace Name with your own name</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'Alya.csv'</span><span class="p">)</span>        <span class="c1"># replace Name with your own name</span>
 <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
     <span class="n">original_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://raw.githubusercontent.com/DanaSaleh1003/IDS-103-Spring-2024/main/mental_health_finaldata_1.csv"</span><span class="p">)</span>
     <span class="n">df1</span><span class="o">=</span><span class="n">original_data</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
-    <span class="n">df1</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'Dana.csv'</span><span class="p">)</span>                   
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'Dana.csv'</span><span class="p">)</span>             
+    <span class="n">df1</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'Alya.csv'</span><span class="p">)</span>                   
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'Alya.csv'</span><span class="p">)</span>             
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'Dana.csv'</span><span class="p">)</span>                    
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'Alya.csv'</span><span class="p">)</span>                    
 
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -7619,86 +7619,86 @@ a.anchor-link {
 <tbody>
 <tr>
 <th>0</th>
-<td>197</td>
-<td>20-25</td>
+<td>66</td>
+<td>25-30</td>
 <td>Female</td>
-<td>Business</td>
-<td>1-14 days</td>
-<td>Yes</td>
+<td>Others</td>
+<td>More than 2 months</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>No</td>
-<td>Yes</td>
-<td>Low</td>
 <td>No</td>
+<td>Yes</td>
+<td>Medium</td>
+<td>Yes</td>
 <td>Yes</td>
 <td>Yes</td>
 </tr>
 <tr>
 <th>1</th>
-<td>709</td>
-<td>30-Above</td>
-<td>Female</td>
-<td>Business</td>
-<td>31-60 days</td>
+<td>447</td>
+<td>20-25</td>
+<td>Male</td>
+<td>Student</td>
+<td>1-14 days</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
 <td>No</td>
 <td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Medium</td>
-<td>Yes</td>
+<td>High</td>
+<td>No</td>
 <td>Yes</td>
 <td>Yes</td>
 </tr>
 <tr>
 <th>2</th>
-<td>337</td>
-<td>20-25</td>
-<td>Female</td>
-<td>Corporate</td>
-<td>1-14 days</td>
-<td>Yes</td>
-<td>No</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-<td>High</td>
-<td>No</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<th>3</th>
-<td>515</td>
+<td>232</td>
 <td>30-Above</td>
 <td>Female</td>
-<td>Corporate</td>
-<td>1-14 days</td>
-<td>Yes</td>
-<td>No</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>High</td>
-<td>Yes</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<th>4</th>
-<td>540</td>
-<td>20-25</td>
-<td>Male</td>
-<td>Housewife</td>
+<td>Others</td>
 <td>1-14 days</td>
 <td>No</td>
 <td>Yes</td>
 <td>Yes</td>
-<td>No</td>
+<td>Yes</td>
 <td>Yes</td>
 <td>Medium</td>
 <td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<th>3</th>
+<td>700</td>
+<td>20-25</td>
+<td>Male</td>
+<td>Corporate</td>
+<td>1-14 days</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Low</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<th>4</th>
+<td>38</td>
+<td>25-30</td>
+<td>Female</td>
+<td>Others</td>
+<td>31-60 days</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>High</td>
+<td>Yes</td>
 <td>Yes</td>
 <td>No</td>
 </tr>
