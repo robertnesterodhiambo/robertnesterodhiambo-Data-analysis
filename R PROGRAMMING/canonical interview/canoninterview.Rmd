@@ -51,3 +51,35 @@ Here's how I handled the situation and implemented strategies to recover:
 5. **Post-Campaign Analysis and Learning**: After the campaign concluded, I conducted a comprehensive post-mortem analysis to evaluate the impact of the setback on campaign performance and identify lessons learned. This involved reviewing data, gathering feedback from stakeholders, and documenting insights to inform future campaigns and prevent similar issues from occurring.
 
 Despite the setback, we were able to salvage the campaign and achieve the majority of our objectives through proactive problem-solving, adaptation of tactics, and effective communication. The experience served as a valuable learning opportunity and reinforced the importance of resilience and flexibility in navigating unexpected challenges in marketing campaigns.
+
+#   Automation specialist
+
+##    How do you measure the ROI of marketing activities?
+
+
+5. **Calculate ROI**: Calculate the ROI using the following formula:
+   
+   \[ \text{ROI} = \left( \frac{\text{Revenue} - \text{Cost}}{\text{Cost}} \right) \times 100\% \]
+   
+
+##    What are the best steps to optimise a nurture campaign?
+##   Give an example of a challenge you encountered when working with multiple connected systems? (CRMs, Ad platform, etc.) and how you solved it?
+##    If you were to optimise one of the following areas: lead scoring, spam filtering or nurture campaigns, how would you approach it? (Choose one area) Please provide an example of a real life optimisation that you worked on.
+
+```{r}
+# Download file with Spatial analyses
+download.file("https://raw.githubusercontent.com/statnmap/blog_tips/master/2018-07-14-introduction-to-mapping-with-sf-and-co.R",
+destfile = "test-spatial.R")
+# Install missing dependencies 
+# This may take some time. Packages will be built from source if not installed with Ubuntu binaries.
+install.packages("attachment")
+deps <- attachment::att_from_rscript("test-spatial.R")
+attachment::install_if_missing(deps)
+# Run the script
+source("test-spatial.R")
+# Show interactive outputs
+m
+tmap_leaflet(tm)
+mapView(departements_L93)
+```
+
