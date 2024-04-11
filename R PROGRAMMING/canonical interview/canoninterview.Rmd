@@ -1,0 +1,53 @@
+---
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+#     Performance Marketing role
+
+##      What's your preferred attribution method for LinkedIn paid ads?
+
+There is no one size fits all for paid ads it all depends on the  purpose of ad campaign.
+My most prefered is the :
+  
+  --- **Linear Attribution:** For businesses with a longer and more complex sales cycle, where multiple touchpoints contribute to conversions over time, a linear attribution model may provide a more holistic view of the customer journey.
+
+##      In your opinion, what is more important for performance marketing: ROI or ROAS?
+
+ROAS, or Return on Ad Spend, is my preferred method for assessing advertising effectiveness because it provides a clear and direct measure of how efficiently my ad dollars are generating revenue. By calculating ROAS, I can see exactly how much revenue I'm generating for every dollar spent on advertising. This helps me make informed decisions about where to allocate my advertising budget and which campaigns are delivering the best results. Additionally, ROAS allows me to quickly identify underperforming ads or channels and make adjustments to improve their effectiveness, ultimately maximizing the return on my advertising investment.
+
+##      Share a situation where you had to manage a limited budget for a campaign. How did you prioritise spending and optimise your strategy to maximise results within the budget constraints?
+
+In 2023 January we were pushing an ad Campaign for a client who wanted results but limited budget. This was my first job and I wanted to prove myself also. these were the methods I implimented:
+
+
+1. **Audience Segmentation**: I conducted thorough research to identify the most responsive audience segments for the product. By focusing our efforts on these segments, we could maximize the impact of our messaging and minimize wasted ad spend on less relevant audiences.
+
+2. **Channel Selection**: Instead of spreading the budget thinly across multiple channels, I carefully selected the most cost-effective channels that aligned with our target audience's preferences and behaviors. This ensured that we could concentrate our resources where they would have the greatest impact.
+
+3. **Creative Optimization**: I invested time and resources in creating high-quality, engaging ad creatives that would resonate with our target audience. By testing different ad formats, messaging variations, and visuals, we were able to identify the most effective combinations and allocate more budget to the top-performing creatives.
+
+4. **Continuous Monitoring and Optimization**: Throughout the campaign, I closely monitored performance metrics to identify areas for improvement and reallocate budget accordingly. This involved adjusting bids, targeting parameters, and ad placements based on real-time data to maximize ROI.
+
+5. **Iterative Testing**: I adopted an iterative approach, constantly testing and refining our strategy based on performance insights. By experimenting with different audience segments, messaging strategies, and campaign tactics, we were able to uncover valuable insights and optimize our approach over time.
+
+By implementing these strategies, we were able to achieve significant results despite the limited budget. We exceeded our campaign objectives in terms of both reach and conversions, demonstrating the power of strategic budget management and optimization in maximizing campaign effectiveness.
+
+##      Describe a situation where you faced a major setback in a marketing campaign. How did you handle it, and what strategies did you employ to recover and achieve the campaign's objectives?
+
+During a crucial promotional campaign for a client, we experienced a significant technical issue with the website's checkout process. This resulted in a high bounce rate and a drastic decrease in conversions, posing a major setback to our campaign objectives.
+
+Here's how I handled the situation and implemented strategies to recover:
+
+1. **Immediate Response**: As soon as the issue was identified, I immediately alerted the technical team and initiated emergency protocols to address the problem. We worked swiftly to identify the root cause of the issue and implemented temporary fixes to minimize disruption to the campaign.
+
+2. **Communication and Transparency**: I maintained open and transparent communication with the client, keeping them informed about the situation and the steps being taken to resolve it. I reassured them that we were dedicated to rectifying the issue and achieving the campaign objectives despite the setback.
+
+3. **Adaptation of Tactics**: Recognizing that the website issue would likely persist for some time, I quickly pivoted our marketing tactics to mitigate the impact. We temporarily redirected traffic to alternative landing pages with simplified checkout processes and optimized user experience to minimize friction and maximize conversions.
+
+4. **Compensatory Offers**: To appease potential customers who were unable to complete their purchases due to the technical issue, we offered special discounts and incentives to encourage them to return and complete their transactions once the issue was resolved. This helped salvage some lost opportunities and retain customer loyalty.
+
+5. **Post-Campaign Analysis and Learning**: After the campaign concluded, I conducted a comprehensive post-mortem analysis to evaluate the impact of the setback on campaign performance and identify lessons learned. This involved reviewing data, gathering feedback from stakeholders, and documenting insights to inform future campaigns and prevent similar issues from occurring.
+
+Despite the setback, we were able to salvage the campaign and achieve the majority of our objectives through proactive problem-solving, adaptation of tactics, and effective communication. The experience served as a valuable learning opportunity and reinforced the importance of resilience and flexibility in navigating unexpected challenges in marketing campaigns.
