@@ -1,12 +1,12 @@
-#   8.1. Recreate the simulated data from Exercise 7.2:
+#   8.1. Recreate the sim_dta data from Exercise 7.2:
 
 ```{r}
-library(mlbench)
+packages <- c("mlbench", "caret", "gbm", "randomForest", "party"); sapply(packages, require, character.only = TRUE)
 set.seed(200)
-simulated <- mlbench.friedman1(200, sd = 1)
-simulated <- cbind(simulated$x, simulated$y)
-simulated <- as.data.frame(simulated)
-colnames(simulated)[ncol(simulated)] <- "y"
+sim_dta <- mlbench.friedman1(200, sd = 1)
+sim_dta <- cbind(sim_dta$x, sim_dta$y)
+sim_dta <- as.data.frame(sim_dta)
+colnames(sim_dta)[ncol(sim_dta)] <- "y"
 ```
 
 
@@ -15,23 +15,23 @@ colnames(simulated)[ncol(simulated)] <- "y"
 ```{r}
 use_conditional_true = T # whether to use the conditional argument in the cforest function call 
 
-library(caret) 
-library(mlbench)
-library(gbm)
-simulated <- na.omit(simulated)
+
+sim_dta <- na.omit(sim_dta)
 set.seed(200)
-simulated = mlbench.friedman1(200,sd=1)
-simulated = cbind(simulated$x, simulated$y)
-simulated = as.data.frame(simulated)
-colnames(simulated)[ncol(simulated)] = "y" 
+sim_dta = mlbench.friedman1(200,sd=1)
+sim_dta = cbind(sim_dta$x, sim_dta$y)
+sim_dta = as.data.frame(sim_dta)
+colnames(sim_dta)[ncol(sim_dta)] = "y" 
 
-library(randomForest)
 
-model1 = randomForest( y ~ ., data=simulated, importance=TRUE, ntree=1000 )
+
+
+model1 = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
 rfImp1 = varImp(model1, scale=FALSE)
-rfImp1 = rfImp1[ order(-rfImp1), , drop=FALSE ]
+rfImp1 <- rfImp1[order(-rfImp1$Overall), , drop = FALSE]
 print("randomForest (no correlated predictor)")
 print(rfImp1)
+rfImp1
 ```
 
 
@@ -39,21 +39,21 @@ print(rfImp1)
 
 ```{r}
 
-simulated$duplicate1 = simulated$V1 + rnorm(200) * 0.1
-cor(simulated$duplicate1,simulated$V1)
+sim_dta$duplicate1 = sim_dta$V1 + rnorm(200) * 0.1
+cor(sim_dta$duplicate1,sim_dta$V1)
 
-model2 = randomForest( y ~ ., data=simulated, importance=TRUE, ntree=1000 )
+model2 = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
 rfImp2 = varImp(model2, scale=FALSE)
-rfImp2 = rfImp2[ order(-rfImp2), , drop=FALSE ] 
+rfImp2 <- rfImp2[order(-rfImp2$Overall), , drop = FALSE]
 print("randomForest (one correlated predictor)")
 print(rfImp2)
 
-simulated$duplicate2 = simulated$V1 + rnorm(200) * 0.1
-cor(simulated$duplicate2,simulated$V1)
+sim_dta$duplicate2 = sim_dta$V1 + rnorm(200) * 0.1
+cor(sim_dta$duplicate2,sim_dta$V1)
 
-model3 = randomForest( y ~ ., data=simulated, importance=TRUE, ntree=1000 )
+model3 = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
 rfImp3 = varImp(model3, scale=FALSE)
-rfImp3 = rfImp3[ order(-rfImp3), , drop=FALSE ] 
+rfImp3 <- rfImp3[order(-rfImp3$Overall), , drop = FALSE]
 print("randomForest (two correlated predictors)")
 print(rfImp3)
 ```
@@ -63,31 +63,32 @@ print(rfImp3)
 
 ```{r}
 
-library(party)
 
-simulated$duplicate1 = NULL
-simulated$duplicate2 = NULL
 
-model1 = cforest( y ~ ., data=simulated )
+sim_dta$duplicate1 = NULL
+sim_dta$duplicate2 = NULL
+
+model1 = cforest( y ~ ., data=sim_dta )
 cfImp1 = as.data.frame(varimp(model1),conditional=use_conditional_true)
-cfImp1 = cfImp1[ order(-cfImp1), , drop=FALSE ] 
+cfImp1 <- cfImp1[order(-cfImp1$`varimp(model1)`), , drop = FALSE]
 print(sprintf("cforest (no correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
 print(cfImp1)
 
 # Now we add correlated predictors one at a time 
-simulated$duplicate1 = simulated$V1 + rnorm(200) * 0.1
+sim_dta$duplicate1 = sim_dta$V1 + rnorm(200) * 0.1
 
-model2 = cforest( y ~ ., data=simulated )
+model2 = cforest( y ~ ., data=sim_dta )
 cfImp2 = as.data.frame(varimp(model2),conditional=use_conditional_true)
-cfImp2 = cfImp2[ order(-cfImp2), , drop=FALSE ]  
+cfImp2 <- cfImp2[order(-cfImp2$`varimp(model2)`), , drop = FALSE]
+
 print(sprintf("cforest (one correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
 print(cfImp2)
 
-simulated$duplicate2 = simulated$V1 + rnorm(200) * 0.1
+sim_dta$duplicate2 = sim_dta$V1 + rnorm(200) * 0.1
 
-model3 = cforest( y ~ ., data=simulated )
+model3 = cforest( y ~ ., data=sim_dta )
 cfImp3 = as.data.frame(varimp(model3),conditional=use_conditional_true)
-cfImp3 = cfImp3[ order(-cfImp3), , drop=FALSE ] 
+cfImp3 <- cfImp3[order(-cfImp3$`varimp(model3)`), , drop = FALSE]
 print(sprintf("cforest (two correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
 print(cfImp3)
 
@@ -97,23 +98,23 @@ print(cfImp3)
 ##    (d) Repeat this process with different tree models, such as boosted trees and Cubist. Does the same pattern occur?
 
 ```{r}
-simulated$duplicate1 = NULL
-simulated$duplicate2 = NULL
+sim_dta$duplicate1 = NULL
+sim_dta$duplicate2 = NULL
       
-model1 = gbm( y ~ ., data=simulated, distribution="gaussian", n.trees=1000 ) 
+model1 = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
 print(sprintf("gbm (no correlated predictor)"))
 print(summary(model1,plotit=F)) # the summary method gives variable importance ... 
 
 # Now we add correlated predictors one at a time 
-simulated$duplicate1 = simulated$V1 + rnorm(200) * 0.1
+sim_dta$duplicate1 = sim_dta$V1 + rnorm(200) * 0.1
 
-model2 = gbm( y ~ ., data=simulated, distribution="gaussian", n.trees=1000 ) 
+model2 = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
 print(sprintf("gbm (one correlated predictor)"))
 print(summary(model2,plotit=F))
 
-simulated$duplicate2 = simulated$V1 + rnorm(200) * 0.1
+sim_dta$duplicate2 = sim_dta$V1 + rnorm(200) * 0.1
 
-model3 = gbm( y ~ ., data=simulated, distribution="gaussian", n.trees=1000 ) 
+model3 = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
 print(sprintf("gbm (two correlated predictor)"))
 print(summary(model3,plotit=F))
 ```
