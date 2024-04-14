@@ -18,7 +18,7 @@ use_conditional_true = T # whether to use the conditional argument in the cfores
 library(caret) 
 library(mlbench)
 library(gbm)
-
+simulated <- na.omit(simulated)
 set.seed(200)
 simulated = mlbench.friedman1(200,sd=1)
 simulated = cbind(simulated$x, simulated$y)
@@ -37,15 +37,8 @@ print(rfImp1)
 
 ##    (b) Now add an additional predictor that is highly correlated with one of the informative predictors. For example:
 
-##    (c) Use the cforest function in the party package to fit a random forest model using conditional inference trees. The party package function varimp can calculate predictor importance. The conditional argument of that function toggles between the traditional importance measure and the modified version described in Strobl et al. (2007). Do these importances show the same pattern as the traditional random forest model?
-
-##    (d) Repeat this process with different tree models, such as boosted trees and Cubist. Does the same pattern occur?
-
 ```{r}
 
-
-# Part (b): Add a correlated variable
-#
 simulated$duplicate1 = simulated$V1 + rnorm(200) * 0.1
 cor(simulated$duplicate1,simulated$V1)
 
@@ -63,9 +56,13 @@ rfImp3 = varImp(model3, scale=FALSE)
 rfImp3 = rfImp3[ order(-rfImp3), , drop=FALSE ] 
 print("randomForest (two correlated predictors)")
 print(rfImp3)
+```
 
-# Part (c): Study this when fitting conditional inference trees:
-# 
+
+##    (c) Use the cforest function in the party package to fit a random forest model using conditional inference trees. The party package function varimp can calculate predictor importance. The conditional argument of that function toggles between the traditional importance measure and the modified version described in Strobl et al. (2007). Do these importances show the same pattern as the traditional random forest model?
+
+```{r}
+
 library(party)
 
 simulated$duplicate1 = NULL
@@ -94,9 +91,12 @@ cfImp3 = cfImp3[ order(-cfImp3), , drop=FALSE ]
 print(sprintf("cforest (two correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
 print(cfImp3)
 
-# Lets try the same experiment but using boosted trees:
-#
+```
 
+
+##    (d) Repeat this process with different tree models, such as boosted trees and Cubist. Does the same pattern occur?
+
+```{r}
 simulated$duplicate1 = NULL
 simulated$duplicate2 = NULL
       
