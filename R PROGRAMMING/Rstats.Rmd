@@ -1,8 +1,10 @@
 ---
-title: "Untitled"
+title: "Regression Trees and Rule-Based Models"
 author: "Frederick Jones"
 date: "2024-04-14"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 #   8.1. Recreate the sim_dta data from Exercise 7.2:
@@ -269,6 +271,8 @@ plot(varImp(cubistTuned), top = 20)
 For the tree-based model, only 3 are biological variables out of the top 10, compared to 4 in the linear and nonlinear models. `ManufactingProcess32` still is deemed the most important. The other predictors have less variable importance. `BiologicalMaterial06` was deemed only the seventh most important, where it was the second most important in other variables. There are some predictors that were not in the top 10 previously, that are in the top 10 now, such as Manufacting Processes number 17, 4, 33, and 10.
 
 ##    (c) Plot the optimal single tree with the distribution of yield in the terminal nodes. Does this view of the data provide additional knowledge about the biological or process predictors and their relationship with yield?
+
+Yes, this model does provide detailed insights into the biological processes, offering comprehensive information to enhance understanding.
 
 ```{r}
 rpartTree <- rpart(Yield ~ ., data = Chemical[index, ])

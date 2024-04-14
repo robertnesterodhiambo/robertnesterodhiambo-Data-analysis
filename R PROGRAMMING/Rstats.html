@@ -13,7 +13,7 @@
 
 <meta name="date" content="2024-04-14" />
 
-<title>Untitled</title>
+<title>Regression Trees and Rule-Based Models</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,7 +350,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Untitled</h1>
+<h1 class="title toc-ignore">Regression Trees and Rule-Based Models</h1>
 <h4 class="author">Frederick Jones</h4>
 <h4 class="date">2024-04-14</h4>
 
@@ -868,6 +868,9 @@ and 10.</p>
 the terminal nodes. Does this view of the data provide additional
 knowledge about the biological or process predictors and their
 relationship with yield?</h2>
+<p>Yes, this model does provide detailed insights into the biological
+processes, offering comprehensive information to enhance
+understanding.</p>
 <pre class="r"><code>rpartTree &lt;- rpart(Yield ~ ., data = Chemical[index, ])
 
 plot(as.party(rpartTree), ip_args = list(abbreviate = 4), gp = gpar(fontsize = 7))</code></pre>
