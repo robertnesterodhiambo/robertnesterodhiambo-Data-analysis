@@ -1,0 +1,120 @@
+#   8.1. Recreate the simulated data from Exercise 7.2:
+
+```{r}
+library(mlbench)
+set.seed(200)
+simulated <- mlbench.friedman1(200, sd = 1)
+simulated <- cbind(simulated$x, simulated$y)
+simulated <- as.data.frame(simulated)
+colnames(simulated)[ncol(simulated)] <- "y"
+```
+
+
+##    (a) Fit a random forest model to all of the predictors, then estimate the variable importance scores:
+
+```{r}
+use_conditional_true = T # whether to use the conditional argument in the cforest function call 
+
+library(caret) 
+library(mlbench)
+library(gbm)
+
+set.seed(200)
+simulated = mlbench.friedman1(200,sd=1)
+simulated = cbind(simulated$x, simulated$y)
+simulated = as.data.frame(simulated)
+colnames(simulated)[ncol(simulated)] = "y" 
+
+library(randomForest)
+
+model1 = randomForest( y ~ ., data=simulated, importance=TRUE, ntree=1000 )
+rfImp1 = varImp(model1, scale=FALSE)
+rfImp1 = rfImp1[ order(-rfImp1), , drop=FALSE ]
+print("randomForest (no correlated predictor)")
+print(rfImp1)
+```
+
+
+##    (b) Now add an additional predictor that is highly correlated with one of the informative predictors. For example:
+
+##    (c) Use the cforest function in the party package to fit a random forest model using conditional inference trees. The party package function varimp can calculate predictor importance. The conditional argument of that function toggles between the traditional importance measure and the modified version described in Strobl et al. (2007). Do these importances show the same pattern as the traditional random forest model?
+
+##    (d) Repeat this process with different tree models, such as boosted trees and Cubist. Does the same pattern occur?
+
+```{r}
+
+
+# Part (b): Add a correlated variable
+#
+simulated$duplicate1 = simulated$V1 + rnorm(200) * 0.1
+cor(simulated$duplicate1,simulated$V1)
+
+model2 = randomForest( y ~ ., data=simulated, importance=TRUE, ntree=1000 )
+rfImp2 = varImp(model2, scale=FALSE)
+rfImp2 = rfImp2[ order(-rfImp2), , drop=FALSE ] 
+print("randomForest (one correlated predictor)")
+print(rfImp2)
+
+simulated$duplicate2 = simulated$V1 + rnorm(200) * 0.1
+cor(simulated$duplicate2,simulated$V1)
+
+model3 = randomForest( y ~ ., data=simulated, importance=TRUE, ntree=1000 )
+rfImp3 = varImp(model3, scale=FALSE)
+rfImp3 = rfImp3[ order(-rfImp3), , drop=FALSE ] 
+print("randomForest (two correlated predictors)")
+print(rfImp3)
+
+# Part (c): Study this when fitting conditional inference trees:
+# 
+library(party)
+
+simulated$duplicate1 = NULL
+simulated$duplicate2 = NULL
+
+model1 = cforest( y ~ ., data=simulated )
+cfImp1 = as.data.frame(varimp(model1),conditional=use_conditional_true)
+cfImp1 = cfImp1[ order(-cfImp1), , drop=FALSE ] 
+print(sprintf("cforest (no correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
+print(cfImp1)
+
+# Now we add correlated predictors one at a time 
+simulated$duplicate1 = simulated$V1 + rnorm(200) * 0.1
+
+model2 = cforest( y ~ ., data=simulated )
+cfImp2 = as.data.frame(varimp(model2),conditional=use_conditional_true)
+cfImp2 = cfImp2[ order(-cfImp2), , drop=FALSE ]  
+print(sprintf("cforest (one correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
+print(cfImp2)
+
+simulated$duplicate2 = simulated$V1 + rnorm(200) * 0.1
+
+model3 = cforest( y ~ ., data=simulated )
+cfImp3 = as.data.frame(varimp(model3),conditional=use_conditional_true)
+cfImp3 = cfImp3[ order(-cfImp3), , drop=FALSE ] 
+print(sprintf("cforest (two correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
+print(cfImp3)
+
+# Lets try the same experiment but using boosted trees:
+#
+
+simulated$duplicate1 = NULL
+simulated$duplicate2 = NULL
+      
+model1 = gbm( y ~ ., data=simulated, distribution="gaussian", n.trees=1000 ) 
+print(sprintf("gbm (no correlated predictor)"))
+print(summary(model1,plotit=F)) # the summary method gives variable importance ... 
+
+# Now we add correlated predictors one at a time 
+simulated$duplicate1 = simulated$V1 + rnorm(200) * 0.1
+
+model2 = gbm( y ~ ., data=simulated, distribution="gaussian", n.trees=1000 ) 
+print(sprintf("gbm (one correlated predictor)"))
+print(summary(model2,plotit=F))
+
+simulated$duplicate2 = simulated$V1 + rnorm(200) * 0.1
+
+model3 = gbm( y ~ ., data=simulated, distribution="gaussian", n.trees=1000 ) 
+print(sprintf("gbm (two correlated predictor)"))
+print(summary(model3,plotit=F))
+```
+
