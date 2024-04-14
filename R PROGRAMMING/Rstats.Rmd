@@ -1,7 +1,7 @@
 #   8.1. Recreate the sim_dta data from Exercise 7.2:
 
 ```{r}
-packages <- c("mlbench", "caret", "gbm", "randomForest", "party"); sapply(packages, require, character.only = TRUE)
+packages <- c("mlbench", "caret", "gbm", "randomForest","pracma","ipred", "AppliedPredictiveModeling","party","ggplot2","rpart","randomForest","randomForestExplainer","partykit"); sapply(packages, require, character.only = TRUE)
 set.seed(200)
 sim_dta <- mlbench.friedman1(200, sd = 1)
 sim_dta <- cbind(sim_dta$x, sim_dta$y)
@@ -24,14 +24,12 @@ sim_dta = as.data.frame(sim_dta)
 colnames(sim_dta)[ncol(sim_dta)] = "y" 
 
 
-
-
-model1 = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
-rfImp1 = varImp(model1, scale=FALSE)
-rfImp1 <- rfImp1[order(-rfImp1$Overall), , drop = FALSE]
+model_one = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
+rf_importtance1 = varImp(model_one, scale=FALSE)
+rf_importtance1 <- rf_importtance1[order(-rf_importtance1$Overall), , drop = FALSE]
 print("randomForest (no correlated predictor)")
-print(rfImp1)
-rfImp1
+print(rf_importtance1)
+rf_importtance1
 ```
 
 
@@ -42,20 +40,20 @@ rfImp1
 sim_dta$duplicate1 = sim_dta$V1 + rnorm(200) * 0.1
 cor(sim_dta$duplicate1,sim_dta$V1)
 
-model2 = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
-rfImp2 = varImp(model2, scale=FALSE)
-rfImp2 <- rfImp2[order(-rfImp2$Overall), , drop = FALSE]
+model_two = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
+rf_importtance2 = varImp(model_two, scale=FALSE)
+rf_importtance2 <- rf_importtance2[order(-rf_importtance2$Overall), , drop = FALSE]
 print("randomForest (one correlated predictor)")
-print(rfImp2)
+print(rf_importtance2)
 
 sim_dta$duplicate2 = sim_dta$V1 + rnorm(200) * 0.1
 cor(sim_dta$duplicate2,sim_dta$V1)
 
-model3 = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
-rfImp3 = varImp(model3, scale=FALSE)
-rfImp3 <- rfImp3[order(-rfImp3$Overall), , drop = FALSE]
+model_three = randomForest( y ~ ., data=sim_dta, importance=TRUE, ntree=1000 )
+rf_importtance3 = varImp(model_three, scale=FALSE)
+rf_importtance3 <- rf_importtance3[order(-rf_importtance3$Overall), , drop = FALSE]
 print("randomForest (two correlated predictors)")
-print(rfImp3)
+print(rf_importtance3)
 ```
 
 
@@ -68,27 +66,27 @@ print(rfImp3)
 sim_dta$duplicate1 = NULL
 sim_dta$duplicate2 = NULL
 
-model1 = cforest( y ~ ., data=sim_dta )
-cfImp1 = as.data.frame(varimp(model1),conditional=use_conditional_true)
-cfImp1 <- cfImp1[order(-cfImp1$`varimp(model1)`), , drop = FALSE]
+model_one = cforest( y ~ ., data=sim_dta )
+cfImp1 = as.data.frame(varimp(model_one),conditional=use_conditional_true)
+cfImp1 <- cfImp1[order(-cfImp1$`varimp(model_one)`), , drop = FALSE]
 print(sprintf("cforest (no correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
 print(cfImp1)
 
 # Now we add correlated predictors one at a time 
 sim_dta$duplicate1 = sim_dta$V1 + rnorm(200) * 0.1
 
-model2 = cforest( y ~ ., data=sim_dta )
-cfImp2 = as.data.frame(varimp(model2),conditional=use_conditional_true)
-cfImp2 <- cfImp2[order(-cfImp2$`varimp(model2)`), , drop = FALSE]
+model_two = cforest( y ~ ., data=sim_dta )
+cfImp2 = as.data.frame(varimp(model_two),conditional=use_conditional_true)
+cfImp2 <- cfImp2[order(-cfImp2$`varimp(model_two)`), , drop = FALSE]
 
 print(sprintf("cforest (one correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
 print(cfImp2)
 
 sim_dta$duplicate2 = sim_dta$V1 + rnorm(200) * 0.1
 
-model3 = cforest( y ~ ., data=sim_dta )
-cfImp3 = as.data.frame(varimp(model3),conditional=use_conditional_true)
-cfImp3 <- cfImp3[order(-cfImp3$`varimp(model3)`), , drop = FALSE]
+model_three = cforest( y ~ ., data=sim_dta )
+cfImp3 = as.data.frame(varimp(model_three),conditional=use_conditional_true)
+cfImp3 <- cfImp3[order(-cfImp3$`varimp(model_three)`), , drop = FALSE]
 print(sprintf("cforest (two correlated predictor); varimp(*,conditional=%s)",use_conditional_true))
 print(cfImp3)
 
@@ -101,21 +99,173 @@ print(cfImp3)
 sim_dta$duplicate1 = NULL
 sim_dta$duplicate2 = NULL
       
-model1 = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
+model_one = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
 print(sprintf("gbm (no correlated predictor)"))
-print(summary(model1,plotit=F)) # the summary method gives variable importance ... 
+print(summary(model_one,plotit=F)) # the summary method gives variable importance ... 
 
 # Now we add correlated predictors one at a time 
 sim_dta$duplicate1 = sim_dta$V1 + rnorm(200) * 0.1
 
-model2 = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
+model_two = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
 print(sprintf("gbm (one correlated predictor)"))
-print(summary(model2,plotit=F))
+print(summary(model_two,plotit=F))
 
 sim_dta$duplicate2 = sim_dta$V1 + rnorm(200) * 0.1
 
-model3 = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
+model_three = gbm( y ~ ., data=sim_dta, distribution="gaussian", n.trees=1000 ) 
 print(sprintf("gbm (two correlated predictor)"))
-print(summary(model3,plotit=F))
+print(summary(model_three,plotit=F))
+```
+
+#    Use a simulation to show tree bias with different granularities.
+
+```{r}
+# Set seed for reproducibility
+set.seed(624)
+
+# Generate simulated data with different variable names
+var1 <- sample(1:10 / 10, 500, replace = TRUE)
+var2 <- sample(1:100 / 100, 500, replace = TRUE)
+var3 <- sample(1:1000 / 1000, 500, replace = TRUE)
+var4 <- sample(1:10000 / 10000, 500, replace = TRUE)
+var5 <- sample(1:100000 / 100000, 500, replace = TRUE)
+response <- var1 + var2 + var3 + var4 + var5
+simData <- data.frame(var1, var2, var3, var4, var5, response)
+
+# Fit a decision tree model
+rpartTree <- rpart(response ~ ., data = simData)
+
+# Convert the rpart model to a party object
+rpart_party <- as.party(rpartTree)
+
+# Plot the decision tree
+plot(rpart_party, gp = gpar(fontsize = 7))
+
+```
+
+#   8.3. In stochastic gradient boosting the bagging fraction and learning rate will govern the construction of the trees as they are guided by the gradient. Although the optimal values of these parameters should be obtained through the tuning process, it is helpful to understand how the magnitudes of these parameters affect magnitudes of variable importance. Figure 8.24 provides the variable importance plots for boosting using two extreme values for the bagging fraction (0.1 and 0.9) and the learning rate (0.1 and 0.9) for the solubility data. The left-hand plot has both parameters set to 0.1, and the right-hand plot has both set to 0.9:
+
+##    (a) Why does the model on the right focus its importance on just the first few of predictors, whereas the model on the left spreads importance across more predictors?
+
+**The bagging fraction represents the proportion of training data used, while the learning rate determines the impact of current predictions on subsequent iterations. Optimal performance often involves a lower learning rate, allowing for more iterations. The left model, with reduced bagging fraction and learning rate, learns slowly and requires more computation but tends to perform better. It utilizes a smaller subset of data and promotes better generalization. Conversely, the right model, with higher values for both parameters, likely overfits the data. It learns faster, using more training data per iteration, which may lead to disproportionate emphasis on select predictors. This rapid learning process can result in a narrowed focus on a subset of predictors, potentially hindering predictive performance on unseen data.**
+
+##    (b) Which model do you think would be more predictive of other samples?
+
+**The left model's predictive capability surpasses that of the right model due to its extensive iterations, leading to reduced weight on individual predictors. This characteristic fosters enhanced generalization, resulting in superior accuracy when applied to unseen samples.**
+
+##    (c) How would increasing interaction depth affect the slope of predictor importance for either model in Fig. 8.24?
+
+**Increasing the interaction depth, which denotes the number of splits or maximum nodes per tree, amplifies the importance of predictors. This heightened significance enables smaller yet influential predictors to contribute more substantially to the model's decision-making process. Consequently, the slope of predictor importance escalates, becoming steeper with each increment in interaction depth.**
+
+#   8.7. Refer to Exercises 6.3 and 7.5 which describe a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several tree-based models:
+
+```{r}
+set.seed(100)
+
+data(ChemicalManufacturingProcess)
+
+# imputation
+miss <- preProcess(ChemicalManufacturingProcess, method = "bagImpute")
+Chemical <- predict(miss, ChemicalManufacturingProcess)
+
+# filtering low frequencies
+Chemical <- Chemical[, -nearZeroVar(Chemical)]
+
+set.seed(624)
+
+# index for training
+index <- createDataPartition(Chemical$Yield, p = .8, list = FALSE)
+
+# train 
+train_x <- Chemical[index, -1]
+train_y <- Chemical[index, 1]
+
+# test
+test_x <- Chemical[-index, -1]
+test_y <- Chemical[-index, 1]
+```
+
+
+##    (a) Which tree-based regression model gives the optimal resampling and test set performance?
+
+**The lowest RMSE is found in the cubist model, giving the best optimal resampling and test set performance.**
+
+```{r}
+# single tree cart 
+set.seed(100)
+
+cartTune <- train(train_x, train_y,
+                  method = "rpart",
+                  tuneLength = 10,
+                  trControl = trainControl(method = "cv"))
+
+cartPred <- predict(cartTune, test_x)
+
+postResample(cartPred, test_y)
+
+# bagged tree 
+
+set.seed(100)
+
+baggedTree <- ipredbagg(train_y, train_x)
+ 
+baggedPred <- predict(baggedTree, test_x)
+
+postResample(baggedPred, test_y)
+
+# random forest 
+set.seed(100)
+
+rfModel <- randomForest(train_x, train_y, 
+                        importance = TRUE,
+                        ntree = 1000)
+
+
+rfPred <- predict(rfModel, test_x)
+
+postResample(rfPred, test_y)
+# boosted tree 
+gbmGrid <- expand.grid(interaction.depth = seq(1, 7, by = 2),
+                       n.trees = seq(100, 1000, by = 50),
+                       shrinkage = c(0.01, 0.1),
+                       n.minobsinnode = 10)
+set.seed(100)
+
+gbmTune <- train(train_x, train_y,
+                 method = "gbm",
+                 tuneGrid = gbmGrid,
+                 verbose = FALSE)
+
+gbmPred <- predict(gbmTune, test_x)
+
+postResample(gbmPred, test_y)
+
+# cubist 
+set.seed(100)
+cubistTuned <- train(train_x, train_y, 
+                     method = "cubist")
+
+cubistPred <- predict(cubistTuned, test_x)
+
+postResample(cubistPred, test_y)
+```
+
+
+##    (b) Which predictors are most important in the optimal tree-based regression model? Do either the biological or process variables dominate the list? How do the top 10 important predictors compare to the top 10 predictors from the optimal linear and nonlinear models?
+
+```{r}
+varImp(cubistTuned, scale = TRUE)
+plot(varImp(cubistTuned), top = 20) 
+```
+**The manufacturing process variables dominate the list at a ratio of 16:4, whereas the optimal linear and nonlinear models had ratios of 11:9**
+
+For the tree-based model, only 3 are biological variables out of the top 10, compared to 4 in the linear and nonlinear models. `ManufactingProcess32` still is deemed the most important. The other predictors have less variable importance. `BiologicalMaterial06` was deemed only the seventh most important, where it was the second most important in other variables. There are some predictors that were not in the top 10 previously, that are in the top 10 now, such as Manufacting Processes number 17, 4, 33, and 10.
+
+##    (c) Plot the optimal single tree with the distribution of yield in the terminal nodes. Does this view of the data provide additional knowledge about the biological or process predictors and their relationship with yield?
+
+```{r}
+rpartTree <- rpart(Yield ~ ., data = Chemical[index, ])
+
+plot(as.party(rpartTree), ip_args = list(abbreviate = 4), gp = gpar(fontsize = 7))
 ```
 
