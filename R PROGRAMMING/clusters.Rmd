@@ -1,0 +1,137 @@
+---
+title: "Clustering"
+author: "Frederick Jones"
+date: "2024-04-16"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# import data 
+grocery
+```{r}
+library(factoextra)
+library(readr)
+library(arules)
+grocery <- read.transactions("~/Downloads/GroceryDataSet.csv")
+head(grocery)
+```
+
+```{r}
+summary(grocery)
+```
+## eploring the data 
+
+```{r}
+library(tibble)
+library(tidyverse)
+library(arules)
+
+
+grocery_frequency <- tibble(Items = names(itemFrequency(grocery)),
+                            Frequency = itemFrequency(grocery))
+head(grocery_frequency)
+```
+
+The table below represents the support or actual frequency with which each item is purchased. For example, whole milk is purchased with actual frequency of 0.255 or 26% of the time. Stated differently, about 1 in 4 transactions (0.255 of the time) include whole milk.
+
+```{r}
+grocery_frequency %>%
+  arrange(desc(Frequency)) %>%
+  slice(1:20)
+```
+
+
+```{r}
+grocery_frequency %>%
+  select(Frequency) %>%
+  summary()
+```
+
+##    Extract the rules
+
+
+```{r}
+frequency_per_day <- 5
+days_per_period <- 30
+total_transactions <- length(grocery)
+
+support_value <- (frequency_per_day * days_per_period)/total_transactions
+
+grocery_rules <- apriori(grocery,
+                         parameter = list(
+                           support = support_value,
+                           confidence = 0.25,
+                           minlen = 2
+                         ))
+```
+
+```{r}
+summary(grocery_rules)
+```
+
+#   Assess the rules
+
+```{r}
+grocery_rules %>%
+  sort(by = "confidence") %>%
+  head(n = 10) %>%
+  inspect()
+```
+
+```{r}
+grocery_rules %>%
+  sort (by = "lift") %>%
+  head(n = 10) %>%
+  inspect()
+```
+
+#   Clustering
+
+```{r}
+grocery_rules_df <- as(grocery_rules, "data.frame")
+head(grocery_rules_df)
+```
+
+
+```{r}
+grocery_rules_df %>%
+  select(lift, count) %>%
+  summary()
+grocery_rules_df <- na.omit(grocery_rules_df)
+```
+
+```{r}
+grocery_rules_scaled <- grocery_rules_df %>%
+  select(lift, count) %>%
+  scale()
+
+head(grocery_rules_scaled)
+```
+
+
+```{r}
+set.seed(101)
+
+k_2 <- kmeans(grocery_rules_scaled, centers = 2, nstart = 5)
+k_2$size
+```
+
+
+```{r}
+fviz_cluster(k_2, data = grocery_rules_scaled, repel = TRUE)
+```
+
+
+```{r}
+set.seed(102)
+
+k_4 <- kmeans(grocery_rules_scaled, centers = 4, nstart = 25)
+k_4$size
+```
+
+
+```{r}
+fviz_cluster(k_4, data = grocery_rules_scaled, repel = TRUE)
+```
+
