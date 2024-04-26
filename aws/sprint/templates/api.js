@@ -9,9 +9,18 @@ const app = express();
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Serve the index.html file when the root URL is accessed
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// Serve the index.html file for all routes except '/add-teacher'
+app.get('*', (req, res, next) => {
+  if (req.url !== '/add-teacher') {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  } else {
+    next();
+  }
+});
+
+// Serve the add_teacher.html file for '/add-teacher' route
+app.get('/add-teacher', (req, res) => {
+  res.sendFile(path.join(__dirname, 'add_teacher.html'));
 });
 
 // Create a MySQL connection pool
@@ -23,7 +32,7 @@ const pool = mysql.createPool({
   database: 'cis3368DB'
 });
 
-// Define a route to handle login and fetch data
+// Route to handle login and fetch data
 app.post('/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -75,6 +84,19 @@ app.post('/login', (req, res) => {
   } else {
     res.status(401).json({ error: 'Unauthorized' });
   }
+});
+
+// Route to add a new teacher
+app.post('/add-teacher', (req, res) => {
+  const { name, email } = req.body;
+  pool.query('INSERT INTO teacher (name, email) VALUES (?, ?)', [name, email], (error, results, fields) => {
+    if (error) {
+      console.error('Error adding teacher:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+    res.status(200).json({ message: 'Teacher added successfully' });
+  });
 });
 
 // Start the server

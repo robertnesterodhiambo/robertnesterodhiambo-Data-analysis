@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Facility</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+    }
+    .container {
+        width: 300px;
+        margin: 100px auto;
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    input[type="submit"] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Add New Facility</h2>
+    <form id="add-facility-form">
+        <label for="facility-name">Name:</label>
+        <input type="text" id="facility-name" name="facility-name" required><br>
+        <label for="facility-location">Location:</label>
+        <input type="text" id="facility-location" name="facility-location" required><br>
+        <input type="submit" value="Add Facility">
+    </form>
+</div>
+
+<script>
+document.getElementById('add-facility-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var facilityName = document.getElementById('facility-name').value;
+    var facilityLocation = document.getElementById('facility-location').value;
+
+    // Send form data to the server
+    fetch('/add-facility', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: facilityName,
+            location: facilityLocation
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message); // Show success message
+        // Clear the form fields
+        document.getElementById('facility-name').value = '';
+        document.getElementById('facility-location').value = '';
+    })
+    .catch(error => {
+        console.error('Error adding facility:', error);
+        alert('An error occurred while adding the facility. Please try again.');
+    });
+});
+</script>
+
+</body>
+</html>

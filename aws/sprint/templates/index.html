@@ -5,6 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login Page</title>
 <style>
+    .add-teacher-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.add-teacher-button:hover {
+    background-color: #45a049;
+}
+
     body {
         font-family: Arial, sans-serif;
         background-color: #f4f4f4;
@@ -82,7 +99,7 @@
 
 <div class="container" id="table-container" style="display: none;">
     <div class="action-buttons">
-        <button id="add-teacher">Add Teacher</button>
+        <a href="add_teacher.html" id="add-teacher" class="add-teacher-button">Add Teacher</a>
         <button id="add-child">Add Child</button>
         <button id="add-facility">Add Facility</button>
         <button id="assign-teacher-child">Assign Teacher and Child</button>
@@ -156,6 +173,9 @@
         }
         table.innerHTML = tableHtml;
     }
+    document.getElementById('add-teacher').addEventListener('click', function() {
+        window.location.href = 'add_teacher.html';
+    });
 </script>
 
 </body>

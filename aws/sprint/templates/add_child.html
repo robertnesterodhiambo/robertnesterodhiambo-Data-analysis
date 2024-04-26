@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Child</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+    }
+    .container {
+        width: 300px;
+        margin: 100px auto;
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+    }
+    input[type="text"], input[type="email"], input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    input[type="submit"] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Add New Child</h2>
+    <form id="add-child-form">
+        <label for="child-name">Name:</label>
+        <input type="text" id="child-name" name="child-name" required><br>
+        <label for="child-age">Age:</label>
+        <input type="number" id="child-age" name="child-age" required><br>
+        <label for="child-parent">Parent Email:</label>
+        <input type="email" id="child-parent" name="child-parent" required><br>
+        <input type="submit" value="Add Child">
+    </form>
+</div>
+
+<script>
+document.getElementById('add-child-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var childName = document.getElementById('child-name').value;
+    var childAge = document.getElementById('child-age').value;
+    var parentEmail = document.getElementById('child-parent').value;
+
+    // Send form data to the server
+    fetch('/add-child', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: childName,
+            age: childAge,
+            parentEmail: parentEmail
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message); // Show success message
+        // Clear the form fields
+        document.getElementById('child-name').value = '';
+        document.getElementById('child-age').value = '';
+        document.getElementById('child-parent').value = '';
+    })
+    .catch(error => {
+        console.error('Error adding child:', error);
+        alert('An error occurred while adding the child. Please try again.');
+    });
+});
+</script>
+
+</body>
+</html>

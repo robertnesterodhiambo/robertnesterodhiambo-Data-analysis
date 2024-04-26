@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Page</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+    }
+    .container {
+        width: 300px;
+        margin: 100px auto;
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+    }
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    input[type="submit"] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    .add-teacher-form {
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<div class="container" id="login-container">
+    <h2>Login</h2>
+    <form id="login-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+        <input type="submit" value="Login">
+    </form>
+</div>
+
+<div class="container" id="table-container" style="display: none;">
+    <div class="action-buttons">
+        <button id="add-teacher-button">Add Teacher</button>
+        <!-- Add other action buttons here -->
+    </div>
+
+    <div class="add-teacher-form">
+        <h2>Add New Teacher</h2>
+        <form id="add-teacher-form">
+            <label for="teacher-name">Name:</label>
+            <input type="text" id="teacher-name" name="teacher-name" required><br>
+            <label for="teacher-email">Email:</label>
+            <input type="email" id="teacher-email" name="teacher-email" required><br>
+            <input type="submit" value="Add Teacher">
+        </form>
+    </div>
+
+    <!-- Add tables to display data here -->
+</div>
+
+<script>
+document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+    if (username === "admin" && password === "123") {
+        // Show table container
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('table-container').style.display = 'block';
+        // Show action buttons
+        document.querySelector('.action-buttons').style.display = 'block';
+        // Fetch data and populate tables
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Populate tables here
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    } else {
+        alert("Invalid username or password. Please try again.");
+    }
+});
+
+document.getElementById('add-teacher-button').addEventListener('click', function() {
+    document.querySelector('.add-teacher-form').style.display = 'block';
+});
+
+document.getElementById('add-teacher-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var teacherName = document.getElementById('teacher-name').value;
+    var teacherEmail = document.getElementById('teacher-email').value;
+    fetch('/add-teacher', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: teacherName,
+            email: teacherEmail
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message); // Show success message
+        // Clear the form fields
+        document.getElementById('teacher-name').value = '';
+        document.getElementById('teacher-email').value = '';
+    })
+    .catch(error => {
+        console.error('Error adding teacher:', error);
+        alert('An error occurred while adding the teacher. Please try again.');
+    });
+});
+</script>
+
+</body>
+</html>
