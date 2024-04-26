@@ -1,0 +1,16 @@
+1. **Install Postman**: If you haven't already, download and install Postman from the official website (https://www.postman.com/downloads/).
+
+2. **Run the Flask Application**: Make sure your Flask application is running. If it's not already running, you can start it by executing the script you wrote in the terminal or command prompt.
+
+3. **Test the Endpoints**:
+   - Open Postman.
+   - Use the appropriate HTTP method (POST, GET, etc.) and URL for the endpoint you want to test.
+   - If the endpoint requires any parameters or JSON data, specify them in the request body or as query parameters.
+   - Click "Send" to make the request.
+   - Review the response to see if it matches your expectations.
+
+For example:
+- To add a new teacher, send a POST request to `http://localhost:5000/teacher` with JSON data containing the teacher's information.
+- To assign a teacher to a classroom, send a POST request to `http://localhost:5000/assign_teacher` with JSON data containing the teacher ID and classroom ID.
+- To add a new child, send a POST request to `http://localhost:5000/child` with JSON data containing the child's information.
+- To assign a child to a classroom, send a POST request to `http://localhost:5000/assign_child` with JSON data containing the child ID and classroom ID.

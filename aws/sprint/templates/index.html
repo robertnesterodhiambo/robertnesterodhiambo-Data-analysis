@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daycare Management System</title>
+</head>
+<body>
+    <h1>Daycare Management System</h1>
+    
+    <!-- Form to add a new teacher -->
+    <h2>Add Teacher</h2>
+    <form id="addTeacherForm">
+        <label for="teacherFirstName">First Name:</label>
+        <input type="text" id="teacherFirstName" name="teacherFirstName" required><br>
+        <label for="teacherLastName">Last Name:</label>
+        <input type="text" id="teacherLastName" name="teacherLastName" required><br>
+        <label for="teacherClassroom">Classroom ID:</label>
+        <input type="number" id="teacherClassroom" name="teacherClassroom" required><br>
+        <button type="submit">Add Teacher</button>
+    </form>
+
+    <!-- Form to add a new child -->
+    <h2>Add Child</h2>
+    <form id="addChildForm">
+        <label for="childFirstName">First Name:</label>
+        <input type="text" id="childFirstName" name="childFirstName" required><br>
+        <label for="childLastName">Last Name:</label>
+        <input type="text" id="childLastName" name="childLastName" required><br>
+        <label for="childAge">Age:</label>
+        <input type="number" id="childAge" name="childAge" required><br>
+        <label for="childClassroom">Classroom ID:</label>
+        <input type="number" id="childClassroom" name="childClassroom" required><br>
+        <button type="submit">Add Child</button>
+    </form>
+
+    <!-- Form to assign teacher to classroom -->
+    <h2>Assign Teacher to Classroom</h2>
+    <form id="assignTeacherForm">
+        <label for="teacherID">Teacher ID:</label>
+        <input type="number" id="teacherID" name="teacherID" required><br>
+        <label for="teacherClassroom">Classroom ID:</label>
+        <input type="number" id="teacherClassroom" name="teacherClassroom" required><br>
+        <button type="submit">Assign Teacher</button>
+    </form>
+
+    <!-- Form to assign child to classroom -->
+    <h2>Assign Child to Classroom</h2>
+    <form id="assignChildForm">
+        <label for="childID">Child ID:</label>
+        <input type="number" id="childID" name="childID" required><br>
+        <label for="childClassroom">Classroom ID:</label>
+        <input type="number" id="childClassroom" name="childClassroom" required><br>
+        <button type="submit">Assign Child</button>
+    </form>
+
+    <script>
+        // Function to handle form submission for adding a new teacher
+        document.getElementById('addTeacherForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+            fetch('/teacher', {
+                method: 'POST',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Function to handle form submission for adding a new child
+        document.getElementById('addChildForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+            fetch('/child', {
+                method: 'POST',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Function to handle form submission for assigning teacher to classroom
+        document.getElementById('assignTeacherForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+            fetch('/assign_teacher', {
+                method: 'POST',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Function to handle form submission for assigning child to classroom
+        document.getElementById('assignChildForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+            fetch('/assign_child', {
+                method: 'POST',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
