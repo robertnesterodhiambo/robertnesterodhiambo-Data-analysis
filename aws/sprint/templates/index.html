@@ -1,123 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daycare Management System</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Page</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+    }
+    .container {
+        width: 300px;
+        margin: 100px auto;
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+    }
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    input[type="submit"] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    .action-buttons {
+        margin-bottom: 20px;
+    }
+    .action-buttons button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+    }
+    .action-buttons button:hover {
+        background-color: #45a049;
+    }
+</style>
 </head>
 <body>
-    <h1>Daycare Management System</h1>
-    
-    <!-- Form to add a new teacher -->
-    <h2>Add Teacher</h2>
-    <form id="addTeacherForm">
-        <label for="teacherFirstName">First Name:</label>
-        <input type="text" id="teacherFirstName" name="teacherFirstName" required><br>
-        <label for="teacherLastName">Last Name:</label>
-        <input type="text" id="teacherLastName" name="teacherLastName" required><br>
-        <label for="teacherClassroom">Classroom ID:</label>
-        <input type="number" id="teacherClassroom" name="teacherClassroom" required><br>
-        <button type="submit">Add Teacher</button>
-    </form>
 
-    <!-- Form to add a new child -->
-    <h2>Add Child</h2>
-    <form id="addChildForm">
-        <label for="childFirstName">First Name:</label>
-        <input type="text" id="childFirstName" name="childFirstName" required><br>
-        <label for="childLastName">Last Name:</label>
-        <input type="text" id="childLastName" name="childLastName" required><br>
-        <label for="childAge">Age:</label>
-        <input type="number" id="childAge" name="childAge" required><br>
-        <label for="childClassroom">Classroom ID:</label>
-        <input type="number" id="childClassroom" name="childClassroom" required><br>
-        <button type="submit">Add Child</button>
+<div class="container" id="login-container">
+    <h2>Login</h2>
+    <form id="login-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+        <input type="submit" value="Login">
     </form>
+</div>
 
-    <!-- Form to assign teacher to classroom -->
-    <h2>Assign Teacher to Classroom</h2>
-    <form id="assignTeacherForm">
-        <label for="teacherID">Teacher ID:</label>
-        <input type="number" id="teacherID" name="teacherID" required><br>
-        <label for="teacherClassroom">Classroom ID:</label>
-        <input type="number" id="teacherClassroom" name="teacherClassroom" required><br>
-        <button type="submit">Assign Teacher</button>
-    </form>
+<div class="container" id="table-container" style="display: none;">
+    <div class="action-buttons">
+        <button id="add-teacher">Add Teacher</button>
+        <button id="add-child">Add Child</button>
+        <button id="add-facility">Add Facility</button>
+        <button id="assign-teacher-child">Assign Teacher and Child</button>
+    </div>
 
-    <!-- Form to assign child to classroom -->
-    <h2>Assign Child to Classroom</h2>
-    <form id="assignChildForm">
-        <label for="childID">Child ID:</label>
-        <input type="number" id="childID" name="childID" required><br>
-        <label for="childClassroom">Classroom ID:</label>
-        <input type="number" id="childClassroom" name="childClassroom" required><br>
-        <button type="submit">Assign Child</button>
-    </form>
+    <h2>Facility table:</h2>
+    <table id="facility-table"></table>
 
-    <script>
-        // Function to handle form submission for adding a new teacher
-        document.getElementById('addTeacherForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let formData = new FormData(this);
-            fetch('/teacher', {
+    <h2>Classroom table:</h2>
+    <table id="classroom-table"></table>
+
+    <h2>Teacher table:</h2>
+    <table id="teacher-table"></table>
+
+    <h2>Child table:</h2>
+    <table id="child-table"></table>
+</div>
+
+<script>
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        if (username === "admin" && password === "123") {
+            // Show table container
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('table-container').style.display = 'block';
+            // Show action buttons
+            document.querySelector('.action-buttons').style.display = 'block';
+            // Fetch data and populate tables
+            fetch('/login', {
                 method: 'POST',
-                body: JSON.stringify(Object.fromEntries(formData)),
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
             })
             .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => console.error('Error:', error));
-        });
+            .then(data => {
+                populateTable('facility-table', data.facility);
+                populateTable('classroom-table', data.classroom);
+                populateTable('teacher-table', data.teacher);
+                populateTable('child-table', data.child);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        } else {
+            alert("Invalid username or password. Please try again.");
+        }
+    });
 
-        // Function to handle form submission for adding a new child
-        document.getElementById('addChildForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let formData = new FormData(this);
-            fetch('/child', {
-                method: 'POST',
-                body: JSON.stringify(Object.fromEntries(formData)),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => console.error('Error:', error));
-        });
+    document.getElementById('add-teacher').addEventListener('click', function() {
+        window.location.href = 'add_teacher.html';
+    });
 
-        // Function to handle form submission for assigning teacher to classroom
-        document.getElementById('assignTeacherForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let formData = new FormData(this);
-            fetch('/assign_teacher', {
-                method: 'POST',
-                body: JSON.stringify(Object.fromEntries(formData)),
-                headers: {
-                    'Content-Type': 'application/json'
+    function populateTable(tableId, rows) {
+        var table = document.getElementById(tableId);
+        var tableHtml = '';
+        for (var i = 0; i < rows.length; i++) {
+            tableHtml += '<tr>';
+            for (var key in rows[i]) {
+                if (rows[i].hasOwnProperty(key)) {
+                    tableHtml += '<td>' + rows[i][key] + '</td>';
                 }
-            })
-            .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => console.error('Error:', error));
-        });
+            }
+            tableHtml += '</tr>';
+        }
+        table.innerHTML = tableHtml;
+    }
+</script>
 
-        // Function to handle form submission for assigning child to classroom
-        document.getElementById('assignChildForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let formData = new FormData(this);
-            fetch('/assign_child', {
-                method: 'POST',
-                body: JSON.stringify(Object.fromEntries(formData)),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
 </body>
 </html>
