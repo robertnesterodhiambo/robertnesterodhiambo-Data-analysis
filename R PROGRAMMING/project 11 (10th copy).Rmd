@@ -1,0 +1,160 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+##     section A
+
+
+2. The AICC should always be used to select models for forecasting.
+   - Disagree: While the AICC is a valuable criterion for model selection, it should not be the sole determinant. Other factors, such as the complexity of the model, the interpretability of the results, and the specific characteristics of the data, should also be considered. Additionally, different model selection criteria may be more appropriate depending on the context, so it's essential to use judgment and consider multiple metrics when selecting forecasting models.
+
+4. The trouble with forecasting is that it assumes the patterns in the past will continue in the future.
+   - Agree: One of the main challenges in forecasting is the assumption of stationarity, which implies that historical patterns will persist into the future. However, this assumption may not always hold true, especially in dynamic and uncertain environments. Forecasting models should be supplemented with scenario analysis and sensitivity testing to account for potential deviations from historical patterns and to improve the robustness of forecasts.
+
+5. An ARIMA model with uncorrelated residuals will usually produce accurate forecasts.
+   - Agree: Uncorrelated residuals indicate that the ARIMA model has adequately captured the autocorrelation structure in the data, which is essential for accurate forecasting. However, while uncorrelated residuals are a necessary condition for accurate forecasts, they are not always a sufficient condition. Other factors, such as model specification and the presence of outliers, should also be considered when assessing forecast accuracy.
+
+6. Regression models with Fourier terms should always be used to model seasonality.
+   - Disagree: While regression models with Fourier terms can effectively capture complex seasonal patterns, they may not always be necessary or appropriate. The choice of modeling approach should depend on the data's characteristics and the analysis's goals. Simpler methods, such as seasonal dummies or seasonal moving averages, may suffice for data with straightforward seasonal patterns. Therefore, it's essential to consider the complexity of the seasonality and the trade-offs between model complexity and interpretability when choosing a modeling approach.
+
+
+## Section B
+
+###    1
+The time series plots depicting birth data from 1980 to 2019 reveal intriguing insights into the dynamics of birth rates over the past four decades. The general plot spanning the entire period highlights discernible trends and seasonal patterns, offering a broad perspective on birth rate fluctuations over time. Meanwhile, the yearly plot with distinct colors for each year provides a detailed view of year-to-year variations and potential cohort effects, enabling a closer examination of changes in fertility patterns over different generations. Additionally, the monthly plots for each year offer a granular analysis of intra-year variability and seasonal effects, shedding light on the nuanced dynamics of birth rates within individual years. Together, these plots offer a comprehensive understanding of the complex interplay of factors influencing birth rates, from long-term trends to short-term fluctuations, providing valuable insights for further research and policy considerations.
+
+###   2
+Yes I am happy with it.
+
+these models decomposisont show and explain alot in terms of explainaing how the data behaves
+Decomposition plots illustrate birth data's components: trend (long-term direction), seasonality (recurring patterns), and remainder (unexplained fluctuations). By analyzing these components, we uncover underlying trends, seasonal effects, and random variation, offering insights into birth rate dynamics over the past four decades.
+
+##    3
+
+(a) Seasonal naïve method: Not suitable for long-term forecasting as it relies solely on the most recent seasonal pattern without considering any trend or other factors.
+
+(b) An STL decomposition combined with the drift method to forecast the seasonally adjusted component: Suitable as it accounts for both seasonal and trend components.
+
+(c) An STL decomposition on the log transformed data combined with an ETS to forecast the seasonally adjusted component: Suitable as it addresses both seasonality and trend while also stabilizing variance through logarithmic transformation.
+
+(d) Holt-Winters method with damped trend and additive seasonality: Suitable for capturing both trend and seasonality with the added benefit of damping to mitigate overly optimistic or pessimistic forecasts.
+
+(e) ETS(A,N,A): Suitable for capturing additive trend, no seasonality, and additive errors.
+
+(f) ETS(A,AD,M): Suitable for capturing additive trend, additive seasonality, and multiplicative errors.
+
+(g) ARIMA(1,1,4): Suitable for capturing both trend and seasonality with differencing and autoregressive and moving average terms.
+
+(h) ARIMA(3,0,2)(1,1,1)4: Suitable for capturing trend and seasonality with a combination of autoregressive, moving average, and seasonal terms.
+
+(i) ARIMA(1,0,2)(2,1,0)12: Suitable for capturing trend and seasonality with different orders of differencing and seasonal terms.
+
+(j) Regression with time and Fourier terms: Suitable for capturing both linear trend and periodic seasonal patterns through Fourier terms.
+
+
+
+##    SECTION C
+
+###   1
+
+The `fit_ETS` object represents fitted exponential smoothing state space models (ETS) for forecasting monthly birth data in Victoria. The accompanying tibble summarizes key model estimates, including smoothing parameters, seasonal components, and trend characteristics, providing insights into how each model captures and forecasts the data's underlying patterns.
+
+###   2
+
+the plot explore the models seasonality  trend and all compnents of ts such that we can see the data decompose.
+
+###   3
+
+3. Based on the provided output, the models' fit can be assessed using metrics such as AIC, AICC, BIC, and MSE. Lower values indicate better fit. Among the models, ETS(A) and ETS(Ad) have the lowest AIC, AICC, and BIC values, indicating better fit. However, their MSE values are slightly higher than ETS(N), suggesting that ETS(N) may provide slightly more accurate forecasts. Therefore, I would choose ETS(N) for forecasting the number of births over the next two years due to its lower MSE and comparable AIC, AICC, and BIC values.
+
+###   4
+
+The estimated ETS(N) model can be written in full as follows:
+
+\[ \hat{y}_{t+1} = \ell_t + b_t + s_{t+1-m} \]
+
+where:
+- \( \hat{y}_{t+1} \) is the forecast for the next period \( t+1 \).
+- \( \ell_t \) represents the level component at time \( t \).
+- \( b_t \) represents the trend component at time \( t \).
+- \( s_{t+1-m} \) represents the seasonal component for the next seasonal cycle \( t+1-m \).
+
+This model assumes no trend (\( b_t = 0 \)) and only considers the level (\( \ell_t \)) and seasonal (\( s_{t+1-m} \)) components for forecasting.
+
+###   5
+
+
+
+- For the level component:
+  - February 2019: \( \ell_{Feb} = 5.90 \)
+
+- For the seasonal component:
+  - February 2019: \( s_{Feb} = 0.318 \)
+
+Now, let's calculate the forecasts:
+
+- For \( h = 1 \) step ahead (March 2019):
+  \( \hat{y}_{Mar} = \ell_{Feb} + s_{Mar} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 4 \) steps ahead (June 2019):
+  \( \hat{y}_{Jun} = \ell_{Feb} + s_{Jun} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 12 \) steps ahead (February 2020):
+  \( \hat{y}_{Feb} = \ell_{Feb} + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 13 \) steps ahead (March 2020):
+  \( \hat{y}_{Mar} = \ell_{Feb} + s_{Mar} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+###   6
+
+- Forecast for March 2019 (\( \hat{y}_{Mar} \)): 6.218
+
+We also need the estimated standard deviation of the forecast errors (\( \sigma \)). This information is typically available from the model output but wasn't provided explicitly. We can estimate it using the mean squared error (MSE) from the model output:
+
+- MSE: 0.0173 (from the output)
+
+The standard deviation of the forecast errors (\( \sigma \)) is the square root of the MSE:
+
+\[ \sigma = \sqrt{MSE} = \sqrt{0.0173} \]
+
+\[ \sigma \approx 0.1316 \]
+
+Now, to calculate the 80% confidence interval for the 1-step ahead forecast:
+
+- Margin of error (ME) at 80% confidence level:
+  \[ ME = Z \times \frac{\sigma}{\sqrt{n}} \]
+  where \( Z \) is the Z-score corresponding to the desired confidence level, and \( n \) is the sample size (which is 1 in this case).
+
+For an 80% confidence level, the Z-score is approximately 1.282.
+
+\[ ME = 1.282 \times \frac{0.1316}{\sqrt{1}} \]
+\[ ME \approx 0.169 \]
+
+####    7
+
+The forecasts from the ETS(N) model, as presented in Figure 7, likely differ from those shown in Figure 5 due to the different characteristics and assumptions of the ETS models used. ETS(N) assumes no trend and only considers the level and seasonal components for forecasting. This may lead to smoother forecasts, especially in the absence of any apparent trend or seasonality changes. In contrast, other ETS models may incorporate trends or additional seasonal patterns, leading to more nuanced and possibly more accurate forecasts, especially over longer horizons.
+
+In longer-term forecasts, differences between the three estimated ETS models are expected to become more pronounced. ETS(N) forecasts may continue to be relatively smooth, capturing primarily the underlying level and seasonal patterns. ETS(A) forecasts may exhibit some trend behavior but with less variability compared to ETS(Ad), which includes a damped trend component. ETS(Ad) forecasts may show more pronounced trend behavior initially, but the damping parameter will likely lead to convergence towards a stable level over longer horizons. Overall, the choice of ETS model for longer-term forecasts depends on the data characteristics and the desired balance between capturing short-term fluctuations and long-term trends.
+
+
+##        secion D
+
+###   1
+
+Differencing with a lag of 12 months is applied to the monthly birth data in Victoria to remove seasonality. The resulting series appears stationary, indicated by a non-significant KPSS p-value of 0.264, suggesting it lacks significant trends or seasonality, making it suitable for further analysis.
+
+
+###   3
+
+1. The ARIMA model (1,0,1)(2,1,0)[12] is selected based on its lowest AIC value among candidate models. This model includes one autoregressive term, one moving average term, seasonal differencing, and two seasonal moving average terms.
+
+2. The residuals in Figure 9 appear to have no discernible pattern, indicating that the model adequately captures the underlying structure of the data. The residuals seem to fluctuate around zero without any systematic trend or seasonal pattern.
+
+3. While the model selection process and the appearance of residuals suggest a good fit, the downward trend in the forecasts plotted in Figure 10 raises concerns. This trend indicates that the model may not adequately capture longer-term dynamics or structural changes in the data. Therefore, further investigation and potentially a more complex model may be necessary to improve longer-term forecasting accuracy.
+
+####    4
+
+The downward trend in the forecasts from the ARIMA model could be due to several factors. Firstly, the model may not adequately capture all the underlying dynamics of the data, such as trend or seasonality. Additionally, if the historical data exhibit a downward trend, the model may extrapolate this trend into the future.
+
+For longer-term forecasts, we would expect the downward trend to persist if the underlying data trend continues unchanged. However, if there are seasonal or cyclical patterns in the data, these may eventually counteract the downward trend, leading to stabilization or even an upward trend in the forecasts over the long term. Therefore, it's important to monitor the forecasts and reassess the model periodically to ensure its accuracy and relevance to the changing data patterns.

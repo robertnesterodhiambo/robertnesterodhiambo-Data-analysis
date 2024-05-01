@@ -1,0 +1,134 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+##     section A
+
+1. Narrower prediction intervals are more informative and should always be preferred.
+   - Disagree: While narrower prediction intervals offer more precise estimates, they often come with increased uncertainty. Wider intervals acknowledge this uncertainty, making them more conservative but potentially more reliable. The choice between narrower and wider prediction intervals depends on the specific context and the consequences of forecast errors.
+
+3. An ETS model for Holt's linear trend method is a generalization of an ETS model for simple exponential smoothing. It should therefore always be preferred as it will produce better forecasts.
+   - Disagree: While Holt's linear trend method offers more flexibility by incorporating trend components, it may not always be the best choice. Simple exponential smoothing (SES) is suitable when the trend is absent or negligible. The choice between SES and Holt's method depends on the data's characteristics, and blindly favoring one over the other can lead to suboptimal forecasts.
+
+4. The trouble with forecasting is that it assumes the patterns in the past will continue in the future.
+   - Agree: This statement highlights a fundamental challenge in forecasting, known as the "stationarity assumption." While historical patterns often provide valuable insights, they can be disrupted by unforeseen events or changes. Forecasting should consider potential deviations from past patterns and incorporate scenario analysis to account for uncertainty.
+
+6. Regression models with Fourier terms should always be used to model seasonality.
+   - Disagree: While regression models with Fourier terms can effectively capture complex seasonality, they may not always be necessary. Simpler methods like seasonal dummies or moving averages could suffice for data with straightforward seasonal patterns. The choice of modeling approach should consider the data's characteristics and the analysis's goals.
+
+
+## Section B
+
+###    1
+Birth data plots from 1980 to 2019 reveal trends, seasons, yearly variations, and monthly dynamics, informing research and policy.
+
+###   2
+Yes I am happy with it.
+
+Decomposition plots reveal birth data trends, seasons, and fluctuations, aiding understanding of birth rate dynamics.
+
+##    3
+
+Suitable:
+(b) An STL decomposition combined with the drift method to forecast the seasonally adjusted component.
+(c) An STL decomposition on the log-transformed data combined with an ETS to forecast the seasonally adjusted component.
+(d) Holt-Winters method with damped trend and additive seasonality.
+(e) ETS(A,N,A).
+(f) ETS(A,AD,M).
+
+Not Suitable:
+(a) Seasonal naïve method. (Does not account for trend or other components)
+(g) ARIMA(1,1,4). (Complexity may not be justified for the data)
+(h) ARIMA(3,0,2)(1,1,1)4. (Complexity may not be justified for the data)
+(i) ARIMA(1,0,2)(2,1,0)12. (Complexity may not be justified for the data)
+(j) Regression with time and Fourier terms. (May not capture all relevant components of the data)
+
+##    SECTION C
+
+###   1
+
+The `fit_ETS` object represents fitted exponential smoothing state space models (ETS) for forecasting monthly birth data in Victoria. The accompanying tibble summarizes key model estimates, including smoothing parameters, seasonal components, and trend characteristics, providing insights into how each model captures and forecasts the data's underlying patterns.
+
+###   2
+
+the plot explore the models seasonality  trend and all compnents of ts such that we can see the data decompose.
+
+###   3
+
+Among the models, ETS(A) and ETS(Ad) show the best fit, but ETS(N) might offer slightly more accurate forecasts.
+
+###   4
+
+The estimated ETS(N) model can be written in full as follows:
+
+\[ \hat{y}_{t+1} = \ell_t + b_t + s_{t+1-m} \]
+
+where:
+- \( \hat{y}_{t+1} \) is the forecast for the next period \( t+1 \).
+- \( \ell_t \) represents the level component at time \( t \).
+- \( b_t \) represents the trend component at time \( t \).
+- \( s_{t+1-m} \) represents the seasonal component for the next seasonal cycle \( t+1-m \).
+
+This model assumes no trend (\( b_t = 0 \)) and only considers the level (\( \ell_t \)) and seasonal (\( s_{t+1-m} \)) components for forecasting.
+
+###   5
+
+
+- For \( h = 1 \) step ahead (March 2019):
+  \( \hat{y}_{Mar} = \ell_{Feb} + s_{Mar} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 4 \) steps ahead (June 2019):
+  \( \hat{y}_{Jun} = \ell_{Feb} + s_{Jun} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 12 \) steps ahead (February 2020):
+  \( \hat{y}_{Feb} = \ell_{Feb} + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 13 \) steps ahead (March 2020):
+  \( \hat{y}_{Mar} = \ell_{Feb} + s_{Mar} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+###   6
+
+- Forecast for March 2019 (\( \hat{y}_{Mar} \)): 6.218
+
+- MSE: 0.0173 (from the output)
+
+The standard deviation of the forecast errors (\( \sigma \)) is the square root of the MSE:
+
+\[ \sigma = \sqrt{MSE} = \sqrt{0.0173} \]
+
+\[ \sigma \approx 0.1316 \]
+
+Now, to calculate the 80% confidence interval for the 1-step ahead forecast:
+
+- Margin of error (ME) at 80% confidence level:
+  \[ ME = Z \times \frac{\sigma}{\sqrt{n}} \]
+  where \( Z \) is the Z-score corresponding to the desired confidence level, and \( n \) is the sample size (which is 1 in this case).
+
+For an 80% confidence level, the Z-score is approximately 1.282.
+
+\[ ME = 1.282 \times \frac{0.1316}{\sqrt{1}} \]
+\[ ME \approx 0.169 \]
+
+####    7
+
+Different ETS models produce varied forecasts; ETS(N) offers smooth predictions, while ETS(A) and ETS(Ad) capture trend nuances.
+
+##        secion D
+
+###   1
+
+Differencing by 12 months makes Victoria's monthly birth data stationary, showing no significant trends or seasonality.
+
+
+###   3
+
+1. ARIMA(1,0,1)(2,1,0)[12] chosen for its lowest AIC, includes seasonal terms.
+
+2. Residuals show no pattern, suggesting model adequacy.
+
+3. Downward trend in forecasts suggests model limitations, may need complexity adjustment.
+
+####    4
+
+Downward forecast trend may result from incomplete model capture or historical trend continuation; future patterns may vary.

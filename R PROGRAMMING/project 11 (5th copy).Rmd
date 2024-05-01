@@ -1,0 +1,143 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+##     section A
+
+
+1. **Narrower prediction intervals are more informative and should always be preferred.**
+   - Disagree. While narrower prediction intervals may offer more precise estimates, they can also be overly optimistic and less reliable, especially in volatile or uncertain environments. It's crucial to balance precision with the need for reliable estimates.
+
+2. **The AICC should always be used to select models for forecasting.**
+   - Disagree. While AICC is a useful criterion for model selection, it's not universally applicable. Depending on the specific context and goals of the forecasting task, other criteria such as AIC or BIC may also be relevant. It's essential to consider multiple criteria and the overall forecasting objectives.
+
+3. **An ETS model for Holt's linear trend method is a generalization of an ETS model for simple exponential smoothing. It should therefore always be preferred as it will produce better forecasts.**
+   - Disagree. While an ETS model for Holt's linear trend method may capture more complex trends, its superiority depends on data characteristics. Simple exponential smoothing might suffice for data with no clear trend. Choice should align with data features.
+
+4. **The trouble with forecasting is that it assumes the patterns in the past will continue in the future.**
+   - Agree. While historical data provide valuable insights, blindly assuming past patterns will persist can lead to inaccurate forecasts, especially in dynamic environments. Forecasting should incorporate flexibility to adapt to changing conditions and uncertainties.
+
+
+## Section B
+
+###    1
+
+The time series plots of birth data from 1980 to 2019 reveal insightful trends and seasonal patterns. The overall plot showcases long-term trends, while yearly plots highlight year-to-year variations and cohort effects. Monthly plots offer detailed insights into intra-year variability and seasonal effects. These visuals provide a comprehensive understanding of birth rate dynamics, aiding research and policy decisions by illuminating the complex interplay of factors influencing birth rates, from long-term trends to short-term fluctuations, thus offering valuable insights for further analysis and policy formulation.
+
+###   2
+Yes I am happy with it.
+Decomposition plots offer a comprehensive view of birth data's behavior by illustrating its components: trend, seasonality, and remainder. Analyzing these components reveals underlying trends, seasonal effects, and random fluctuations, enhancing our understanding of birth rate dynamics over the past four decades.
+
+##    3
+
+(a) Seasonal naïve method: Suitable for simple seasonal patterns.
+
+(b) An STL decomposition with drift method: Suitable for capturing complex seasonal patterns and trends.
+
+(c) STL decomposition on log-transformed data with ETS: Suitable for handling non-linear trends and seasonality.
+
+(d) Holt-Winters method with damped trend: Suitable for stable and predictable patterns.
+
+(e) ETS(A,N,A): Not suitable due to additive errors assumption.
+
+(f) ETS(A,AD,M): Suitable for capturing additive errors with trend damping and multiplicative seasonality.
+
+(g) ARIMA(1,1,4): Not suitable due to high differencing and moving average terms.
+
+(h) ARIMA(3,0,2)(1,1,1)4: Not suitable due to complexity.
+
+(i) ARIMA(1,0,2)(2,1,0)12: Suitable for capturing seasonality with additional covariates.
+
+(j) Regression with time and Fourier terms: Suitable for modeling seasonality and trends.
+
+
+
+##    SECTION C
+
+###   1
+
+The `fit_ETS` object encapsulates fitted ETS models for forecasting monthly birth data in Victoria, along with key estimates like smoothing parameters and seasonal components.
+###   2
+
+the plot explore the models seasonality  trend and all compnents of ts such that we can see the data decompose.
+
+###   3
+
+Based on the output provided, model fit can be evaluated using AIC, AICC, BIC, and MSE metrics, where lower values indicate better fit. ETS(A) and ETS(Ad) exhibit the lowest AIC, AICC, and BIC values, implying superior fit. However, their MSE values are marginally higher than ETS(N), suggesting potential for slightly more accurate forecasts with ETS(N). Hence, ETS(N) is chosen for forecasting births over the next two years due to its lower MSE and comparable AIC, AICC, and BIC values, indicating a good balance between fit and forecast accuracy.
+
+###   4
+
+The estimated ETS(N) model can be written in full as follows:
+
+\[ \hat{y}_{t+1} = \ell_t + b_t + s_{t+1-m} \]
+
+where:
+- \( \hat{y}_{t+1} \) is the forecast for the next period \( t+1 \).
+- \( \ell_t \) represents the level component at time \( t \).
+- \( b_t \) represents the trend component at time \( t \).
+- \( s_{t+1-m} \) represents the seasonal component for the next seasonal cycle \( t+1-m \).
+
+This model assumes no trend (\( b_t = 0 \)) and only considers the level (\( \ell_t \)) and seasonal (\( s_{t+1-m} \)) components for forecasting.
+
+###   5
+
+Now, let's calculate the forecasts:
+
+- For \( h = 1 \) step ahead (March 2019):
+  \( \hat{y}_{Mar} = \ell_{Feb} + s_{Mar} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 4 \) steps ahead (June 2019):
+  \( \hat{y}_{Jun} = \ell_{Feb} + s_{Jun} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 12 \) steps ahead (February 2020):
+  \( \hat{y}_{Feb} = \ell_{Feb} + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+- For \( h = 13 \) steps ahead (March 2020):
+  \( \hat{y}_{Mar} = \ell_{Feb} + s_{Mar} = 5.90 + s_{Feb} = 5.90 + 0.318 = 6.218 \)
+
+###   6
+
+- Forecast for March 2019 (\( \hat{y}_{Mar} \)): 6.218
+
+We also need the estimated standard deviation of the forecast errors (\( \sigma \)). This information is typically available from the model output but wasn't provided explicitly. We can estimate it using the mean squared error (MSE) from the model output:
+
+- MSE: 0.0173 (from the output)
+
+The standard deviation of the forecast errors (\( \sigma \)) is the square root of the MSE:
+
+\[ \sigma = \sqrt{MSE} = \sqrt{0.0173} \]
+
+\[ \sigma \approx 0.1316 \]
+
+Now, to calculate the 80% confidence interval for the 1-step ahead forecast:
+
+- Margin of error (ME) at 80% confidence level:
+  \[ ME = Z \times \frac{\sigma}{\sqrt{n}} \]
+  where \( Z \) is the Z-score corresponding to the desired confidence level, and \( n \) is the sample size (which is 1 in this case).
+
+For an 80% confidence level, the Z-score is approximately 1.282.
+
+\[ ME = 1.282 \times \frac{0.1316}{\sqrt{1}} \]
+\[ ME \approx 0.169 \]
+
+####    7
+
+Forecasts from ETS(N) differ from other ETS models due to its focus on level and seasonal components, leading to smoother forecasts. Long-term differences depend on data characteristics and desired balance.
+
+##        secion D
+
+###   1
+
+Victoria's monthly birth data undergoes differencing with a 12-month lag to eliminate seasonality. This process yields a stationary series, as evidenced by a non-significant KPSS p-value of 0.264. The absence of significant trends or seasonality makes the data suitable for further analysis.
+
+####    3
+
+1. ARIMA (1,0,1)(2,1,0)[12] selected for its lowest AIC. It includes one AR term, one MA term, seasonal differencing, and two seasonal MA terms.
+
+2. Residuals in Figure 9 show no pattern, indicating the model captures data structure well.
+
+3. While model selection and residuals suggest good fit, downward trend in forecasts raises concerns about capturing longer-term dynamics.
+
+#### 4
+ Downward trend in ARIMA forecasts may result from incomplete data dynamics capture. Long-term trend persistence or seasonal patterns may counteract.
