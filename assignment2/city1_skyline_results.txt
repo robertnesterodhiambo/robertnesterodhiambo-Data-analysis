@@ -1,0 +1,7 @@
+Skyline Homes:
+id=51282, cost=204.18, size=50.0
+
+Execution Times:
+Sequential Scan: 2.784997 seconds
+Branch and Bound: 39.145815 seconds
+BBS with Divide-and-Conquer: 1.441183 seconds
