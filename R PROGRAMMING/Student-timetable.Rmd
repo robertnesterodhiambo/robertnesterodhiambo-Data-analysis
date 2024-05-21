@@ -1,0 +1,201 @@
+---
+output: 
+  word_document: 
+    toc: true
+---
+```{r}
+if (!require("tidyverse"))
+  install.packages("tidyverse")
+if (!require("dplyr"))
+  install.packages("dplyr")
+if (!require("plotly"))
+  install.packages("plotly")
+if (!require("readr"))
+  install.packages("readr")
+library(tidyverse)
+library(dplyr)
+library(plotly)
+library(ggplot2)
+library(readr)
+```
+
+
+# Date Range
+
+```{r}
+startdate <- "20220101"
+enddate <- "20240512"
+```
+
+# trump
+
+
+```{r}
+### Trump
+query <- "'Trump' SourceCountry:US"
+#Building the Volume dataframe
+vp1 <- "https://api.gdeltproject.org/api/v2/doc/doc?query="
+vp2 <- "&mode=timelinevolinfo&startdatetime="
+vp3 <- "000000&enddatetime="
+vp4 <- "000000&format=CSV"
+text_v_url <- paste0(vp1, query, vp2, startdate, vp3, enddate, vp4)
+v_url <- URLencode(text_v_url)
+v_url
+### Trump
+query <- "'Trump' SourceCountry:US"
+#Building the Volume dataframe
+vp1 <- "https://api.gdeltproject.org/api/v2/doc/doc?query="
+vp2 <- "&mode=timelinevolinfo&startdatetime="
+vp3 <- "000000&enddatetime="
+vp4 <- "000000&format=CSV"
+text_v_url <- paste0(vp1, query, vp2, startdate, vp3, enddate, vp4)
+v_url <- URLencode(text_v_url)
+v_url
+Volume <- read_csv(v_url)
+Volume$Date <- as.Date(Volume$Date, "%Y-%m-%d")
+VolumeTrump <- Volume
+```
+
+```{r}
+VolumeTrump
+```
+
+
+
+# Biden Tweets
+
+```{r}
+### Biden
+query <- "'Biden' SourceCountry:US"
+#Building the Volume dataframe
+vp1 <- "https://api.gdeltproject.org/api/v2/doc/doc?query="
+vp2 <- "&mode=timelinevolinfo&startdatetime="
+vp3 <- "000000&enddatetime="
+vp4 <- "000000&format=CSV"
+text_v_url <- paste0(vp1, query, vp2, startdate, vp3, enddate, vp4)
+v_url <- URLencode(text_v_url)
+v_url
+Volume <- read_csv(v_url)
+Volume$Date <- as.Date(Volume$Date, "%Y-%m-%d")
+VolumeBiden <- Volume
+
+```
+
+
+# plotting the data 
+
+```{r}
+### Merging
+VolumeTrumpBiden <- merge(VolumeTrump, VolumeBiden, by = "Date")
+VolumeTrumpBiden$TrumpVolume <- VolumeTrumpBiden$Value.x
+VolumeTrumpBiden$BidenVolume <- VolumeTrumpBiden$Value.y
+
+#Plotting volume by date
+library(plotly)
+fig <- plot_ly(
+  VolumeTrumpBiden,
+  x = ~ Date,
+  y = ~ BidenVolume,
+  name = 'Biden',
+  type = 'scatter',
+  mode = 'lines',
+  line = list(color = "#005F73")
+)
+fig <- fig %>% add_trace(
+  y = ~ TrumpVolume,
+  name = 'Trump',
+  mode = 'lines',
+  line = list(color = "#AE2012")
+)
+fig <-
+  fig %>% layout(
+    title = 'U.S. coverage volume, Biden v. Trump',
+    xaxis = list(title = "Date",
+                 showgrid = FALSE),
+    yaxis = list(title = "Volume",
+                 showgrid = TRUE)
+  )
+fig
+```
+
+.
+
+## word cloud
+
+```{r}
+getwd()
+trump <- read.csv("realdonaldtrump.csv")
+trump
+biden <- read.csv("JoeBidenTweets.csv")
+biden
+```
+
+
+```{r}
+library(tm)
+library(wordcloud)
+```
+
+# corpus
+
+
+```{r}
+# Create a Corpus from the tweet column
+corp <- Corpus(VectorSource(biden$tweet))
+
+# Convert to lowercase
+corp <- tm_map(corp, content_transformer(tolower))
+
+# Remove punctuation
+corp <- tm_map(corp, removePunctuation)
+
+# Remove stopwords (common words like 'the', 'and', etc.)
+corp <- tm_map(corp, removeWords, stopwords("english"))
+
+# Remove numbers
+corp <- tm_map(corp, removeNumbers)
+
+# Strip whitespace
+corp <- tm_map(corp, stripWhitespace)
+
+```
+
+
+# biden word  cloud
+
+```{r}
+# Convert corpus to a plain text document
+dtm <- DocumentTermMatrix(corp)
+
+# Calculate word frequencies
+freq <- colSums(as.matrix(dtm))
+
+# Create wordcloud
+wordcloud(names(freq), freq, min.freq = 1, random.order = FALSE, colors = brewer.pal(8, "Dark2"))
+```
+
+
+
+## trump word cloud
+```{r}
+colnames(trump)
+```
+
+```{r}
+corp_trump <- Corpus(VectorSource(trump$content))
+corp_trump <- tm_map(corp_trump, content_transformer(tolower))
+corp_trump <- tm_map(corp_trump, removePunctuation)
+corp_trump <- tm_map(corp_trump, removeWords, stopwords("english"))
+corp_trump <- tm_map(corp_trump, removeNumbers)
+corp_trump <- tm_map(corp_trump, stripWhitespace)
+
+```
+
+
+```{r}
+dtm_trump <- DocumentTermMatrix(corp_trump)
+freq_trump <- colSums(as.matrix(dtm_trump))
+wordcloud(names(freq_trump), freq_trump, min.freq = 1, random.order = FALSE, colors = brewer.pal(8, "Dark2"))
+
+```
+
