@@ -1,0 +1,16 @@
+---
+title: "Portfolio"
+format: beamer
+editor: visual
+---
+
+# Intro to Porfolio Analysis in R
+
+Diversify investment -> porfolio -> increase return’s expectation and reduce the risk. Hence, we need to test our investment strategy, it is called: backtesting. Backtesting are tested using historical data. We also need to use an online performance monitoring.
+
+
+```{r}
+library(tidyquant)
+ko <- getSymbols("ko", from = "2003-01-01", to = "2016-08-30", auto.assign = FALSE)
+```
+
