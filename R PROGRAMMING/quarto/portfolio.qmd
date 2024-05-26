@@ -11,7 +11,11 @@ Diversify investment -> porfolio -> increase return’s expectation and reduce t
 
 ```{r}
 library(tidyquant)
-
 ko <- getSymbols("ko", from = "2003-01-01", to = "2016-08-30", auto.assign = FALSE)
+```
+
+```{r}
+pep <- getSymbols("pep", from = "2003-01-01", to = "2016-08-30", auto.assign = FALSE)
+head(cbind(ko, pep))
 ```
 
