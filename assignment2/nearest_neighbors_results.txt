@@ -199,8 +199,8 @@ Query 197 -> id=20124, x=29.56, y=82.76 (Distance: 0.14)
 Query 198 -> id=41854, x=10.03, y=93.42 (Distance: 0.09)
 Query 199 -> id=111350, x=16.29, y=152.71 (Distance: 0.19)
 Query 200 -> id=88404, x=42.17, y=137.12 (Distance: 0.13)
-Total running time: 9.96 seconds
-Average time per query: 0.0498 seconds
+Total running time: 14.37 seconds
+Average time per query: 0.0719 seconds
 
 Nearest Restaurants using Best First Algorithm with R-tree:
 Query 1 -> id=121862, x=47.1, y=128.88 (Distance: 0.12)
@@ -607,5 +607,5 @@ Query 197 -> id=20124, x=29.56, y=82.76 (Distance: 0.14)
 Query 198 -> id=41854, x=10.03, y=93.42 (Distance: 0.09)
 Query 199 -> id=111350, x=16.29, y=152.71 (Distance: 0.19)
 Query 200 -> id=88404, x=42.17, y=137.12 (Distance: 0.13)
-Total running time: 18.82 seconds
-Average time per query: 0.0941 seconds
+Total running time: 27.60 seconds
+Average time per query: 0.1380 seconds
