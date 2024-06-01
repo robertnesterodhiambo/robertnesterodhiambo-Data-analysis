@@ -93,8 +93,8 @@ server <- function(input, output, session) {
     word_count <- text_data()
     
     if (nrow(word_count) > 0) {
-      # Create a palette of colors for authors
-      author_colors <- RColorBrewer::brewer.pal(length(unique(word_count$author)), "Set3")
+      # Create a palette of bright colors for authors
+      author_colors <- RColorBrewer::brewer.pal(length(unique(word_count$author)), "Spectral")
       names(author_colors) <- unique(word_count$author)
       
       # Define a function to assign colors based on authors
@@ -102,7 +102,7 @@ server <- function(input, output, session) {
         author_colors[author]
       }
       
-      # Create word cloud
+      # Create word cloud with brighter colors
       with(word_count, wordcloud(word, n, scale = c(3, 0.5), colors = assign_colors(author), 
                                  random.order = FALSE, max.words = input$num_words))
     }
