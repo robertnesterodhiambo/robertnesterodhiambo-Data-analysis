@@ -21,6 +21,7 @@ ui <- fluidPage(
                    choices = c("Jane Austen" = "Jane Austen", 
                                "Gutenberg - State of the Union Addresses" = "Gutenberg")),
       uiOutput("author_selection"),
+      numericInput("num_words", "Number of Words:", 100, min = 10, max = 500, step = 10),
       actionButton("analyze", "Analyze Text")
     ),
     
@@ -43,14 +44,23 @@ server <- function(input, output, session) {
         selectInput("gutenberg_authors", "Choose Authors:", choices = authors, multiple = TRUE)
       })
     } else {
+      jane_austen_books <- c("Pride and Prejudice" = "prideprejudice", 
+                             "Sense and Sensibility" = "sense", 
+                             "Emma" = "emma",
+                             "Mansfield Park" = "mansfield", 
+                             "Northanger Abbey" = "northanger", 
+                             "Persuasion" = "persuasion")
       output$author_selection <- renderUI({
-        NULL
+        selectInput("jane_austen_books", "Choose Book:", choices = jane_austen_books, selected = "prideprejudice")
       })
     }
   })
   
   text_data <- eventReactive(input$analyze, {
     if (input$book_type == "Gutenberg") {
+      if (is.null(input$gutenberg_authors)) {
+        return(data.frame())
+      }
       selected_books <- gutenberg_works(author %in% input$gutenberg_authors)
       book_ids <- selected_books$gutenberg_id
       text <- gutenberg_download(book_ids)
@@ -58,16 +68,16 @@ server <- function(input, output, session) {
         left_join(selected_books, by = "gutenberg_id") %>%
         select(gutenberg_id, text, title, author)
     } else {
-      # Use the janeaustenr package to load "Pride and Prejudice"
-      pride_prejudice <- janeaustenr::prideprejudice
-      text <- data.frame(text = pride_prejudice, 
-                         title = "Pride and Prejudice", 
+      book_name <- input$jane_austen_books
+      text <- data.frame(text = get(book_name), 
+                         title = book_name, 
                          author = "Jane Austen",
                          stringsAsFactors = FALSE)
     }
     
     # Remove punctuation and convert to a tidy format
     text$text <- stri_replace_all_regex(text$text, "[[:punct:]]", "")
+    text$text <- tolower(text$text)
     tidy_text <- text %>%
       unnest_tokens(word, text) %>%
       anti_join(stop_words, by = "word")
@@ -94,7 +104,7 @@ server <- function(input, output, session) {
       
       # Create word cloud
       with(word_count, wordcloud(word, n, scale = c(3, 0.5), colors = assign_colors(author), 
-                                 random.order = FALSE, max.words = 100))
+                                 random.order = FALSE, max.words = input$num_words))
     }
   })
 }
