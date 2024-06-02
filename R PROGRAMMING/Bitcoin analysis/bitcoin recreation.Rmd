@@ -1,0 +1,73 @@
+---
+title: "REPRORODUCIBLE RESEARCH WITH BITCOIN FORECASTING"
+author: "AYOUB JARBOUAI (418035) &&  IDRISS TALBI (418232)"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document: 
+    toc: yes
+  html_document: 
+    toc: yes
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# BITCOIN
+
+------------------------------------------------------------------------
+
+Bitcoin, introduced in 2009 by the mysterious Satoshi Nakamoto, stands as the pioneering cryptocurrency.
+It operates on a decentralized peer-to-peer network, allowing secure and transparent transactions without the need for a central authority.
+Bitcoin's blockchain technology records every transaction in a public ledger, ensuring immutability and trustworthiness through cryptographic hashing.
+
+This project is structured into two key sections:
+
+**1. Data Exploration** - Analyzing and visualizing Bitcoin price data.
+- Identifying trends and patterns in historical price movements.
+
+**2. Time Series Analysis and Forecasting** - **Forecasting Methods:** - **LSTM (Long Short-Term Memory):** Leveraging deep learning to capture complex temporal dependencies.
+- **XGBoost:** Harnessing gradient boosting to predict Bitcoin price fluctuations.
+- **Facebook Prophet:** Using a versatile tool for forecasting with seasonality and holidays.
+- **ARIMA (AutoRegressive Integrated Moving Average):** Employing a traditional statistical approach for time series forecasting.
+
+This project draws inspiration from notable kernels and tutorials, including those focused on Prophet, XGBoost, and ARIMA models, tailored specifically for Bitcoin price prediction.
+
+For those new to Bitcoin, you can learn more about its fundamentals [here](https://www.coindesk.com/information/what-is-bitcoin).
+
+------------------------------------------------------------------------
+
+##    Checking out the dataset in my data folder
+
+```{r}
+library(tidyverse)  # For data manipulation and visualization
+library(plotly)     # For interactive plots
+
+# Set the directory path
+data_dir <- "~/Git/Data"
+
+# List files in the directory
+dir_contents <- list.files(data_dir)
+
+# Print the contents of the directory
+print(dir_contents)
+```
+
+
+
+```{r}
+library(lubridate)  # For handling date/time data
+library(readr)      # For reading CSV files
+
+# Define a function to parse timestamps
+dateparse <- function(time_in_secs) {
+  as_datetime(as.numeric(time_in_secs), origin = "1970-01-01", tz = "UTC")
+}
+
+# Expand the tilde to the home directory
+file_path <- "~/Git/Data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv"
+
+# Read the CSV file
+data <- read_csv("~/Git/Data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv")
+head(data)
+```
+
