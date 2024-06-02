@@ -1,0 +1,401 @@
+---
+title: "REPRORODUCIBLE RESEARCH WITH BITCOIN FORECASTING"
+author: "AYOUB JARBOUAI (418035) &&  IDRISS TALBI (418232)"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: yes
+  pdf_document: 
+    toc: yes
+---
+
+## BITCOIN TIME SERIES
+
+
+Bitcoin is the longest running and most well known cryptocurrency, first released as open source in 2009 by the anonymous Satoshi Nakamoto. Bitcoin serves as a decentralized medium of digital exchange, with transactions verified and recorded in a public distributed ledger (the blockchain) without the need for a trusted record keeping authority or central intermediary. Transaction blocks contain a SHA-256 cryptographic hash of previous transaction blocks, and are thus "chained" together, serving as an immutable record of all transactions that have ever occurred. As with any currency/commodity on the market, bitcoin trading and financial instruments soon followed public adoption of bitcoin and continue to grow.
+
+*We will also divide our document into two parts*
+
+-   Data exploration. -Time series analysis.
+
+*Taking our time series further we will use*
+
+-ARIMA -SARIMA -PROPHET -To further the study our data is up to date to 2023 august.
+
+*THE NEWLY ADDED MODELS* From our analysis, we are trying to improve the authors work by adding the following two new models. 1. SARIMA 2. WAVENET MODEL
+
+## LIBRARIES USED IN THIS ANALYSIS
+
+1.  A character vector named lib is created to store the names of the desired R packages. Each package name is enclosed in double quotation marks and separated by commas.
+
+2.  The lapply() function is utilized to iterate over the elements of the lib vector. For each package name in the vector, the library() function is applied.
+
+3.  This loads the respective package into the R environment. The character.only argument is set to TRUE to indicate that only character strings (package names) are being passed. The purpose of running this code is to ensure that the listed packages are loaded and available for use within the R script. It's important to note the following:
+
+Some packages, such as rnn, TSrepr, sarima, tensorflow, keras, aTSA, xgboost, tidymodels, timetk, fpp3, and biwavelet, may require additional installation steps, dependencies, or prerequisites to be set up properly. An active internet connection is necessary, as the packages are downloaded and installed from the CRAN repository if they're not already present.
+
+```{r}
+lib <- c("readr", "tidyverse", "tidyr", "rnn", "dplyr", "ggplot2", "plotly", "gganimate", "TSrepr", "sarima", "tensorflow", "keras","forecast","aTSA","xgboost","tidymodels","timetk","fpp3","biwavelet")
+#lapply(lib, install.packages, character.only = TRUE) installation of packages if you lack them
+lapply(lib, library, character.only = TRUE)
+getwd()
+```
+
+## DATA IMPORTATION
+
+2.  <div>
+
+    1.  This code reads a CSV file named "btc_history.csv" containing historical data for Bitcoin (BTC) and performs some data manipulation. Let's break down each line of code:
+    2.  **`btc_history <- read_csv("btc_history.csv")`**:
+        -   This line uses the **`read_csv()`** function from the "readr" package (assumed to be loaded in your environment) to read the contents of a CSV file named "btc_history.csv" into a data frame named **`btc_history`**.
+
+        -   The **`read_csv()`** function is commonly used for reading comma-separated values (CSV) files while maintaining the data's structure.
+    3.  **`btc_history$Date <- as.Date(btc_history$Date, "%b %d, %Y")`**:
+        -   This line modifies the **`Date`** column in the **`btc_history`** data frame by converting it to a date format.
+
+        -   **`btc_history$Date`** refers to the **`Date`** column in the data frame.
+
+        -   The **`as.Date()`** function is used to convert the dates in the specified format ("%b %d, %Y") to the standard Date class in R. The format string corresponds to the format used in the column.
+
+            -   **`%b`** represents abbreviated month names (e.g., Jan, Feb, \...).
+
+            -   **`%d`** represents day of the month as a zero-padded decimal number (01, 02, \..., 31).
+
+            -   **`%Y`** represents the year with century as a decimal number (e.g., 2023).
+
+        -   The result of the **`as.Date()`** conversion is then assigned back to the **`Date`** column in the **`btc_history`** data frame.
+
+    </div>
+
+```{r}
+btc_history <- read_csv("btc_history.csv")
+btc_history$Date <- as.Date(btc_history$Date, "%b %d, %Y")
+```
+
+# DATA VISUALIZATION
+
+*first we need to get the data into month form as its the daily data of btc prices. using the dplyr and tidyr package this is possible*
+
+## DATA EXPLORATION
+
+our data starts from 2010 july. Now that we have added months and years in our data and pulled out the monthly vallues we can continue to visualisation of the daa.
+
+```{r}
+month_btc <- btc_history %>%
+  mutate(month = format(Date, '%B'), year = format(Date, "%Y")) %>%
+  group_by(year, month) %>%
+  arrange(desc(year)) %>%
+  summarise(monthly.price = mean(Price),monthly.vol = mean(Vol.))
+```
+
+#### Monthly Aggregated Statistics for Bitcoin (BTC) Prices and Volumes
+
+The provided R code processes the \`btc_history\` data frame to calculate monthly aggregated statistics for Bitcoin (BTC) prices and volumes. Here's a breakdown of each step:
+
+The \`%\>%\` operator, also known as the pipe operator, chains together multiple operations on the \`btc_history\` data frame in a readable and concise manner. Each subsequent operation takes the result of the previous operation as its input.
+
+The \`mutate()\` function adds new columns to the data frame based on existing columns. In this line, two new columns named \`month\` and \`year\` are created in the \`btc_history\` data frame. The \`format()\` function extracts the month name (\`%B\`) and year (\`%Y\`) from the \`Date\` column, assigning them to the new columns.
+
+The \`group_by()\` function groups the data by values in the \`year\` and \`month\` columns, preparing it for aggregation within each unique combination of year and month.
+
+The \`arrange()\` function reorders the grouped data based on the \`year\` column in descending order (\`desc(year)\`), arranging the data by year for further processing.
+
+The \`summarise()\` function calculates summary statistics for each group of \`year\` and \`month\`. The \`mean()\` function calculates the average of the \`Price\` and \`Vol.\` columns within each group. The results are stored in two new columns: \`monthly.price\` and \`monthly.vol\`.
+
+After running this code, the \`month_btc\` data frame will contain aggregated statistics for each month and year combination. It will have columns for the year, month, average monthly price (\`monthly.price\`), and average monthly volume (\`monthly.vol\`) of Bitcoin transactions.
+
+In summary, this code processes raw Bitcoin historical data, extracting month and year information, grouping by year and month, arranging by descending year, and calculating average monthly price and volume statistics for each combination of year and month.
+
+You can copy and paste the above content into an R Markdown document (with a \`.Rmd\` extension), and when you knit the document, it will generate a formatted document with the explanation provided in the desired format.
+
+## VISUALISATION
+
+```{r}
+btc_history %>%
+  ggplot(mapping = aes(x = Date, y = Price)) +
+  geom_line(color = "green") 
+
+anim <- btc_history %>%
+  ggplot() +
+  geom_line(mapping = aes(x = Date, y = Open), color = "blue")+
+  transition_reveal(Date)
+anim
+month_btc %>%
+  ggplot(mapping = aes(x = month, y = monthly.price, fill = month)) +
+  geom_col(position = "dodge") +
+  transition_reveal(as.integer(year))
+
+```
+
+From these visualization, we see the growth of Bitcoin and spikes throughout the years like November 6th 2010, Bitcoin share capital reaches 1 million USD. Its exchange rate on MtGox reaches USD 0.50 per BTC. June 2nd 2011, USD to BTC rate is 10 USD to the coin. For 6 days, the Bitcoin value is fixed at 31.91 USD on MtGox. February 28th 2013, Bitcoin exchange rate surpasses 31.91 USD for the first time for the last 601 days. April 1st,2013 Exchange rate of Bitcoin reaches 100 USD to 1 BTC. January,2015 Coinbase raised 75 million USD as part of a Series C funding round, smashing the previous record for a bitcoin company. February ,2015 Bitcoin price reached USD 262. January 2017,After the rally for most of the second half of 2016, bitcoin broke the USD 1,000 mark for the first time in 3 years. June 12th 2017, Bitcoin exchange rate exceeds USD 3000 to the BTC. November 29th 2017, Bitcoin price exceeds USD 10,000. December 18th 2017, Bitcoin reaches a record high, but does not reach USD 20,000. December 28th 2017, The price of bitcoins fell after South Korea announced additional measures to regulate bitcoin trading, including the potential closure of exchanges, among the volatile movements in the world's third largest cryptocurrency market. October 31st 2018, USD 6,300, on the 10 year anniversary of Bitcoin, price holds steady above USD 6,000 during a period of historically low volatility.
+
+## TIME SERIES ANALYSIS
+
+Time series analysis tends to show how data changes over time, capturing different values of the changes like seasonality. Seasonality are the changes that occur at specific intervals. These changes seem to occur at the same intervals and create a certain pattern that can be seen when data is plotted over time. These seasonalities tend to bring variation when they changed, hence we need time series analysis. Another variation of time series checks out is moving averages. The moving averages remove the peakedness of data when plotted. The plots above have very sharp peaks on spikes in prices. Moving averages create smooth curves for the analysis.
+
+Moving averages can help identify trends too. These trends are what we want to remove so that we can have data that is free from any specific changes that are from external factors.
+
+Moving averages can also identify outliers. While performing moving averages and we identify an outlier, we will have to investigate these changes. The changes can be caused by anything from sudden spike in prices that is caused by factors in the real world like war, diseases and any international events which can also lead to drop in prices.
+
+## CREATING THE TIME-SERIES DATA
+
+Irrespective of the fact that our data has dates and time month, it still has to be parsed into the time-series formats.
+
+```{r}
+monthly.ts <- ts(format(month_btc$monthly.price))#, scientific = FALSE, big.mark = ","), start = c(2010,7), frequency = 12)
+monthly.ts2 <- ts(format(month_btc$monthly.price, scientific = FALSE), start = c(2010,7), frequency = 12)
+plot(monthly.ts2)
+```
+
+#### DATA PROCESSING
+
+Here we normalisae the data.
+
+```{r}
+normalized_data <- month_btc  %>%
+  mutate(monthly.price.norma = (monthly.price - min(monthly.price)) / (max(monthly.price) - min(monthly.price)))
+head(normalized_data)
+
+```
+
+### Split into training and testing sets
+
+Splitting the data helps in testing the model efficinecy to help in checking th accuracy of our model. we want models witht the highest level of efficiency.
+
+```{r}
+train_size <- 0.8
+train_samples <- floor(nrow(normalized_data) * train_size)
+
+train_data <- normalized_data[1:train_samples, ]
+test_data <- normalized_data[(train_samples + 1):nrow(normalized_data), ]
+```
+
+### CREATINGA ARIMA MODEL
+
+```{r}
+arima_model <- auto.arima(train_data$monthly.price.norma)
+print(arima_model)
+summary(arima_model)
+```
+
+#### model briefing
+
+This code segment fits an ARIMA (AutoRegressive Integrated Moving Average) model to the normalized monthly price data of Bitcoin (\`train_data\$monthly.price.norma\`). Here's a breakdown of each line:
+
+1\. \`arima_model \<- auto.arima(train_data\$monthly.price.norma)\`:
+
+-   The \`auto.arima()\` function, from the "forecast" package (assuming it's loaded), automatically determines the best-fitting ARIMA model for the provided time series data.
+
+-   \`train_data\$monthly.price.norma\` refers to the column containing normalized monthly price data in the \`train_data\` data frame.
+
+-   The result of this function call is stored in the variable \`arima_model\`, representing the fitted ARIMA model.
+
+2\. \`print(arima_model)\`:
+
+-   The \`print()\` function is used to display the details of the fitted ARIMA model stored in \`arima_model\`. This includes information about the chosen model order (p, d, q) and any other relevant information about the model.
+
+3\. \`summary(arima_model)\`:
+
+-   The \`summary()\` function is used to display a summary of the fitted ARIMA model. This includes detailed statistics, coefficients, standard errors, p-values, and other information related to the model's performance and fit to the data.
+
+In summary, the provided code segment performs the following steps:
+
+\- Fits an ARIMA model to the normalized monthly price data of Bitcoin using the \`auto.arima()\` function.
+
+\- Prints the details of the fitted ARIMA model using \`print()\`.
+
+\- Provides a comprehensive summary of the fitted ARIMA model using \`summary()\`.
+
+It's important to note that ARIMA models are used for time series forecasting and analysis. The model order (p, d, q) determined by \`auto.arima()\` indicates the number of autoregressive, differencing, and moving average terms, respectively, used in the model. The quality of the model fit and its performance should be assessed through various diagnostic tools and validation techniques, such as residual analysis and out-of-sample forecasting.
+
+##### model interpretation
+
+-   The ARIMA model has been applied to a time series represented by **`train_data$monthly.price.norma`**, with a frequency of 12 (indicating monthly data).
+
+-   The model coefficients represent the parameters of the ARIMA(0,0,2) model with a non-zero mean.
+
+-   The coefficient **`ma1`** is 0.0828, corresponding to the first moving average term.
+
+-   The coefficient **`ma2`** is -0.2635, corresponding to the second moving average term.
+
+-   The coefficient **`mean`** is 0.3245, representing the non-zero mean.
+
+-   The estimated variance of the model's residuals (sigma squared) is 0.09964.
+
+-   The log likelihood of the model is -32.05.
+
+-   The Akaike Information Criterion (AIC) is 72.11, the corrected AIC (AICc) is 72.44, and the Bayesian Information Criterion (BIC) is 83.45. Lower values indicate better-fitting models.
+
+-   This section provides error measures for evaluating the model's performance on the training set.
+
+-   **`ME`** represents the Mean Error, which is very close to zero.
+
+-   **`RMSE`** is the Root Mean Squared Error, measuring the average magnitude of errors (0.3118738).
+
+-   **`MAE`** is the Mean Absolute Error (0.2603076).
+
+-   **`MPE`** and **`MAPE`** are not well-defined (indicated by **`-Inf`** and **`Inf`**, respectively).
+
+-   **`MASE`** (Mean Absolute Scaled Error) is 0.7383955, measuring relative accuracy.
+
+-   **`ACF1`** is -0.02373901, indicating the first-order autocorrelation of residuals.
+
+In summary, the ARIMA(0,0,2) model with non-zero mean has been fitted to the time series data. The coefficients, variance, information criteria, and error measures provide insights into the model's performance and fit to the training data. Further diagnostics and analysis are recommended for assessing the model's quality and suitability for forecasting and analysis tasks.
+
+#### comparison with the original pynb file
+
+### Python ARIMA Model (Lag 50, Coefficients 0, 1, 2, 1):
+
+This ARIMA model represents a time series forecasting model using the AutoRegressive Integrated Moving Average (ARIMA) approach, implemented in Python. The model is defined with the following parameters:
+
+*ARIMA(0, 1, 2)(1, 0, 0)[50]*
+
+
+- The orders of the AR, I, and MA components are 0, 1, and 2 respectively. This means the model has a first-order differencing (I) to make the data stationary and considers the past two forecast errors for its moving average (MA) component. However, there is no autoregressive (AR) component, as the order is set to 0.
+
+- The seasonal AR, I, and MA components are represented as (1, 0, 0), which indicates a seasonal autoregressive (SAR) component of order 1, and no seasonal integrated (SI) or seasonal moving average (SMA) components.
+
+- The [50] indicates that the model has a seasonal period of 50 time units (lags), which means it takes into account the values at lag 50.
+
+### R ARIMA Model (Lag 1, Coefficients 0, 0, 2):
+
+This ARIMA model represents a time series forecasting model using the ARIMA approach, implemented in R. The model is defined with the following parameters:
+
+
+- The orders of the AR, I, and MA components are 0, 0, and 2 respectively. In this case, there is no differencing (I = 0), and the model considers the past two forecast errors for its moving average (MA) component. Similarly to the Python model, there is no autoregressive (AR) component, as the order is set to 0.
+
+- Since there are no seasonal orders specified, it can be assumed that this model does not incorporate seasonal components.
+
+### Difference between the Two Models:
+
+The key differences between the two models are as follows:
+
+1. **Lag and Time Series Characteristics:**
+   - The Python model has a lag (seasonal period) of 50, meaning it accounts for patterns that repeat every 50 time units.
+   - The R model has a lag of 1, indicating it's looking at the immediate past value.
+
+2. **Coefficient Values:**
+   - The Python model has non-zero coefficient values for the moving average component (2 and 1), whereas the R model has non-zero coefficient values only for the moving average component (2).
+
+3. **Seasonality:**
+   - The Python model explicitly includes a seasonal ARIMA component with a seasonal order of (1, 0, 0), while the R model doesn't specify any seasonal components.
+
+4. **Integration:**
+   - Both models do not include differencing for the integrated (I) component (I = 0), which means they assume that the data is already stationary.
+
+Both models have different approaches to capturing time series patterns and trends. The Python model considers a longer seasonal period and includes a seasonal AR component, while the R model focuses on a simpler structure with just a moving average component. The choice between these models would depend on the characteristics of the specific time series data and the level of complexity needed to accurately capture its behavior.
+
+
+#### *forecasting with arima model*
+
+```{r}
+forecast_data <-forecast::forecast(arima_model, h = length(test_data$monthly.price.norma))
+```
+
+### TESTING ARIMA MODEL STRNGTH
+
+```{r}
+res <- residuals(arima_model)
+res
+Box.test(res, lag = 12, type = "Ljung-Box")
+```
+
+-   **Box-Ljung Test**: This indicates that the Ljung-Box test is being conducted to assess the efficiency of the ARIMA model by examining the autocorrelations of the model's residuals.
+
+-   **Data**: "res" refers to the residuals obtained from the ARIMA model.
+
+-   **X-squared**: The test statistic calculated by the Ljung-Box test. In this context, the test statistic of 17.695 is indicative of the magnitude of the autocorrelations of the residuals.
+
+-   **Degrees of Freedom (df)**: The degrees of freedom associated with the X-squared distribution used in the test. In this case, it's 20.
+
+-   **p-value**: The p-value associated with the test. The p-value measures the probability of observing a test statistic as extreme as the one calculated, assuming that the null hypothesis (of no autocorrelation) is true. In this case, the p-value is 0.6075.
+
+###### **Interpretation**:
+
+-   When assessing the efficiency of an ARIMA model, a low p-value (typically below 0.05) from the Ljung-Box test suggests that there is significant evidence of autocorrelation in the residuals, which indicates that the model might not be efficient in capturing all the underlying patterns in the data.
+
+-   Conversely, a high p-value (greater than 0.05) suggests that there is no significant evidence of autocorrelation in the residuals, indicating that the model is efficient in capturing the patterns in the data.
+
+-   In this case, the relatively high p-value of 0.6075 suggests that the residuals do not exhibit significant autocorrelation. This would indicate that the ARIMA model is relatively efficient in explaining the observed data and capturing the underlying patterns.
+
+    ### arima model conclusion
+
+    this model is not a great fit. the test for eficiency has p vlaue that is greater that 0.05.
+
+```{r}
+# Calculate accuracy measures
+
+
+# Calculate Mean Absolute Percentage Error (MAPE)
+forecast_data$mean - test_data$monthly.price.norma
+mape <- mean(abs((forecast_data$mean - test_data$monthly.price.norma) / test_data$monthly.price.norma)) * 100
+print(paste("MAPE:", mape))
+
+# Calculate Root Mean Squared Error (RMSE)
+rmse <- sqrt(mean((forecast_data$mean - test_data$monthly.price.norma)^2))
+print(paste("RMSE:", rmse))
+```
+
+## SARIMA
+
+for sarima model we first do the adf test to check for staionerity. this help in confirming whether we will require diferencing before performing sarima. the adf test stands for the Augmented Dicky Fuller test. this is a test of stationerity in our data. from our analysis below we fail to accept the null hypothesis and conlcude the data is stationery hence we can proceed with sarima model.
+
+```{r}
+adf.test(train_data$monthly.price.norma)
+```
+
+### SARIMA MODEL
+
+```{r}
+arima_model <- auto.arima(ts(train_data$monthly.price.norma, frequency = 12), seasonal = TRUE)
+sarima.ml <- Arima(test_data$monthly.price.norma, order = c(0,0,2))
+forecast::forecast(sarima.ml,2)
+```
+
+##### testing the sarima model eficiency
+
+```{r}
+res2 <- residuals(sarima.ml)
+Box.test(res2, lag = 12, type = "Ljung-Box")
+```
+
+The sarima model also has the same draw backs as the arima model
+
+### prophet
+
+Prophet is a forecasting model developed by Facebook that is designed to handle time series data with strong seasonality, holidays, and other patterns. It's particularly well-suited for business and economic forecasting, as well as other applications where historical data needs to be used to predict future values.
+
+Prophet is available as an R package and provides a user-friendly interface to create accurate forecasts without requiring in-depth expertise in time series modeling. It incorporates several important features:
+
+from this prophet model we have to use the original data as prophet model reqires actual dates. plottog the wholde data dosent give a clear plot from the mmass amount of information we have the plot becomes too samll to see anything clearly.
+
+```{r}
+library(prophet)
+ds <- btc_history$Date
+y <- btc_history$Price
+pr.data <- data.frame(ds, y)
+ml.pr <- prophet(pr.data, daily.seasonality = TRUE)
+future <- make_future_dataframe(ml.pr, periods = 365, freq = 'day')
+prd <- predict(ml.pr, future)
+
+```
+
+this is a pictorial flow of howw the bitcoin trends behave throught the year week and month and times of the day,
+
+```{r}
+prophet_plot_components(ml.pr, prd)
+```
+
+### Determination of Saturation Points
+
+"saturating growth" or "saturation level" might refer to a scenario where a certain variable is growing or changing over time but is expected to level off and stabilize at some point. For instance, if you are modeling the adoption of a new product, the growth rate might initially be rapid but eventually slow down as the product reaches its maximum potential market share. In this case, the "saturation point" could refer to the point at which the growth stops and the variable reaches its maximum value.
+
+```{r}
+model = prophet(pr.data, n.changepoints = 12)
+future = make_future_dataframe(model,periods = 365, freq = 'day')
+plot(model,prd)+add_changepoints_to_plot(model)+xlab("Date")+ylab("Avg Price")
+```
+
+## CONCLUSION
+
+The best model to be used was the PROPHET MODEL. adding more data into it has revealed that bitcoin will drop untill mid 2024. unless un forseen circumstances that are not yet to be fearured occure from our model we do not see a rise but a continous downtrend with significant rises but not higher than the previous drop.
