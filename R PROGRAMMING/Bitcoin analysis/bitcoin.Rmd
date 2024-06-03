@@ -1,401 +1,1177 @@
----
-title: "REPRORODUCIBLE RESEARCH WITH BITCOIN FORECASTING"
-author: "AYOUB JARBOUAI (418035) &&  IDRISS TALBI (418232)"
-date: "`r Sys.Date()`"
-output: 
-  html_document: 
-    toc: yes
-  pdf_document: 
-    toc: yes
----
 
-## BITCOIN TIME SERIES
+# Environment preparation
 
+## Getting pakages
 
-Bitcoin is the longest running and most well known cryptocurrency, first released as open source in 2009 by the anonymous Satoshi Nakamoto. Bitcoin serves as a decentralized medium of digital exchange, with transactions verified and recorded in a public distributed ledger (the blockchain) without the need for a trusted record keeping authority or central intermediary. Transaction blocks contain a SHA-256 cryptographic hash of previous transaction blocks, and are thus "chained" together, serving as an immutable record of all transactions that have ever occurred. As with any currency/commodity on the market, bitcoin trading and financial instruments soon followed public adoption of bitcoin and continue to grow.
-
-*We will also divide our document into two parts*
-
--   Data exploration. -Time series analysis.
-
-*Taking our time series further we will use*
-
--ARIMA -SARIMA -PROPHET -To further the study our data is up to date to 2023 august.
-
-*THE NEWLY ADDED MODELS* From our analysis, we are trying to improve the authors work by adding the following two new models. 1. SARIMA 2. WAVENET MODEL
-
-## LIBRARIES USED IN THIS ANALYSIS
-
-1.  A character vector named lib is created to store the names of the desired R packages. Each package name is enclosed in double quotation marks and separated by commas.
-
-2.  The lapply() function is utilized to iterate over the elements of the lib vector. For each package name in the vector, the library() function is applied.
-
-3.  This loads the respective package into the R environment. The character.only argument is set to TRUE to indicate that only character strings (package names) are being passed. The purpose of running this code is to ensure that the listed packages are loaded and available for use within the R script. It's important to note the following:
-
-Some packages, such as rnn, TSrepr, sarima, tensorflow, keras, aTSA, xgboost, tidymodels, timetk, fpp3, and biwavelet, may require additional installation steps, dependencies, or prerequisites to be set up properly. An active internet connection is necessary, as the packages are downloaded and installed from the CRAN repository if they're not already present.
-
-```{r}
-lib <- c("readr", "tidyverse", "tidyr", "rnn", "dplyr", "ggplot2", "plotly", "gganimate", "TSrepr", "sarima", "tensorflow", "keras","forecast","aTSA","xgboost","tidymodels","timetk","fpp3","biwavelet")
-#lapply(lib, install.packages, character.only = TRUE) installation of packages if you lack them
-lapply(lib, library, character.only = TRUE)
-getwd()
-```
-
-## DATA IMPORTATION
-
-2.  <div>
-
-    1.  This code reads a CSV file named "btc_history.csv" containing historical data for Bitcoin (BTC) and performs some data manipulation. Let's break down each line of code:
-    2.  **`btc_history <- read_csv("btc_history.csv")`**:
-        -   This line uses the **`read_csv()`** function from the "readr" package (assumed to be loaded in your environment) to read the contents of a CSV file named "btc_history.csv" into a data frame named **`btc_history`**.
-
-        -   The **`read_csv()`** function is commonly used for reading comma-separated values (CSV) files while maintaining the data's structure.
-    3.  **`btc_history$Date <- as.Date(btc_history$Date, "%b %d, %Y")`**:
-        -   This line modifies the **`Date`** column in the **`btc_history`** data frame by converting it to a date format.
-
-        -   **`btc_history$Date`** refers to the **`Date`** column in the data frame.
-
-        -   The **`as.Date()`** function is used to convert the dates in the specified format ("%b %d, %Y") to the standard Date class in R. The format string corresponds to the format used in the column.
-
-            -   **`%b`** represents abbreviated month names (e.g., Jan, Feb, \...).
-
-            -   **`%d`** represents day of the month as a zero-padded decimal number (01, 02, \..., 31).
-
-            -   **`%Y`** represents the year with century as a decimal number (e.g., 2023).
-
-        -   The result of the **`as.Date()`** conversion is then assigned back to the **`Date`** column in the **`btc_history`** data frame.
-
-    </div>
-
-```{r}
-btc_history <- read_csv("btc_history.csv")
-btc_history$Date <- as.Date(btc_history$Date, "%b %d, %Y")
-```
-
-# DATA VISUALIZATION
-
-*first we need to get the data into month form as its the daily data of btc prices. using the dplyr and tidyr package this is possible*
-
-## DATA EXPLORATION
-
-our data starts from 2010 july. Now that we have added months and years in our data and pulled out the monthly vallues we can continue to visualisation of the daa.
-
-```{r}
-month_btc <- btc_history %>%
-  mutate(month = format(Date, '%B'), year = format(Date, "%Y")) %>%
-  group_by(year, month) %>%
-  arrange(desc(year)) %>%
-  summarise(monthly.price = mean(Price),monthly.vol = mean(Vol.))
-```
-
-#### Monthly Aggregated Statistics for Bitcoin (BTC) Prices and Volumes
-
-The provided R code processes the \`btc_history\` data frame to calculate monthly aggregated statistics for Bitcoin (BTC) prices and volumes. Here's a breakdown of each step:
-
-The \`%\>%\` operator, also known as the pipe operator, chains together multiple operations on the \`btc_history\` data frame in a readable and concise manner. Each subsequent operation takes the result of the previous operation as its input.
-
-The \`mutate()\` function adds new columns to the data frame based on existing columns. In this line, two new columns named \`month\` and \`year\` are created in the \`btc_history\` data frame. The \`format()\` function extracts the month name (\`%B\`) and year (\`%Y\`) from the \`Date\` column, assigning them to the new columns.
-
-The \`group_by()\` function groups the data by values in the \`year\` and \`month\` columns, preparing it for aggregation within each unique combination of year and month.
-
-The \`arrange()\` function reorders the grouped data based on the \`year\` column in descending order (\`desc(year)\`), arranging the data by year for further processing.
-
-The \`summarise()\` function calculates summary statistics for each group of \`year\` and \`month\`. The \`mean()\` function calculates the average of the \`Price\` and \`Vol.\` columns within each group. The results are stored in two new columns: \`monthly.price\` and \`monthly.vol\`.
-
-After running this code, the \`month_btc\` data frame will contain aggregated statistics for each month and year combination. It will have columns for the year, month, average monthly price (\`monthly.price\`), and average monthly volume (\`monthly.vol\`) of Bitcoin transactions.
-
-In summary, this code processes raw Bitcoin historical data, extracting month and year information, grouping by year and month, arranging by descending year, and calculating average monthly price and volume statistics for each combination of year and month.
-
-You can copy and paste the above content into an R Markdown document (with a \`.Rmd\` extension), and when you knit the document, it will generate a formatted document with the explanation provided in the desired format.
-
-## VISUALISATION
-
-```{r}
-btc_history %>%
-  ggplot(mapping = aes(x = Date, y = Price)) +
-  geom_line(color = "green") 
-
-anim <- btc_history %>%
-  ggplot() +
-  geom_line(mapping = aes(x = Date, y = Open), color = "blue")+
-  transition_reveal(Date)
-anim
-month_btc %>%
-  ggplot(mapping = aes(x = month, y = monthly.price, fill = month)) +
-  geom_col(position = "dodge") +
-  transition_reveal(as.integer(year))
+```{r, results='hide'}
+library(tidyverse)  # Loads the tidyverse package for data manipulation and visualization
+library(plotly)     # Loads the plotly package for interactive plots
+library(lubridate)  # Loads the lubridate package for handling date/time data
+library(readr)      # Loads the readr package for reading CSV files
 
 ```
 
-From these visualization, we see the growth of Bitcoin and spikes throughout the years like November 6th 2010, Bitcoin share capital reaches 1 million USD. Its exchange rate on MtGox reaches USD 0.50 per BTC. June 2nd 2011, USD to BTC rate is 10 USD to the coin. For 6 days, the Bitcoin value is fixed at 31.91 USD on MtGox. February 28th 2013, Bitcoin exchange rate surpasses 31.91 USD for the first time for the last 601 days. April 1st,2013 Exchange rate of Bitcoin reaches 100 USD to 1 BTC. January,2015 Coinbase raised 75 million USD as part of a Series C funding round, smashing the previous record for a bitcoin company. February ,2015 Bitcoin price reached USD 262. January 2017,After the rally for most of the second half of 2016, bitcoin broke the USD 1,000 mark for the first time in 3 years. June 12th 2017, Bitcoin exchange rate exceeds USD 3000 to the BTC. November 29th 2017, Bitcoin price exceeds USD 10,000. December 18th 2017, Bitcoin reaches a record high, but does not reach USD 20,000. December 28th 2017, The price of bitcoins fell after South Korea announced additional measures to regulate bitcoin trading, including the potential closure of exchanges, among the volatile movements in the world's third largest cryptocurrency market. October 31st 2018, USD 6,300, on the 10 year anniversary of Bitcoin, price holds steady above USD 6,000 during a period of historically low volatility.
+## Data importation
 
-## TIME SERIES ANALYSIS
+- **The data importation utliises read_csv function from readr library. our Data ahas a Timestamp which will be converteed to readbale from with the code line `mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))`**
 
-Time series analysis tends to show how data changes over time, capturing different values of the changes like seasonality. Seasonality are the changes that occur at specific intervals. These changes seem to occur at the same intervals and create a certain pattern that can be seen when data is plotted over time. These seasonalities tend to bring variation when they changed, hence we need time series analysis. Another variation of time series checks out is moving averages. The moving averages remove the peakedness of data when plotted. The plots above have very sharp peaks on spikes in prices. Moving averages create smooth curves for the analysis.
+- the lineinterprates the Timestamp to human readable form. We set the format to UTC  then give it a sample date to use like in our case 1970-01-01. and set the path to our file 
 
-Moving averages can help identify trends too. These trends are what we want to remove so that we can have data that is free from any specific changes that are from external factors.
+```{r, results='hide'}
+# Define a function to parse timestamps from seconds since the Unix epoch
+dateparse <- function(time_in_secs) {
+  as_datetime(as.numeric(time_in_secs), origin = "1970-01-01", tz = "UTC")
+}
 
-Moving averages can also identify outliers. While performing moving averages and we identify an outlier, we will have to investigate these changes. The changes can be caused by anything from sudden spike in prices that is caused by factors in the real world like war, diseases and any international events which can also lead to drop in prices.
+# Expand the tilde to the home directory and specify the file path
+file_path <- "~/Git/Data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv"
 
-## CREATING THE TIME-SERIES DATA
+# Read the CSV file into a data frame named 'data'
+data <- read_csv("~/Git/Data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv")
 
-Irrespective of the fact that our data has dates and time month, it still has to be parsed into the time-series formats.
+# Convert the 'Timestamp' column from numeric Unix timestamps to POSIXct date-time objects
+data <- data %>%
+  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
 
-```{r}
-monthly.ts <- ts(format(month_btc$monthly.price))#, scientific = FALSE, big.mark = ","), start = c(2010,7), frequency = 12)
-monthly.ts2 <- ts(format(month_btc$monthly.price, scientific = FALSE), start = c(2010,7), frequency = 12)
-plot(monthly.ts2)
-```
-
-#### DATA PROCESSING
-
-Here we normalisae the data.
-
-```{r}
-normalized_data <- month_btc  %>%
-  mutate(monthly.price.norma = (monthly.price - min(monthly.price)) / (max(monthly.price) - min(monthly.price)))
-head(normalized_data)
+# Display the first few rows of the 'data' data frame
+head(data)
 
 ```
 
-### Split into training and testing sets
-
-Splitting the data helps in testing the model efficinecy to help in checking th accuracy of our model. we want models witht the highest level of efficiency.
+### Summary statistics
 
 ```{r}
-train_size <- 0.8
-train_samples <- floor(nrow(normalized_data) * train_size)
-
-train_data <- normalized_data[1:train_samples, ]
-test_data <- normalized_data[(train_samples + 1):nrow(normalized_data), ]
+summary(data)
 ```
 
-### CREATINGA ARIMA MODEL
+## Data Cleaning
+
+### handling missing values
 
 ```{r}
-arima_model <- auto.arima(train_data$monthly.price.norma)
-print(arima_model)
+library(dplyr)  # Load the dplyr package for data manipulation
+library(zoo)    # Load the zoo package for handling time series data
+library(tidyverse)
+# Access and print the 'Weighted_Price' column from 'data'
+
+
+# Fill NA values with zeroes for volume/trade-related fields using dplyr's mutate function
+data <- data %>%
+  mutate(`Volume_(BTC)` = ifelse(is.na(`Volume_(BTC)`), 0, `Volume_(BTC)`),  # Replace NA with 0 in 'Volume_(BTC)'
+         `Volume_(Currency)` = ifelse(is.na(`Volume_(Currency)`), 0, `Volume_(Currency)`),  # Replace NA with 0 in 'Volume_(Currency)'
+         Weighted_Price = ifelse(is.na(Weighted_Price), 0, Weighted_Price))  # Replace NA with 0 in 'Weighted_Price'
+
+# Fill forward NA values (last observation carried forward) for OHLC data using zoo's na.locf function
+data$Open <- zoo::na.locf(data$Open)    # Fill NA values in 'Open' column
+data$High <- zoo::na.locf(data$High)    # Fill NA values in 'High' column
+data$Low <- zoo::na.locf(data$Low)      # Fill NA values in 'Low' column
+data$Close <- zoo::na.locf(data$Close)  # Fill NA values in 'Close' column
+
+# Convert 'Timestamp' column from numeric Unix timestamps to POSIXct date-time objects in UTC timezone
+data <- data %>%
+  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
+
+# Display the first few rows of the updated dataframe 'data'
+head(data)
+
+
+```
+
+### Getting weekly data
+
+```{r}
+# Create valid date range
+start <- ymd_hms("2015-01-01 00:00:00", tz = "UTC")  # Define start date-time in UTC timezone
+end <- ymd_hms("2018-11-11 00:00:00", tz = "UTC")    # Define end date-time in UTC timezone
+
+# Find rows between start and end time in 'data' dataframe
+filtered_data <- data %>%
+  filter(Timestamp >= start & Timestamp <= end)  # Filter data for rows with Timestamp between 'start' and 'end'
+
+
+# Find the first row of each week (starting on Monday) in filtered_data
+weekly_rows <- filtered_data %>%
+  mutate(Week = floor_date(Timestamp, unit = "week", week_start = 1)) %>% # Create 'Week' column by flooring Timestamp to the nearest week starting on Monday
+  group_by(Week) %>%        # Group rows by 'Week' column
+  slice(1) %>%               # Select the first row from each group (week)
+  ungroup()                  # Remove grouping for further operations
+
+# Display the first few rows of weekly_rows dataframe
+head(weekly_rows)
+
+```
+
+### Lets visualize Historical Bitcoin Market Volume (2015-2018)
+
+```{r}
+library(plotly)   # Load the plotly package for interactive plots
+library(dplyr)    # Load the dplyr package for data manipulation
+library(lubridate) # Load the lubridate package for handling date/time data
+
+# Create the traces for each line plot
+trace1 <- plot_ly(data = weekly_rows, x = ~Timestamp, y = ~Open, type = 'scatter', mode = 'lines', name = 'Open')
+trace2 <- plot_ly(data = weekly_rows, x = ~Timestamp, y = ~Close, type = 'scatter', mode = 'lines', name = 'Close')
+trace3 <- plot_ly(data = weekly_rows, x = ~Timestamp, y = ~Weighted_Price, type = 'scatter', mode = 'lines', name = 'Weighted Avg')
+
+# Combine the traces into a subplot with shared axes
+fig <- subplot(trace1, trace2, trace3, nrows = 1, shareX = TRUE, shareY = TRUE)
+
+# Update the layout of the plot with title, x-axis options, and range slider
+fig <- fig %>% layout(
+  title = 'Historical Bitcoin Prices (2015-2018) with the Slider',  # Set the title of the plot
+  xaxis = list(
+    rangeselector = list(
+      buttons = list(
+        list(count = 1, label = '1m', step = 'month', stepmode = 'backward'),  # Button for 1 month range
+        list(count = 6, label = '6m', step = 'month', stepmode = 'backward'),  # Button for 6 months range
+        list(count = 12, label = '1y', step = 'month', stepmode = 'backward'),  # Button for 1 year range
+        list(count = 36, label = '3y', step = 'month', stepmode = 'backward'),  # Button for 3 years range
+        list(step = 'all')  # Button for showing all data
+      )
+    ),
+    rangeslider = list(visible = TRUE),  # Enable the range slider for zooming
+    type = 'date'  # Set the type of x-axis to date
+  )
+)
+
+# Plot the figure
+fig
+
+
+```
+
+### Lets visualize Historical Bitcoin Prices (2015-2018)
+
+```{r}
+library(plotly)     # Load the plotly package for interactive plots
+library(dplyr)      # Load the dplyr package for data manipulation
+library(lubridate)  # Load the lubridate package for handling date/time data
+
+# Create the trace for Volume (Currency)
+trace1 <- plot_ly(data = weekly_rows, x = ~Timestamp, y = ~`Volume_(Currency)`, type = 'scatter', mode = 'lines', name = 'Bitcoin Volume (USD)')
+
+# Update layout with title, x-axis options, and range slider
+fig <- trace1 %>% layout(
+  title = 'Historical Bitcoin Volume (USD) (2015-2018) with the slider',  # Set the title of the plot
+  xaxis = list(
+    rangeselector = list(
+      buttons = list(
+        list(count = 1, label = '1m', step = 'month', stepmode = 'backward'),  # Button for 1 month range
+        list(count = 6, label = '6m', step = 'month', stepmode = 'backward'),  # Button for 6 months range
+        list(count = 12, label = '1y', step = 'month', stepmode = 'backward'),  # Button for 1 year range
+        list(count = 36, label = '3y', step = 'month', stepmode = 'backward'),  # Button for 3 years range
+        list(step = 'all')  # Button for showing all data
+      )
+    ),
+    rangeslider = list(visible = TRUE),  # Enable the range slider for zooming
+    type = 'date'  # Set the type of x-axis to date
+  )
+)
+
+# Plot the figure
+fig
+
+```
+
+```{r}
+library(plotly)     # Load the plotly package for interactive plots
+library(dplyr)      # Load the dplyr package for data manipulation
+library(lubridate)  # Load the lubridate package for handling date/time data
+
+# Create the trace for BTC Volume vs USD
+trace <- plot_ly(data = weekly_rows, x = ~Weighted_Price, y = ~`Volume_(BTC)`, 
+                 type = 'scattergl', mode = 'markers', marker = list(color = '#FFBAD2', line = list(width = 1)))
+
+# Update layout with title and axis labels
+fig <- trace %>% layout(
+  title = 'BTC Volume vs USD',  # Set the title of the plot
+  xaxis = list(title = 'Weighted Price', titlefont = list(family = 'Courier New, monospace', size = 18, color = '#7f7f7f')),  # Set x-axis title and formatting
+  yaxis = list(title = 'Volume BTC', titlefont = list(family = 'Courier New, monospace', size = 18, color = '#7f7f7f'))  # Set y-axis title and formatting
+)
+
+# Plot the figure
+fig
+
+
+```
+
+# Timeserires Forecasting
+
+## Prediction using LSTM
+
+```{r}
+data <- read_csv("~/Git/Data/bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv")  # Read CSV data into 'data' dataframe
+data <- data %>% 
+  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))  # Convert 'Timestamp' to POSIXct with UTC timezone
+
+# Define a function to convert Unix timestamp to datetime with UTC timezone
+dateparse <- function(time_in_secs) {
+  as.POSIXct(time_in_secs, origin = "1970-01-01", tz = "UTC")
+}
+
+# Parse the 'Timestamp' column using 'dateparse' function
+data <- data %>% 
+  mutate(Timestamp = dateparse(Timestamp))
+
+# Group by hour and take the first value in each group
+data <- data %>% 
+  mutate(Timestamp = floor_date(Timestamp, unit = "hour")) %>%  # Floor 'Timestamp' to the nearest hour
+  group_by(Timestamp) %>%  # Group by 'Timestamp'
+  slice(1) %>%  # Take the first row from each group
+  ungroup() %>%  # Ungroup the data
+  select(Timestamp, Weighted_Price)  # Select 'Timestamp' and 'Weighted_Price' columns
+
+# Fill missing values in 'Weighted_Price' with the last available value
+data <- data %>% 
+  fill(Weighted_Price)  # Fill NA values in 'Weighted_Price' with the last non-NA value
+
+# Print the first few rows of the dataframe
+head(data)  # Display the first few rows of 'data'
+
+```
+
+**For the train and test, we take '25-Jun-2018' as the split date. There was a considerable dip in Bitcoin prices between the June-July period 2018. If we check the historical prices the seasonal market started going up from this date after reaching the lowest, though the price reached much lower \$5972 on June 29th 2018. After reaching the historic 20K mark on December 18th, there were several dips and market price was recorrected every time. Read more about [Bitcoin dips.](http://https://news.bitcoin.com/data-reveals-reasons-behind-bitcoins-big-dip/)**
+
+```{r}
+library(dplyr)     # Load the dplyr package for data manipulation
+library(lubridate) # Load the lubridate package for handling date/time data
+
+# Convert 'Timestamp' column to POSIXct with UTC timezone
+data$Timestamp <- as.POSIXct(data$Timestamp, origin = "1970-01-01", tz = "UTC")
+
+# Define the split date
+split_date <- as.POSIXct("2018-06-25", tz = "UTC")
+
+# Split data into training and testing sets
+data_train <- data %>% 
+  filter(Timestamp <= split_date) %>%  # Filter rows where Timestamp is less than or equal to split_date
+  select(Timestamp, Weighted_Price) %>%  # Select Timestamp and Weighted_Price columns
+  mutate(Timestamp = as.character(Timestamp))  # Convert Timestamp to character for writing to CSV
+
+  data_test <- data %>% 
+  filter(Timestamp > split_date) %>%  # Filter rows where Timestamp is greater than split_date
+  select(Timestamp, Weighted_Price) %>%  # Select Timestamp and Weighted_Price columns
+  mutate(Timestamp = as.character(Timestamp))  # Convert Timestamp to character for writing to CSV
+
+# Print head of training and testing sets
+head(data_train)  # Display the first few rows of 'data_train'
+head(data_test)   # Display the first few rows of 'data_test'
+
+```
+
+```{r}
+library(ggplot2)  # Load the ggplot2 package for data visualization
+
+# Define the color palette
+color_pal <- c("#F8766D", "#D39200", "#93AA00", "#00BA38", "#00C19F", "#00B9E3", "#619CFF", "#DB72FB")
+
+# Plot using ggplot2
+ggplot(data, aes(x = Timestamp, y = Weighted_Price)) +  # Define x and y aesthetics
+  geom_line(color = color_pal[1]) +  # Add a line plot with specified color from color_pal
+  labs(title = "BTC Weighted_Price Price (USD) by Hours") +  # Set the plot title
+  theme_minimal() +  # Apply a minimal theme
+  theme(plot.title = element_text(hjust = 0.5)) +  # Center the plot title
+  scale_x_datetime(date_labels = "%b %Y", date_breaks = "1 month")  # Customize x-axis date labels and breaks
+
+
+```
+
+```{r}
+library(ggplot2)  # Load the ggplot2 package for data visualization
+library(dplyr)     # Load the dplyr package for data manipulation
+
+# Convert 'Timestamp' to POSIXct for proper datetime handling
+data_test$Timestamp <- as.POSIXct(data_test$Timestamp, origin = "1970-01-01", tz = "UTC")
+data_train$Timestamp <- as.POSIXct(data_train$Timestamp, origin = "1970-01-01", tz = "UTC")
+
+# Rename columns for clarity
+data_test <- data_test %>% 
+  rename(`Test Set` = Weighted_Price)  # Rename 'Weighted_Price' column in data_test to 'Test Set'
+
+data_train <- data_train %>% 
+  rename(`Training Set` = Weighted_Price)  # Rename 'Weighted_Price' column in data_train to 'Training Set'
+
+# Join data_test and data_train
+joined_data <- full_join(data_test, data_train, by = "Timestamp")  # Perform a full join on 'Timestamp'
+
+# Plot using ggplot2
+ggplot(joined_data, aes(x = Timestamp)) +  # Define x-axis as 'Timestamp'
+  geom_line(aes(y = `Test Set`), color = "#F8766D") +  # Add line plot for 'Test Set' with specified color
+  geom_line(aes(y = `Training Set`), color = "#D39200") +  # Add line plot for 'Training Set' with specified color
+  labs(title = "BTC Weighted_Price Price (USD) by Hours") +  # Set plot title
+  theme_minimal() +  # Apply minimal theme
+  theme(plot.title = element_text(hjust = 0.5)) +  # Center the plot title
+  xlab("Date") +  # Label x-axis
+  ylab("Weighted Price (USD)")  # Label y-axis
+
+```
+
+## We will use a Vanilla LSTM here for forecasting. The model is trained on pre 25-Jun-2018 data.
+
+```{r}
+# Convert Timestamps to hours and group by hour, taking the first value
+data$hour <- as.POSIXct(format(data$Timestamp, "%Y-%m-%d %H:00:00"), tz = "UTC")
+data <- data[!duplicated(data$hour), ]
+
+# Function to fill missing values with the last available value
+fill_missing <- function(values) {
+  last_value <- NA  # Initialize the last value as NA
+  filled_values <- numeric(length(values))  # Initialize the vector to store filled values
+  for (i in seq_along(values)) {
+    if (is.na(values[i])) {
+      filled_values[i] <- last_value  # Use the last value if current is NA
+    } else {
+      filled_values[i] <- values[i]  # Update with the current value
+      last_value <- values[i]  # Update the last value
+    }
+  }
+  return(filled_values)  # Return the filled values
+}
+
+# Apply the fill_missing function to the Weighted_Price column
+data$Weighted_Price <- fill_missing(data$Weighted_Price)
+
+# Split the data into training and testing sets based on a specific date
+split_date <- as.POSIXct("2018-06-25", tz = "UTC")
+data_train <- data[data$hour <= split_date, "Weighted_Price", drop = FALSE]  # Training set
+data_test <- data[data$hour > split_date, "Weighted_Price", drop = FALSE]  # Testing set
+
+# Function for manual scaling of data
+scale_data <- function(values) {
+  mean_val <- mean(values, na.rm = TRUE)  # Calculate mean of values
+  std_val <- sd(values, na.rm = TRUE)  # Calculate standard deviation of values
+  scaled_values <- (values - mean_val) / std_val  # Scale values
+  list(scaled_values = scaled_values, mean = mean_val, std = std_val)  # Return scaled values and parameters
+}
+
+# Assign the training data to scaled_data
+scaled_data <- data_train
+training_set <- data_train$Weighted_Price
+
+# Prepare training data for LSTM
+X_train <- training_set[-length(training_set)]  # Input features
+y_train <- training_set[-1]  # Target values
+
+# Ensure y_train is a matrix with explicit dimensions
+y_train <- matrix(y_train, ncol = 1)
+
+# Check dimensions of the training data
+cat("Dimensions of X_train before reshaping:", dim(X_train), "\n")
+cat("Dimensions of y_train:", dim(y_train), "\n")
+
+# Reshape X_train for LSTM input (samples, time steps, features)
+X_train <- array(X_train, dim = c(length(X_train), 1, 1))
+
+# Verify dimensions again
+cat("Rechecked dimensions of X_train:", dim(X_train), "\n")
+
+# Define activation functions
+sigmoid <- function(x) {
+  1 / (1 + exp(-x))  # Sigmoid activation function
+}
+
+tanh_act <- function(x) {
+  (exp(x) - exp(-x)) / (exp(x) + exp(-x))  # Tanh activation function
+}
+
+# Function to initialize weights for the neural network
+initialize_weights <- function(input_size, output_size) {
+  matrix(rnorm(input_size * output_size), nrow = input_size, ncol = output_size)  # Random normal initialization
+}
+
+# Function to create a simple LSTM model
+SimpleLSTM <- function(input_shape, units) {
+  list(
+    units = units,
+    Wf = initialize_weights(input_shape[2], units),  # Forget gate weights
+    Wi = initialize_weights(input_shape[2], units),  # Input gate weights
+    Wc = initialize_weights(input_shape[2], units),  # Cell gate weights
+    Wo = initialize_weights(input_shape[2], units),  # Output gate weights
+    bf = rep(0, units),  # Forget gate biases
+    bi = rep(0, units),  # Input gate biases
+    bc = rep(0, units),  # Cell gate biases
+    bo = rep(0, units),  # Output gate biases
+    Wy = initialize_weights(units, 1),  # Output weights
+    by = 0  # Output bias
+  )
+}
+
+# Forward pass through the LSTM
+forward <- function(model, x) {
+  h_prev <- rep(0, model$units)  # Initialize previous hidden state
+  c_prev <- rep(0, model$units)  # Initialize previous cell state
+  for (t in 1:dim(x)[1]) {
+    xt <- x[t, , , drop = FALSE]  # Extract current time step input
+    f_t <- sigmoid(xt %*% model$Wf + model$bf)  # Forget gate
+    i_t <- sigmoid(xt %*% model$Wi + model$bi)  # Input gate
+    c_tilde_t <- tanh_act(xt %*% model$Wc + model$bc)  # Candidate cell state
+    c_t <- f_t * c_prev + i_t * c_tilde_t  # Update cell state
+    o_t <- sigmoid(xt %*% model$Wo + model$bo)  # Output gate
+    h_t <- o_t * tanh_act(c_t)  # Update hidden state
+    h_prev <- h_t  # Store current hidden state as previous for next time step
+    c_prev <- c_t  # Store current cell state as previous for next time step
+  }
+  y <- h_t %*% model$Wy + model$by  # Compute output
+  y
+}
+
+# Train the LSTM model
+train <- function(model, X, y, epochs, lr) {
+  for (epoch in 1:epochs) {
+    loss <- 0  # Initialize loss
+    for (i in 1:dim(X)[1]) {
+      output <- forward(model, X[i, , , drop = FALSE])  # Forward pass
+      error <- output - y[i, ]  # Compute error
+      loss <- loss + sum(error^2)  # Accumulate loss
+      # Backpropagation omitted for brevity
+    }
+    if (epoch %% 10 == 0) {
+      cat("Epoch", epoch, "Loss:", loss, "\n")  # Print loss every 10 epochs
+    }
+  }
+}
+
+# Initialize and train the model
+input_shape <- c(1, 1)  # Input shape
+units <- 128  # Number of LSTM units
+model <- SimpleLSTM(input_shape, units)  # Create LSTM model
+ml.train <- train(model, X_train, y_train, epochs = 10, lr = 0.001)  # Train the model
+
+# Summary of the model (function not implemented in the provided code)
+summary(model)
+summary(ml.train)
+```
+
+```{r}
+# Function to predict using the LSTM model
+predict_lstm <- function(model, X) {
+  predictions <- vector("numeric", length = dim(X)[1])
+  for (i in 1:dim(X)[1]) {
+    predictions[i] <- forward(model, X[i, , , drop = FALSE])
+  }
+  predictions
+}
+
+# Predict on the test dataset
+X_test <- array(data_test$Weighted_Price[-length(data_test$Weighted_Price)], dim = c(length(data_test$Weighted_Price) - 1, 1, 1))
+y_test <- data_test$Weighted_Price[-1]
+y_test <- matrix(y_test, ncol = 1)
+
+# Ensure dimensions match
+if (dim(X_test)[1] != dim(y_test)[1]) {
+  stop("Dimensions of X_test and y_test do not match!")
+}
+
+# Make predictions
+predictions <- predict_lstm(model, X_train)
+```
+
+```{r}
+# Plotting actual vs predicted values
+plot(1:length(y_test), y_test, type = "b", 
+     main = "Actual vs Predicted Values",
+     xlab = "Time Steps", ylab = "Values",
+     col = "blue", pch = 19)
+points(1:length(predictions), predictions, type = "b", col = "red", pch = 19)
+legend("topright", legend = c("Actual", "Predicted"), col = c("blue", "red"), pch = 19)
+
+```
+
+## XGBOOST
+
+```{r}
+cat("\014")
+
+# Clear the environment (remove all objects)
+rm(list = ls())
+
+# Load necessary libraries
+library(dplyr)  # For data manipulation
+library(lubridate)  # For handling date/time data
+
+# Define a function to parse timestamps from seconds since the Unix epoch
+dateparse <- function(time_in_secs) {
+  as.POSIXct(as.numeric(time_in_secs), origin="1970-01-01", tz="UTC")  # Convert seconds to POSIXct date-time format
+}
+
+# Replace with your actual file path to the CSV file
+file_path <- '~/Git/Data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv'
+
+# Read the CSV file into a data frame
+data <- read.csv(file_path)
+
+# Convert the 'Timestamp' column from Unix time to POSIXct date-time format
+data <- data %>%
+  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
+
+```
+
+### missing values and cleaning
+
+```{r}
+
+# Fill NA values with zeroes for volume/trade-related fields using dplyr's mutate function
+data <- data %>%
+  mutate(Volume_.BTC. = ifelse(is.na(Volume_.BTC.), 0, Volume_.BTC.),  # Replace NA with 0 in 'Volume_(BTC)'
+         Volume_.Currency. = ifelse(is.na(Volume_.Currency.), 0, Volume_.Currency.),  # Replace NA with 0 in 'Volume_(Currency)'
+         Weighted_Price = ifelse(is.na(Weighted_Price), 0, Weighted_Price))  # Replace NA with 0 in 'Weighted_Price'
+
+# Fill forward NA values (last observation carried forward) for OHLC data using zoo's na.locf function
+data$Open <- zoo::na.locf(data$Open)    # Fill NA values in 'Open' column
+data$High <- zoo::na.locf(data$High)    # Fill NA values in 'High' column
+data$Low <- zoo::na.locf(data$Low)      # Fill NA values in 'Low' column
+data$Close <- zoo::na.locf(data$Close)  # Fill NA values in 'Close' column
+
+# Convert 'Timestamp' column from numeric Unix timestamps to POSIXct date-time objects in UTC timezone
+data <- data %>%
+  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
+
+# Display the first few rows of the updated dataframe 'data'
+head(data)# Fill NA values with zeroes for volume/trade-related fields using dplyr's mutate function
+data <- data %>%
+  mutate(Volume_.BTC. = ifelse(is.na(Volume_.BTC.), 0, Volume_.BTC.),  # Replace NA with 0 in 'Volume_(BTC)'
+         Volume_.Currency. = ifelse(is.na(Volume_.Currency.), 0, Volume_.Currency.),  # Replace NA with 0 in 'Volume_(Currency)'
+         Weighted_Price = ifelse(is.na(Weighted_Price), 0, Weighted_Price))  # Replace NA with 0 in 'Weighted_Price'
+
+# Fill forward NA values (last observation carried forward) for OHLC data using zoo's na.locf function
+data$Open <- zoo::na.locf(data$Open)    # Fill NA values in 'Open' column
+data$High <- zoo::na.locf(data$High)    # Fill NA values in 'High' column
+data$Low <- zoo::na.locf(data$Low)      # Fill NA values in 'Low' column
+data$Close <- zoo::na.locf(data$Close)  # Fill NA values in 'Close' column
+
+# Convert 'Timestamp' column from numeric Unix timestamps to POSIXct date-time objects in UTC timezone
+data <- data %>%
+  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
+
+# Group by hourly frequency, take the first observation per hour
+data <- data %>% 
+  mutate(Timestamp = floor_date(Timestamp, unit = "hour")) %>%  # Floor 'Timestamp' to the nearest hour
+  group_by(Timestamp) %>%  # Group by 'Timestamp'
+  slice(1) %>%  # Take the first row from each group
+  ungroup() %>%  # Ungroup the data
+  select(Timestamp, Weighted_Price)  # Select 'Timestamp' and 'Weighted_Price' columns
+
+
+# Display the first few rows of the updated dataframe 'data'
+head(data)
+```
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(zoo)
+
+# Assuming 'data' is already loaded with 'Timestamp' and 'Weighted_Price' columns
+
+# Remove timezone information (if present)
+data$Timestamp <- as.POSIXct(data$Timestamp, tz = "")  # This step removes timezone information
+
+# Group by hourly frequency, take the first observation per hour
+data <- data %>%
+  mutate(Timestamp = floor_date(Timestamp, unit = "hour")) %>%  # Floor 'Timestamp' to the nearest hour
+  group_by(Timestamp) %>%  # Group by 'Timestamp'
+  slice(1) %>%  # Take the first row from each group
+  ungroup()  # Ungroup the data
+
+# Fill missing values using forward fill (na.locf from zoo package)
+data$Weighted_Price <- na.locf(data$Weighted_Price)
+
+# Print or return processed data
+head(data)
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+
+# Define color palette
+color_pal <- c("#F8766D", "#D39200", "#93AA00", "#00BA38", "#00C19F", "#00B9E3", "#619CFF", "#DB72FB")
+
+# Plot using ggplot2
+ggplot(data, aes(x = Timestamp, y = Weighted_Price)) +
+  geom_line(color = color_pal[1]) +  # Adjust color based on your preference
+  labs(title = "BTC Weighted_Price Price (USD) by Hours") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels if needed
+  scale_x_datetime(date_labels = "%Y-%m-%d %H:%M") +  # Adjust date format on x-axis
+  labs(x = "Timestamp", y = "Weighted_Price (USD)") +
+  NULL  # Suppress the printing of the plot object in console
+
+```
+
+## test and train data
+
+```{r}
+# Load necessary libraries
+library(dplyr)  # For data manipulation
+library(ggplot2)  # For data visualization
+
+# Convert 'Timestamp' to Date format (if it's POSIXct)
+data$Timestamp <- as.Date(data$Timestamp)  # Ensure the Timestamp column is in Date format
+
+# Define split date for training and testing sets
+split_date <- as.Date("2018-06-25")  # The date to split the data into training and testing sets
+
+# Split data into training set (before or on split_date) and select relevant columns
+data_train <- data %>% 
+  filter(Timestamp <= split_date) %>%  # Filter rows where Timestamp is on or before the split date
+  select(Timestamp, Weighted_Price)  # Select only the Timestamp and Weighted_Price columns
+
+# Split data into testing set (after split_date) and select relevant columns
+data_test <- data %>% 
+  filter(Timestamp > split_date) %>%  # Filter rows where Timestamp is after the split date
+  select(Timestamp, Weighted_Price)  # Select only the Timestamp and Weighted_Price columns
+
+# Plot the data using ggplot2
+ggplot() +
+  geom_line(data = data_test, aes(x = Timestamp, y = Weighted_Price, color = "Test Set")) +  # Plot the testing set with a line
+  geom_line(data = data_train, aes(x = Timestamp, y = Weighted_Price, color = "Training Set")) +  # Plot the training set with a line
+  labs(title = "BTC Weighted_Price Price (USD) by Hours") +  # Add a title to the plot
+  theme_minimal() +  # Use a minimal theme for the plot
+  scale_x_date(date_labels = "%Y-%m-%d %H:%M", date_breaks = "1 day") +  # Format the x-axis with dates and set breaks at every day
+  labs(x = "Timestamp", y = "Weighted_Price (USD)") +  # Label the x and y axes
+  scale_color_manual(values = c("Test Set" = "#F8766D", "Training Set" = "#00B9E3"))  # Set custom colors for the lines representing the test and training sets
+
+
+```
+
+```{r}
+# Load necessary libraries
+library(xgboost)  # For XGBoost model
+
+# Convert 'Timestamp' column to numeric format (seconds since the Unix epoch) if necessary
+data_train$Timestamp <- as.numeric(as.POSIXct(data_train$Timestamp))
+
+# Convert the data frame to matrix format for XGBoost
+X_train <- as.matrix(data_train[, c("Timestamp", "Weighted_Price")])  # Select 'Timestamp' and 'Weighted_Price' columns and convert to matrix
+y_train <- data_train$Weighted_Price  # Extract the target variable 'Weighted_Price'
+
+# Create DMatrix, a special data structure in XGBoost for training
+dtrain <- xgb.DMatrix(data = X_train, label = y_train)  # Create a DMatrix with data and labels
+dtest <- xgb.DMatrix(data = X_train, label = y_train)
+# Define parameters for the XGBoost model
+params <- list(
+  objective = "reg:squarederror",  # Specify the objective function type for regression
+  min_child_weight = 10,  # Minimum sum of instance weight (hessian) needed in a child
+  booster = "gbtree",  # Use tree-based boosters
+  colsample_bytree = 0.3,  # Fraction of features to be used for each tree
+  learning_rate = 0.1,  # Step size shrinkage to prevent overfitting
+  max_depth = 5,  # Maximum depth of a tree
+  alpha = 10  # L1 regularization term on weights (lasso regression)
+)
+
+# Train the XGBoost model
+model <- xgb.train(
+  params = params,  # Model parameters
+  data = dtrain,  # Training data
+  nrounds = 100,  # Number of boosting rounds
+  early_stopping_rounds = 50,  # Stop training if the performance doesn't improve for 50 rounds
+  maximize = FALSE,  # Minimize the evaluation metric (since this is regression)
+  watchlist = list(train = dtrain),  # List of data to evaluate on during training
+  verbose = 0  # Set to 1 to print training progress, 0 for silent mode
+)
+
+
+
+```
+
+## prediciotn
+
+```{r}
+# Load necessary libraries
+library(xgboost)  # For XGBoost model
+library(ggplot2)  # For plotting
+
+# Convert 'Timestamp' column to numeric format (seconds since the Unix epoch) if necessary
+data_train$Timestamp <- as.numeric(as.POSIXct(data_train$Timestamp))
+
+# Convert the data frame to matrix format for XGBoost
+X_train <- as.matrix(data_train[, c("Timestamp", "Weighted_Price")])  # Select 'Timestamp' and 'Weighted_Price' columns and convert to matrix
+y_train <- data_train$Weighted_Price  # Extract the target variable 'Weighted_Price'
+
+# Create DMatrix, a special data structure in XGBoost for training
+dtrain <- xgb.DMatrix(data = X_train, label = y_train)  # Create a DMatrix with data and labels
+
+# Define parameters for the XGBoost model
+params <- list(
+  objective = "reg:squarederror",  # Specify the objective function type for regression
+  min_child_weight = 10,  # Minimum sum of instance weight (hessian) needed in a child
+  booster = "gbtree",  # Use tree-based boosters
+  colsample_bytree = 0.3,  # Fraction of features to be used for each tree
+  learning_rate = 0.1,  # Step size shrinkage to prevent overfitting
+  max_depth = 5,  # Maximum depth of a tree
+  alpha = 10  # L1 regularization term on weights (lasso regression)
+)
+
+# Train the XGBoost model
+model <- xgb.train(
+  params = params,  # Model parameters
+  data = dtrain,  # Training data
+  nrounds = 100,  # Number of boosting rounds
+  early_stopping_rounds = 50,  # Stop training if the performance doesn't improve for 50 rounds
+  maximize = FALSE,  # Minimize the evaluation metric (since this is regression)
+  watchlist = list(train = dtrain),  # List of data to evaluate on during training
+  verbose = 0  # Set to 1 to print training progress, 0 for silent mode
+)
+
+# Make predictions on the training data
+predictions <- predict(model, dtrain)
+
+# Convert 'Timestamp' back to POSIXct format for plotting
+data_train$Timestamp <- as.POSIXct(data_train$Timestamp, origin="1970-01-01", tz="UTC")
+
+# Combine actual and predicted values into a single data frame
+results <- data.frame(
+  Timestamp = data_train$Timestamp,
+  Actual = y_train,
+  Predicted = predictions
+)
+
+# Plot actual vs predicted values using ggplot2
+ggplot(results, aes(x = Timestamp)) +
+  geom_line(aes(y = Actual, color = "Actual")) +  # Plot actual values
+  geom_line(aes(y = Predicted, color = "Predicted")) +  # Plot predicted values
+  labs(title = "Actual vs Predicted Weighted Price",
+       x = "Timestamp",
+       y = "Weighted Price (USD)") +
+  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +  # Define colors for the lines
+  theme_minimal()  # Apply a minimal theme
+
+
+```
+
+### forecats ahead
+
+```{r}
+# Load necessary libraries
+library(xgboost)  # For XGBoost model
+library(ggplot2)  # For plotting
+library(dplyr)    # For data manipulation
+
+# Convert 'Timestamp' column to numeric format (seconds since the Unix epoch) if necessary
+data$Timestamp <- as.numeric(as.POSIXct(data$Timestamp))
+
+# Split data into training and testing sets
+split_date <- as.numeric(as.POSIXct("2018-06-25"))
+data_train <- data %>% filter(Timestamp <= split_date)
+data_test <- data %>% filter(Timestamp > split_date)
+
+# Convert to matrix format for XGBoost
+X_train <- as.matrix(data_train[, c("Timestamp", "Weighted_Price")])
+y_train <- data_train$Weighted_Price
+
+X_test <- as.matrix(data_test[, c("Timestamp", "Weighted_Price")])
+y_test <- data_test$Weighted_Price
+
+# Create DMatrix for training and testing
+dtrain <- xgb.DMatrix(data = X_train, label = y_train)
+dtest <- xgb.DMatrix(data = X_test, label = y_test)
+
+# Define parameters for the XGBoost model
+params <- list(
+  objective = "reg:squarederror",  # Specify the objective function type for regression
+  min_child_weight = 10,  # Minimum sum of instance weight (hessian) needed in a child
+  booster = "gbtree",  # Use tree-based boosters
+  colsample_bytree = 0.3,  # Fraction of features to be used for each tree
+  learning_rate = 0.1,  # Step size shrinkage to prevent overfitting
+  max_depth = 5,  # Maximum depth of a tree
+  alpha = 10  # L1 regularization term on weights (lasso regression)
+)
+
+# Train the XGBoost model
+model <- xgb.train(
+  params = params,  # Model parameters
+  data = dtrain,  # Training data
+  nrounds = 100,  # Number of boosting rounds
+  early_stopping_rounds = 50,  # Stop training if the performance doesn't improve for 50 rounds
+  maximize = FALSE,  # Minimize the evaluation metric (since this is regression)
+  watchlist = list(train = dtrain),  # List of data to evaluate on during training
+  verbose = 0  # Set to 1 to print training progress, 0 for silent mode
+)
+
+# Make predictions on the training data
+predictions_train <- predict(model, dtrain)
+
+# Make predictions on the test data
+predictions_test <- predict(model, dtest)
+
+# Convert 'Timestamp' back to POSIXct format for plotting
+data_train$Timestamp <- as.POSIXct(data_train$Timestamp, origin="1970-01-01", tz="UTC")
+data_test$Timestamp <- as.POSIXct(data_test$Timestamp, origin="1970-01-01", tz="UTC")
+
+# Combine actual and predicted values into a single data frame
+results_train <- data.frame(
+  Timestamp = data_train$Timestamp,
+  Actual = y_train,
+  Predicted = predictions_train
+)
+
+results_test <- data.frame(
+  Timestamp = data_test$Timestamp,
+  Actual = y_test,
+  Predicted = predictions_test
+)
+
+# Plot actual vs predicted values using ggplot2
+ggplot() +
+  geom_line(data = results_train, aes(x = Timestamp, y = Actual, color = "Actual Train")) +  # Plot actual values for training data
+  geom_line(data = results_train, aes(x = Timestamp, y = Predicted, color = "Predicted Train")) +  # Plot predicted values for training data
+  geom_line(data = results_test, aes(x = Timestamp, y = Actual, color = "Actual Test")) +  # Plot actual values for test data
+  geom_line(data = results_test, aes(x = Timestamp, y = Predicted, color = "Predicted Test")) +  # Plot predicted values for test data
+  labs(title = "Actual vs Predicted Weighted Price",
+       x = "Timestamp",
+       y = "Weighted Price (USD)") +
+  scale_color_manual(values = c("Actual Train" = "blue", "Predicted Train" = "red", "Actual Test" = "green", "Predicted Test" = "purple")) +  # Define colors for the lines
+  theme_minimal()  # Apply a minimal theme
+
+```
+
+# PROPHET FORECASTING
+
+```{r}
+library(dplyr)  # For data manipulation
+library(zoo)  # For the na.locf function (Last Observation Carried Forward)
+library(lubridate)  # For handling date/time data
+
+# Assuming 'data' is your data frame in R with 'Timestamp' and 'Weighted_Price'
+data <- data %>%
+  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
+
+# Step 2: Group by hourly frequency and take the first value within each hour
+data <- data %>%
+  group_by(Timestamp = floor_date(Timestamp, unit = "hour")) %>%  # Group data by hour (round down to the nearest hour)
+  summarise(Weighted_Price = first(Weighted_Price)) %>%  # Summarize by taking the first 'Weighted_Price' within each hour
+  ungroup()  # Ungroup the data
+
+# Step 3: Set 'Timestamp' as the index and handle missing values
+data <- data %>%
+  mutate(Timestamp = as.POSIXct(Timestamp)) %>%  # Ensure 'Timestamp' is in POSIXct format
+  arrange(Timestamp) %>%  # Arrange the data by 'Timestamp' in ascending order
+  select(Timestamp, Weighted_Price) %>%  # Select only the 'Timestamp' and 'Weighted_Price' columns
+  mutate(Weighted_Price = na.locf(Weighted_Price))  # Fill missing values by carrying the last observation forward
+
+# Print the resulting data frame
+print(data)  # Output the cleaned and processed data frame
+
+
+```
+
+```{r}
+library(ggplot2)
+
+# Define color palette
+color_pal <- c("#F8766D", "#D39200", "#93AA00", "#00BA38", "#00C19F", "#00B9E3", "#619CFF", "#DB72FB")
+
+
+
+# Plot using ggplot2
+ggplot(data, aes(x = Timestamp, y = Weighted_Price)) +
+  geom_line(color = color_pal[1]) +  # Adjust color_pal index as needed
+  labs(title = "BTC Weighted_Price Price (USD) by Hours") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for better readability
+  scale_x_datetime(date_breaks = "1 hour", date_labels = "%Y-%m-%d %H:%M")  # Set breaks and format for datetime x-axis
+
+```
+
+```{r}
+# Assuming 'data' is your dataset with 'Timestamp' as a column
+
+# Convert 'Timestamp' to POSIXct (datetime) format if not already in that format
+data$Timestamp <- as.POSIXct(data$Timestamp, format = "%d-%b-%Y")
+
+# Define split_date in POSIXct format
+split_date <- as.POSIXct("2018-06-25")
+
+# Create data_train and data_test
+data_train <- data[data$Timestamp <= split_date, ]
+data_test <- data[data$Timestamp > split_date, ]
+
+
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+
+# Assuming 'data' is your dataframe with 'Timestamp' (POSIXct) and 'Weighted_Price'
+
+
+
+# Group and summarize by hour, ensuring no missing values
+data_hourly <- data %>%
+  group_by(Timestamp = floor_date(Timestamp, "hour")) %>%
+  summarize(Weighted_Price = mean(Weighted_Price, na.rm = TRUE)) %>%
+  ungroup()
+
+# Plotting with ggplot2
+ggplot(data_hourly, aes(x = Timestamp, y = Weighted_Price)) +
+  geom_line(color = "#F8766D") +
+  labs(title = "BTC Weighted_Price Price (USD) by Hours", x = "Timestamp", y = "Price") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_datetime(date_labels = "%d-%b %H:%M", date_breaks = "1 hour") +
+  scale_color_manual(values = c("#F8766D"))
+
+```
+
+## MODEL
+
+```{r}
+
+# Load required libraries
+library(prophet)
+library(dplyr)
+
+# Assuming 'data_train' is your dataframe with columns 'Timestamp' and 'Weighted_Price'
+
+# Convert data_train to proper format and rename columns
+data_train <- data_train %>%
+  mutate(ds = Timestamp, y = Weighted_Price) %>%
+  select(ds, y)
+
+# Setup and train model
+model <- prophet()  # Create a new Prophet model object
+model_fit <- fit.prophet(model, data_train)  # Fit the model to the training data
+
+# Optionally, make future predictions
+future <- data.frame(ds = seq(min(data_train$ds), max(data_train$ds) + days(365), by = "day"))
+future$ds <- as.POSIXct(future$ds)
+summary(model_fit$extra_regressors)
+summary(model)
+
+predict(model_fit)
+
+```
+
+```{r}
+# Load required libraries
+library(prophet)
+library(dplyr)
+
+# Assuming 'data_train' is your dataframe with columns 'Timestamp' and 'Weighted_Price'
+
+
+
+# Setup and train model
+model <- prophet()  # Create a new Prophet model object
+model_fit <- fit.prophet(model, data_train)  # Fit the model to the training data
+
+# Optionally, make future predictions
+future <- make_future_dataframe(model_fit, periods = 365)  # Forecasting for the next 365 days
+forecast <- predict(model_fit, future)
+
+# Plotting predicted vs actual and future forecasted values
+plot(model_fit, forecast)
+
+```
+
+## Arima
+
+### daily data
+
+```{r}
+# Load required libraries
+library(forecast)
+library(dplyr)
+library(ggplot2)
+
+# Assuming 'data_train' is your dataframe with columns 'Timestamp' and 'Weighted_Price'
+
+# Filter data_train to start from '2014-12-01' and convert to time series format (ts)
+ts_data <- data %>%
+  filter(Timestamp >= as.POSIXct("2014-12-01")) %>%
+  arrange(Timestamp) %>%
+  pull(Weighted_Price) %>%
+  ts(start = c(year(as.Date("2014-12-01")), month(as.Date("2014-12-01"))), frequency = 365)
+
+plot(decompose(ts_data))
+
+# Decompose the time series to extract its components
+decomp <- decompose(ts_data)
+
+# Extract the seasonal, trend, and random (or residual) components
+seasonal <- decomp$seasonal
+trend <- decomp$trend
+random <- decomp$random
+
+# Show the components
+seasonal
+#trend
+#random
+
+# Remove seasonal and trend components from the original time series data
+detrended <- ts_data - seasonal - trend
+autoplot(detrended, title = "ts without seasonality and trend")
+```
+
+### LJUNG BOX
+
+```{r}
+# Perform Ljung-Box test for autocorrelation
+ljung_box <- Box.test(ts_data, lag = 20, type = "Ljung-Box")
+print(ljung_box)
+
+```
+
+### PACF
+
+```{r}
+# Differentiate the time series data
+diff_ts_data <- diff(ts_data)
+
+# Plot the differentiated time series data
+plot(diff_ts_data, main = "Differentiated Time Series")
+
+# PACF (Partial Autocorrelation Function) plot of differentiated data
+pacf_plot <- pacf(diff_ts_data, lag.max = 5)
+plot(pacf_plot, main = "Partial Autocorrelation Function (PACF) of Differentiated Time Series")
+
+
+```
+
+### ACF
+
+```{r}
+# Differentiate the time series data
+diff_ts_data <- diff(ts_data)
+
+# Plot the differentiated time series data
+plot(diff_ts_data, main = "Differentiated Time Series")
+
+# ACF (Autocorrelation Function) plot of differentiated data
+acf_plot <- acf(diff_ts_data, lag.max = 5)
+plot(acf_plot, main = "Autocorrelation Function (ACF) of Differentiated Time Series")
+
+
+```
+
+### staionerity testt
+
+```{r}
+library(forecast)
+library(stats)
+library(tseries)
+# Augmented Dickey-Fuller Test for stationarity
+adf_test <- adf.test(ts_data)
+print(adf_test)
+
+```
+
+```{r}
+# Fit ARIMA model
+arima_model <- auto.arima(ts_data)
+summary(arima_model)
+# Forecast future values
+forecast_results <- forecast(arima_model, h = 365)  # Forecasting for 365 days into the future
+
+# Extract mean forecast and prediction intervals
+forecast_df <- data.frame(date = time(forecast_results$mean),
+                          mean = forecast_results$mean)
+
+# Check if lower and upper prediction intervals are available
+if ("lower" %in% colnames(forecast_results) && "upper" %in% colnames(forecast_results)) {
+  forecast_df <- cbind(forecast_df, lower = forecast_results$lower, upper = forecast_results$upper)
+}
+
+autoplot(forecast_results)
+
+
+```
+
+### monnthky data
+
+```{r}
+# Assuming 'data' is your dataframe with columns 'Timestamp' and 'Weighted_Price'
+
+# Convert 'Timestamp' to Date format (if it's POSIXct)
+data$Timestamp <- as.Date(data$Timestamp)
+
+# Aggregate daily data to monthly averages (or sums if appropriate)
+monthly_data <- data %>%
+  group_by(year = year(Timestamp), month = month(Timestamp)) %>%
+  summarise(Weighted_Price = mean(Weighted_Price)) %>%
+  ungroup()
+
+# Create time series object (ts) from monthly aggregated data
+ts_data_month <- ts(monthly_data$Weighted_Price, start = c(min(monthly_data$year), min(monthly_data$month)), frequency = 12)
+
+# Print the monthly time series data
+print(ts_data_month)
+
+
+
+```
+
+## plot and summary
+
+```{r}
+# Example: Plotting the time series
+plot(ts_data_month, main = "Monthly Time Series Plot")
+
+# Example: Computing statistics
+summary(ts_data_month)
+```
+
+To perform decomposition, ACF, PACF, ADF test, stationarity test, ARIMA modeling, forecasting, and plotting for your monthly time series data `ts_data_month`, here's a structured approach in R:
+
+### 1. Decomposition
+
+```{r}
+# Perform decomposition
+decomp <- decompose(ts_data_month)
+
+# Plot decomposition
+plot(decomp)
+```
+
+### 2. ACF (Autocorrelation Function) and PACF (Partial Autocorrelation Function)
+
+```{r}
+# ACF plot
+acf_plot <- acf(ts_data_month, lag.max = 5)
+plot(acf_plot, main = "Autocorrelation Function (ACF)")
+
+# PACF plot
+pacf_plot <- pacf(ts_data_month, lag.max = 5)
+plot(pacf_plot, main = "Partial Autocorrelation Function (PACF)")
+```
+
+### 3. Augmented Dickey-Fuller (ADF) Test for Stationarity
+
+```{r}
+library(forecast)
+library(urca)
+library(TSA)
+# ADF test
+adf_test <- ur.df(ts_data_month, lags = 1, type = "drift")  # Adjust lags as needed
+summary(adf_test)
+```
+
+### 4. Stationarity Test
+
+```{r}
+# KPSS test (alternative to ADF test)
+kpss_test <- kpss.test(ts_data_month)
+print(kpss_test)
+```
+
+### 5. ARIMA Modeling
+
+```{r}
+# Fit ARIMA model
+arima_model <- auto.arima(ts_data_month)
 summary(arima_model)
 ```
 
-#### model briefing
-
-This code segment fits an ARIMA (AutoRegressive Integrated Moving Average) model to the normalized monthly price data of Bitcoin (\`train_data\$monthly.price.norma\`). Here's a breakdown of each line:
-
-1\. \`arima_model \<- auto.arima(train_data\$monthly.price.norma)\`:
-
--   The \`auto.arima()\` function, from the "forecast" package (assuming it's loaded), automatically determines the best-fitting ARIMA model for the provided time series data.
-
--   \`train_data\$monthly.price.norma\` refers to the column containing normalized monthly price data in the \`train_data\` data frame.
-
--   The result of this function call is stored in the variable \`arima_model\`, representing the fitted ARIMA model.
-
-2\. \`print(arima_model)\`:
-
--   The \`print()\` function is used to display the details of the fitted ARIMA model stored in \`arima_model\`. This includes information about the chosen model order (p, d, q) and any other relevant information about the model.
-
-3\. \`summary(arima_model)\`:
-
--   The \`summary()\` function is used to display a summary of the fitted ARIMA model. This includes detailed statistics, coefficients, standard errors, p-values, and other information related to the model's performance and fit to the data.
-
-In summary, the provided code segment performs the following steps:
-
-\- Fits an ARIMA model to the normalized monthly price data of Bitcoin using the \`auto.arima()\` function.
-
-\- Prints the details of the fitted ARIMA model using \`print()\`.
-
-\- Provides a comprehensive summary of the fitted ARIMA model using \`summary()\`.
-
-It's important to note that ARIMA models are used for time series forecasting and analysis. The model order (p, d, q) determined by \`auto.arima()\` indicates the number of autoregressive, differencing, and moving average terms, respectively, used in the model. The quality of the model fit and its performance should be assessed through various diagnostic tools and validation techniques, such as residual analysis and out-of-sample forecasting.
-
-##### model interpretation
-
--   The ARIMA model has been applied to a time series represented by **`train_data$monthly.price.norma`**, with a frequency of 12 (indicating monthly data).
-
--   The model coefficients represent the parameters of the ARIMA(0,0,2) model with a non-zero mean.
-
--   The coefficient **`ma1`** is 0.0828, corresponding to the first moving average term.
-
--   The coefficient **`ma2`** is -0.2635, corresponding to the second moving average term.
-
--   The coefficient **`mean`** is 0.3245, representing the non-zero mean.
-
--   The estimated variance of the model's residuals (sigma squared) is 0.09964.
-
--   The log likelihood of the model is -32.05.
-
--   The Akaike Information Criterion (AIC) is 72.11, the corrected AIC (AICc) is 72.44, and the Bayesian Information Criterion (BIC) is 83.45. Lower values indicate better-fitting models.
-
--   This section provides error measures for evaluating the model's performance on the training set.
-
--   **`ME`** represents the Mean Error, which is very close to zero.
-
--   **`RMSE`** is the Root Mean Squared Error, measuring the average magnitude of errors (0.3118738).
-
--   **`MAE`** is the Mean Absolute Error (0.2603076).
-
--   **`MPE`** and **`MAPE`** are not well-defined (indicated by **`-Inf`** and **`Inf`**, respectively).
-
--   **`MASE`** (Mean Absolute Scaled Error) is 0.7383955, measuring relative accuracy.
-
--   **`ACF1`** is -0.02373901, indicating the first-order autocorrelation of residuals.
-
-In summary, the ARIMA(0,0,2) model with non-zero mean has been fitted to the time series data. The coefficients, variance, information criteria, and error measures provide insights into the model's performance and fit to the training data. Further diagnostics and analysis are recommended for assessing the model's quality and suitability for forecasting and analysis tasks.
-
-#### comparison with the original pynb file
-
-### Python ARIMA Model (Lag 50, Coefficients 0, 1, 2, 1):
-
-This ARIMA model represents a time series forecasting model using the AutoRegressive Integrated Moving Average (ARIMA) approach, implemented in Python. The model is defined with the following parameters:
-
-*ARIMA(0, 1, 2)(1, 0, 0)[50]*
-
-
-- The orders of the AR, I, and MA components are 0, 1, and 2 respectively. This means the model has a first-order differencing (I) to make the data stationary and considers the past two forecast errors for its moving average (MA) component. However, there is no autoregressive (AR) component, as the order is set to 0.
-
-- The seasonal AR, I, and MA components are represented as (1, 0, 0), which indicates a seasonal autoregressive (SAR) component of order 1, and no seasonal integrated (SI) or seasonal moving average (SMA) components.
-
-- The [50] indicates that the model has a seasonal period of 50 time units (lags), which means it takes into account the values at lag 50.
-
-### R ARIMA Model (Lag 1, Coefficients 0, 0, 2):
-
-This ARIMA model represents a time series forecasting model using the ARIMA approach, implemented in R. The model is defined with the following parameters:
-
-
-- The orders of the AR, I, and MA components are 0, 0, and 2 respectively. In this case, there is no differencing (I = 0), and the model considers the past two forecast errors for its moving average (MA) component. Similarly to the Python model, there is no autoregressive (AR) component, as the order is set to 0.
-
-- Since there are no seasonal orders specified, it can be assumed that this model does not incorporate seasonal components.
-
-### Difference between the Two Models:
-
-The key differences between the two models are as follows:
-
-1. **Lag and Time Series Characteristics:**
-   - The Python model has a lag (seasonal period) of 50, meaning it accounts for patterns that repeat every 50 time units.
-   - The R model has a lag of 1, indicating it's looking at the immediate past value.
-
-2. **Coefficient Values:**
-   - The Python model has non-zero coefficient values for the moving average component (2 and 1), whereas the R model has non-zero coefficient values only for the moving average component (2).
-
-3. **Seasonality:**
-   - The Python model explicitly includes a seasonal ARIMA component with a seasonal order of (1, 0, 0), while the R model doesn't specify any seasonal components.
-
-4. **Integration:**
-   - Both models do not include differencing for the integrated (I) component (I = 0), which means they assume that the data is already stationary.
-
-Both models have different approaches to capturing time series patterns and trends. The Python model considers a longer seasonal period and includes a seasonal AR component, while the R model focuses on a simpler structure with just a moving average component. The choice between these models would depend on the characteristics of the specific time series data and the level of complexity needed to accurately capture its behavior.
-
-
-#### *forecasting with arima model*
+### 6. Forecasting
 
 ```{r}
-forecast_data <-forecast::forecast(arima_model, h = length(test_data$monthly.price.norma))
+# Forecast using ARIMA model
+forecast_values <- forecast(arima_model, h = 12)  # Forecasting 12 months ahead
+print(forecast_values)
+
+# Plot forecasted values
+plot(forecast_values, main = "Forecasted Values")
 ```
-
-### TESTING ARIMA MODEL STRNGTH
-
-```{r}
-res <- residuals(arima_model)
-res
-Box.test(res, lag = 12, type = "Ljung-Box")
-```
-
--   **Box-Ljung Test**: This indicates that the Ljung-Box test is being conducted to assess the efficiency of the ARIMA model by examining the autocorrelations of the model's residuals.
-
--   **Data**: "res" refers to the residuals obtained from the ARIMA model.
-
--   **X-squared**: The test statistic calculated by the Ljung-Box test. In this context, the test statistic of 17.695 is indicative of the magnitude of the autocorrelations of the residuals.
-
--   **Degrees of Freedom (df)**: The degrees of freedom associated with the X-squared distribution used in the test. In this case, it's 20.
-
--   **p-value**: The p-value associated with the test. The p-value measures the probability of observing a test statistic as extreme as the one calculated, assuming that the null hypothesis (of no autocorrelation) is true. In this case, the p-value is 0.6075.
-
-###### **Interpretation**:
-
--   When assessing the efficiency of an ARIMA model, a low p-value (typically below 0.05) from the Ljung-Box test suggests that there is significant evidence of autocorrelation in the residuals, which indicates that the model might not be efficient in capturing all the underlying patterns in the data.
-
--   Conversely, a high p-value (greater than 0.05) suggests that there is no significant evidence of autocorrelation in the residuals, indicating that the model is efficient in capturing the patterns in the data.
-
--   In this case, the relatively high p-value of 0.6075 suggests that the residuals do not exhibit significant autocorrelation. This would indicate that the ARIMA model is relatively efficient in explaining the observed data and capturing the underlying patterns.
-
-    ### arima model conclusion
-
-    this model is not a great fit. the test for eficiency has p vlaue that is greater that 0.05.
-
-```{r}
-# Calculate accuracy measures
-
-
-# Calculate Mean Absolute Percentage Error (MAPE)
-forecast_data$mean - test_data$monthly.price.norma
-mape <- mean(abs((forecast_data$mean - test_data$monthly.price.norma) / test_data$monthly.price.norma)) * 100
-print(paste("MAPE:", mape))
-
-# Calculate Root Mean Squared Error (RMSE)
-rmse <- sqrt(mean((forecast_data$mean - test_data$monthly.price.norma)^2))
-print(paste("RMSE:", rmse))
-```
-
-## SARIMA
-
-for sarima model we first do the adf test to check for staionerity. this help in confirming whether we will require diferencing before performing sarima. the adf test stands for the Augmented Dicky Fuller test. this is a test of stationerity in our data. from our analysis below we fail to accept the null hypothesis and conlcude the data is stationery hence we can proceed with sarima model.
-
-```{r}
-adf.test(train_data$monthly.price.norma)
-```
-
-### SARIMA MODEL
-
-```{r}
-arima_model <- auto.arima(ts(train_data$monthly.price.norma, frequency = 12), seasonal = TRUE)
-sarima.ml <- Arima(test_data$monthly.price.norma, order = c(0,0,2))
-forecast::forecast(sarima.ml,2)
-```
-
-##### testing the sarima model eficiency
-
-```{r}
-res2 <- residuals(sarima.ml)
-Box.test(res2, lag = 12, type = "Ljung-Box")
-```
-
-The sarima model also has the same draw backs as the arima model
-
-### prophet
-
-Prophet is a forecasting model developed by Facebook that is designed to handle time series data with strong seasonality, holidays, and other patterns. It's particularly well-suited for business and economic forecasting, as well as other applications where historical data needs to be used to predict future values.
-
-Prophet is available as an R package and provides a user-friendly interface to create accurate forecasts without requiring in-depth expertise in time series modeling. It incorporates several important features:
-
-from this prophet model we have to use the original data as prophet model reqires actual dates. plottog the wholde data dosent give a clear plot from the mmass amount of information we have the plot becomes too samll to see anything clearly.
-
-```{r}
-library(prophet)
-ds <- btc_history$Date
-y <- btc_history$Price
-pr.data <- data.frame(ds, y)
-ml.pr <- prophet(pr.data, daily.seasonality = TRUE)
-future <- make_future_dataframe(ml.pr, periods = 365, freq = 'day')
-prd <- predict(ml.pr, future)
-
-```
-
-this is a pictorial flow of howw the bitcoin trends behave throught the year week and month and times of the day,
-
-```{r}
-prophet_plot_components(ml.pr, prd)
-```
-
-### Determination of Saturation Points
-
-"saturating growth" or "saturation level" might refer to a scenario where a certain variable is growing or changing over time but is expected to level off and stabilize at some point. For instance, if you are modeling the adoption of a new product, the growth rate might initially be rapid but eventually slow down as the product reaches its maximum potential market share. In this case, the "saturation point" could refer to the point at which the growth stops and the variable reaches its maximum value.
-
-```{r}
-model = prophet(pr.data, n.changepoints = 12)
-future = make_future_dataframe(model,periods = 365, freq = 'day')
-plot(model,prd)+add_changepoints_to_plot(model)+xlab("Date")+ylab("Avg Price")
-```
-
-## CONCLUSION
-
-The best model to be used was the PROPHET MODEL. adding more data into it has revealed that bitcoin will drop untill mid 2024. unless un forseen circumstances that are not yet to be fearured occure from our model we do not see a rise but a continous downtrend with significant rises but not higher than the previous drop.
