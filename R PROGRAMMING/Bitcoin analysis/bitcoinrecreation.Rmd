@@ -479,231 +479,157 @@ ggplot(joined_data, aes(x = Timestamp)) +  # Define x-axis as 'Timestamp'
 
 ## We will use a Vanilla LSTM here for forecasting. The model is trained on pre 25-Jun-2018 data.
 
-```{r, message=FALSE, warning=FALSE}
-
-# Convert Timestamps to hours and group by hour, taking the first value
-data$hour <- as.POSIXct(format(data$Timestamp, "%Y-%m-%d %H:00:00"), tz = "UTC")
-data <- data[!duplicated(data$hour), ]
-
-# Function to fill missing values with the last available value
-fill_missing <- function(values) {
-  last_value <- NA  # Initialize the last value as NA
-  filled_values <- numeric(length(values))  # Initialize the vector to store filled values
-  for (i in seq_along(values)) {
-    if (is.na(values[i])) {
-      filled_values[i] <- last_value  # Use the last value if current is NA
-    } else {
-      filled_values[i] <- values[i]  # Update with the current value
-      last_value <- values[i]  # Update the last value
-    }
-  }
-  return(filled_values)  # Return the filled values
-}
-
-# Apply the fill_missing function to the Weighted_Price column
-data$Weighted_Price <- fill_missing(data$Weighted_Price)
-
-# Split the data into training and testing sets based on a specific date
-split_date <- as.POSIXct("2018-06-25", tz = "UTC")
-data_train <- data[data$hour <= split_date, "Weighted_Price", drop = FALSE]  # Training set
-data_test <- data[data$hour > split_date, "Weighted_Price", drop = FALSE]  # Testing set
-
-# Function for manual scaling of data
-scale_data <- function(values) {
-  mean_val <- mean(values, na.rm = TRUE)  # Calculate mean of values
-  std_val <- sd(values, na.rm = TRUE)  # Calculate standard deviation of values
-  scaled_values <- (values - mean_val) / std_val  # Scale values
-  list(scaled_values = scaled_values, mean = mean_val, std = std_val)  # Return scaled values and parameters
-}
-
-# Assign the training data to scaled_data
-scaled_data <- data_train
-training_set <- data_train$Weighted_Price
-
-# Prepare training data for LSTM
-X_train <- training_set[-length(training_set)]  # Input features
-y_train <- training_set[-1]  # Target values
-
-# Ensure y_train is a matrix with explicit dimensions
-y_train <- matrix(y_train, ncol = 1)
-
-# Check dimensions of the training data
-cat("Dimensions of X_train before reshaping:", dim(X_train), "\n")
-cat("Dimensions of y_train:", dim(y_train), "\n")
-# Reshape X_train for LSTM input (samples, time steps, features)
-X_train <- array(X_train, dim = c(length(X_train), 1, 1))
-
-# Verify dimensions again
-cat("Rechecked dimensions of X_train:", dim(X_train), "\n")
-```
-
 ```{r}
-# Convert Timestamps to hours and group by hour, taking the first value
+library(ggplot2)
+
+# Data Preprocessing
+data <- na.omit(data)
 data$hour <- as.POSIXct(format(data$Timestamp, "%Y-%m-%d %H:00:00"), tz = "UTC")
 data <- data[!duplicated(data$hour), ]
 
-# Function to fill missing values with the last available value
 fill_missing <- function(values) {
-  last_value <- NA  # Initialize the last value as NA
-  filled_values <- numeric(length(values))  # Initialize the vector to store filled values
+  last_value <- NA
+  filled_values <- numeric(length(values))
   for (i in seq_along(values)) {
     if (is.na(values[i])) {
-      filled_values[i] <- last_value  # Use the last value if current is NA
+      filled_values[i] <- last_value
     } else {
-      filled_values[i] <- values[i]  # Update with the current value
-      last_value <- values[i]  # Update the last value
+      filled_values[i] <- values[i]
+      last_value <- values[i]
     }
   }
-  return(filled_values)  # Return the filled values
+  return(filled_values)
 }
 
-# Apply the fill_missing function to the Weighted_Price column
 data$Weighted_Price <- fill_missing(data$Weighted_Price)
 
-# Split the data into training and testing sets based on a specific date
 split_date <- as.POSIXct("2018-06-25", tz = "UTC")
-data_train <- data[data$hour <= split_date, "Weighted_Price", drop = FALSE]  # Training set
-data_test <- data[data$hour > split_date, "Weighted_Price", drop = FALSE]  # Testing set
+data_train <- data[data$hour <= split_date, "Weighted_Price", drop = FALSE]
+data_test <- data[data$hour > split_date, "Weighted_Price", drop = FALSE]
 
-# Function for manual scaling of data
 scale_data <- function(values) {
-  mean_val <- mean(values, na.rm = TRUE)  # Calculate mean of values
-  std_val <- sd(values, na.rm = TRUE)  # Calculate standard deviation of values
-  scaled_values <- (values - mean_val) / std_val  # Scale values
-  list(scaled_values = scaled_values, mean = mean_val, std = std_val)  # Return scaled values and parameters
+  mean_val <- mean(values, na.rm = TRUE)
+  std_val <- sd(values, na.rm = TRUE)
+  scaled_values <- (values - mean_val) / std_val
+  list(scaled_values = scaled_values, mean = mean_val, std = std_val)
 }
 
-# Assign the training data to scaled_data
-scaled_data <- data_train
-training_set <- data_train$Weighted_Price
+scaled_train <- scale_data(data_train$Weighted_Price)
+scaled_test <- scale_data(data_test$Weighted_Price)  # Apply same scaling to test data
+training_set <- scaled_train$scaled_values
+testing_set <- scaled_test$scaled_values
 
-# Prepare training data for LSTM
-X_train <- training_set[-length(training_set)]  # Input features
-y_train <- training_set[-1]  # Target values
-
-# Ensure y_train is a matrix with explicit dimensions
+X_train <- training_set[-length(training_set)]
+y_train <- training_set[-1]
 y_train <- matrix(y_train, ncol = 1)
 
-# Check dimensions of the training data
-cat("Dimensions of X_train before reshaping:", dim(X_train), "\n")
-cat("Dimensions of y_train:", dim(y_train), "\n")
-
-# Reshape X_train for LSTM input (samples, time steps, features)
 X_train <- array(X_train, dim = c(length(X_train), 1, 1))
 
-# Verify dimensions again
-cat("Rechecked dimensions of X_train:", dim(X_train), "\n")
-
-# Define activation functions
+# LSTM Model Definition
 sigmoid <- function(x) {
-  1 / (1 + exp(-x))  # Sigmoid activation function
+  1 / (1 + exp(-x))
 }
 
 tanh_act <- function(x) {
-  (exp(x) - exp(-x)) / (exp(x) + exp(-x))  # Tanh activation function
+  tanh(x)
 }
 
-# Function to initialize weights for the neural network
 initialize_weights <- function(input_size, output_size) {
-  matrix(rnorm(input_size * output_size), nrow = input_size, ncol = output_size)  # Random normal initialization
+  matrix(rnorm(input_size * output_size), nrow = input_size, ncol = output_size)
 }
 
-# Function to create a simple LSTM model
 SimpleLSTM <- function(input_shape, units) {
   list(
     units = units,
-    Wf = initialize_weights(input_shape[2], units),  # Forget gate weights
-    Wi = initialize_weights(input_shape[2], units),  # Input gate weights
-    Wc = initialize_weights(input_shape[2], units),  # Cell gate weights
-    Wo = initialize_weights(input_shape[2], units),  # Output gate weights
-    bf = rep(0, units),  # Forget gate biases
-    bi = rep(0, units),  # Input gate biases
-    bc = rep(0, units),  # Cell gate biases
-    bo = rep(0, units),  # Output gate biases
-    Wy = initialize_weights(units, 1),  # Output weights
-    by = 0  # Output bias
+    Wf = initialize_weights(input_shape[2], units),
+    Wi = initialize_weights(input_shape[2], units),
+    Wc = initialize_weights(input_shape[2], units),
+    Wo = initialize_weights(input_shape[2], units),
+    bf = rep(0, units),
+    bi = rep(0, units),
+    bc = rep(0, units),
+    bo = rep(0, units),
+    Wy = initialize_weights(units, 1),
+    by = 0
   )
 }
 
-# Forward pass through the LSTM
 forward <- function(model, x) {
-  h_prev <- rep(0, model$units)  # Initialize previous hidden state
-  c_prev <- rep(0, model$units)  # Initialize previous cell state
+  h_prev <- rep(0, model$units)
+  c_prev <- rep(0, model$units)
   for (t in 1:dim(x)[1]) {
-    xt <- x[t, , , drop = FALSE]  # Extract current time step input
-    f_t <- sigmoid(xt %*% model$Wf + model$bf)  # Forget gate
-    i_t <- sigmoid(xt %*% model$Wi + model$bi)  # Input gate
-    c_tilde_t <- tanh_act(xt %*% model$Wc + model$bc)  # Candidate cell state
-    c_t <- f_t * c_prev + i_t * c_tilde_t  # Update cell state
-    o_t <- sigmoid(xt %*% model$Wo + model$bo)  # Output gate
-    h_t <- o_t * tanh_act(c_t)  # Update hidden state
-    h_prev <- h_t  # Store current hidden state as previous for next time step
-    c_prev <- c_t  # Store current cell state as previous for next time step
+    xt <- x[t, , , drop = FALSE]
+    f_t <- sigmoid(xt %*% model$Wf + model$bf)
+    i_t <- sigmoid(xt %*% model$Wi + model$bi)
+    c_tilde_t <- tanh_act(xt %*% model$Wc + model$bc)
+    c_t <- f_t * c_prev + i_t * c_tilde_t
+    o_t <- sigmoid(xt %*% model$Wo + model$bo)
+    h_t <- o_t * tanh_act(c_t)
+    h_prev <- h_t
+    c_prev <- c_t
   }
-  y <- h_t %*% model$Wy + model$by  # Compute output
+  y <- h_t %*% model$Wy + model$by
   y
 }
 
-# Train the LSTM model
 train <- function(model, X, y, epochs, lr) {
   for (epoch in 1:epochs) {
-    loss <- 0  # Initialize loss
+    loss <- 0
     for (i in 1:dim(X)[1]) {
-      output <- forward(model, X[i, , , drop = FALSE])  # Forward pass
-      error <- output - y[i, ]  # Compute error
-      loss <- loss + sum(error^2)  # Accumulate loss
-      # Backpropagation omitted for brevity
+      output <- forward(model, X[i, , , drop = FALSE])
+      error <- output - y[i, ]
+      loss <- loss + sum(error^2)
+      # Backpropagation would be added here
     }
     if (epoch %% 10 == 0) {
-      cat("Epoch", epoch, "Loss:", loss, "\n")  # Print loss every 10 epochs
+      cat("Epoch", epoch, "Loss:", loss, "\n")
     }
   }
 }
 
-# Initialize and train the model
-input_shape <- c(1, 1)  # Input shape
-units <- 128  # Number of LSTM units
-model <- SimpleLSTM(input_shape, units)  # Create LSTM model
-ml.train <- train(model, X_train, y_train, epochs = 100, lr = 0.001)  # Train the model
-
-# Summary of the model (function not implemented in the provided code)
-summary(model)
-summary(ml.train)
-```
-
-```{r}
-# Function to predict using the LSTM model
+# Prediction Function
 predict_lstm <- function(model, X) {
-  predictions <- vector("numeric", length = dim(X)[1])
+  predictions <- numeric(dim(X)[1])
   for (i in 1:dim(X)[1]) {
     predictions[i] <- forward(model, X[i, , , drop = FALSE])
   }
-  predictions
+  return(predictions)
 }
 
-# Predict on the test dataset
-X_test <- array(data_test$Weighted_Price[-length(data_test$Weighted_Price)], dim = c(length(data_test$Weighted_Price) - 1, 1, 1))
-y_test <- data_test$Weighted_Price[-1]
-y_test <- matrix(y_test, ncol = 1)
+input_shape <- c(1, 1)
+units <- 128
+model <- SimpleLSTM(input_shape, units)
+train(model, X_train, y_train, epochs = 100, lr = 0.001)
 
-# Ensure dimensions match
-if (dim(X_test)[1] != dim(y_test)[1]) {
-  stop("Dimensions of X_test and y_test do not match!")
-}
+# Prepare test data for prediction
+X_test <- array(testing_set[-length(testing_set)], dim = c(length(testing_set) - 1, 1, 1))
 
 # Make predictions
-predictions <- predict_lstm(model, X_train)
-```
+predictions <- predict_lstm(model, X_test)
 
-```{r}
-# Plotting actual vs predicted values
-plot(1:length(y_test), y_test, type = "b", 
-     main = "Actual vs Predicted Values",
-     xlab = "Time Steps", ylab = "Values",
-     col = "blue", pch = 19)
-points(1:length(predictions), predictions, type = "b", col = "red", pch = 19)
-legend("topright", legend = c("Actual", "Predicted"), col = c("blue", "red"), pch = 19)
+# Rescale predictions to original scale
+predictions_rescaled <- predictions * scaled_train$std + scaled_train$mean
+actual_rescaled <- testing_set[-1] * scaled_train$std + scaled_train$mean
 
+# Prepare data for plotting
+plot_data <- data.frame(
+  #Timestamp = data[data$hour > split_date, "hour"][-1],
+  Actual = actual_rescaled,
+  Predicted = predictions_rescaled
+)
+
+
+# Plotting
+ggplot(plot_data, aes(x = data$Timestamp[1:length(plot_data$Actual)] )) +
+  geom_line(aes(y = Actual, color = "Actual")) +
+  geom_line(aes(y = Predicted, color = "Predicted")) +
+  labs(title = "LSTM Predictions vs Actual",
+       x = "Time",
+       y = "Weighted Price") +
+  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +
+  theme_minimal()
+
+summary(model)
 ```
 
 #### comparison with ppython
