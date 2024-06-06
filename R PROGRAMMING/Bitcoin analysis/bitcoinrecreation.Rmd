@@ -64,7 +64,23 @@ print(dir_contents)
 
 # Environment preparation
 
-## Getting pakages
+## Getting packages
+
+We are utilizing the `lapply` function and lists in R to import a set of packages. Vectors are stored within the `c()` function in R. Subsequently, we call this list and import all packages, where `lapply` takes package names as a list and runs the `library` function on each.
+
+###   Packages use
+
+1. **tidyverse**: Collection of R packages for data manipulation and visualization.
+2. **plotly**: Interactive plotting library for creating web-based graphs.
+3. **lubridate**: Simplifies date-time handling in R.
+4. **readr**: Fast and friendly package for reading rectangular data.
+5. **dplyr**: Data manipulation package for filtering, transforming, and summarizing data.
+6. **zoo**: Provides tools for working with regular and irregular time series data.
+7. **ggplot2**: Data visualization package based on the grammar of graphics.
+8. **forecast**: Forecasting methods and tools for time series analysis.
+9. **stats**: Core statistical functions and distributions in R.
+10. **tseries**: Time series analysis and econometrics tools.
+
 
 ```{r, message=FALSE}
 # Define the list of package names
@@ -75,13 +91,13 @@ lapply(packages, require, character.only = TRUE)
 
 ## Data importation
 
--   **The data importation utliises read_csv function from readr library. our Data ahas a Timestamp which will be converteed to readbale from with the code line `mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))`**
+Here's the corrected text:
 
--   the lineinterprates the Timestamp to human readable form.
-    We set the format to UTC then give it a sample date to use like in our case 1970-01-01.
-    and set the path to our file
+- **The data is imported using the `read_csv` function from the `readr` library. Our data includes a `Timestamp` column, which will be converted to a readable format using the code line `mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))`.**
 
--   here we end the code by displaying the firt 6 rows of data
+- This line interprets the `Timestamp` into a human-readable form. We set the format to UTC and provide a reference date, such as 1970-01-01, for conversion.
+
+- Finally, we conclude the code by displaying the first 6 rows of the data.
 
 ```{r, message=FALSE}
 # Define a function to parse timestamps from seconds since the Unix epoch
@@ -156,12 +172,11 @@ end <- ymd_hms("2018-11-11 00:00:00", tz = "UTC")    # Define end date-time in U
 filtered_data <- data %>%
   filter(Timestamp >= start & Timestamp <= end)  # Filter data for rows with Timestamp between 'start' and 'end'
 
-
 # Find the first row of each week (starting on Monday) in filtered_data
 weekly_rows <- filtered_data %>%
   mutate(Week = floor_date(Timestamp, unit = "week", week_start = 1)) %>% # Create 'Week' column by flooring Timestamp to the nearest week starting on Monday
   group_by(Week) %>%        # Group rows by 'Week' column
-  slice(1) %>%               # Select the first row from each group (week)
+  slice_head(n = 1) %>%               # Select the first row from each group (week)
   ungroup()                  # Remove grouping for further operations
 
 # Display the first few rows of weekly_rows dataframe
@@ -393,7 +408,7 @@ data <- data %>%
 data <- data %>% 
   mutate(Timestamp = floor_date(Timestamp, unit = "hour")) %>%  # Floor 'Timestamp' to the nearest hour
   group_by(Timestamp) %>%  # Group by 'Timestamp'
-  slice(1) %>%  # Take the first row from each group
+  slice_head(n = 1) %>%  # Take the first row from each group
   ungroup() %>%  # Ungroup the data
   select(Timestamp, Weighted_Price)  # Select 'Timestamp' and 'Weighted_Price' columns
 
@@ -475,6 +490,7 @@ ggplot(joined_data, aes(x = Timestamp)) +  # Define x-axis as 'Timestamp'
   xlab("Date") +  # Label x-axis
   ylab("Weighted Price (USD)")  # Label y-axis
 
+
 ```
 
 ## We will use a Vanilla LSTM here for forecasting. The model is trained on pre 25-Jun-2018 data.
@@ -483,7 +499,9 @@ ggplot(joined_data, aes(x = Timestamp)) +  # Define x-axis as 'Timestamp'
 library(ggplot2)
 
 # Data Preprocessing
-data <- na.omit(data)
+data <- data %>%
+  filter(Weighted_Price > 0) %>%
+  na.omit(data)
 data$hour <- as.POSIXct(format(data$Timestamp, "%Y-%m-%d %H:00:00"), tz = "UTC")
 data <- data[!duplicated(data$hour), ]
 
@@ -600,7 +618,9 @@ input_shape <- c(1, 1)
 units <- 128
 model <- SimpleLSTM(input_shape, units)
 train(model, X_train, y_train, epochs = 100, lr = 0.001)
+```
 
+```{r}
 # Prepare test data for prediction
 X_test <- array(testing_set[-length(testing_set)], dim = c(length(testing_set) - 1, 1, 1))
 
@@ -628,8 +648,6 @@ ggplot(plot_data, aes(x = data$Timestamp[1:length(plot_data$Actual)] )) +
        y = "Weighted Price") +
   scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +
   theme_minimal()
-
-summary(model)
 ```
 
 #### comparison with ppython
@@ -672,7 +690,7 @@ data <- read.csv(file_path)
 
 # Convert the 'Timestamp' column from Unix time to POSIXct date-time format
 data <- data %>%
-  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
+  mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC")) 
 
 ```
 
@@ -717,7 +735,7 @@ data <- data %>%
 data <- data %>% 
   mutate(Timestamp = floor_date(Timestamp, unit = "hour")) %>%  # Floor 'Timestamp' to the nearest hour
   group_by(Timestamp) %>%  # Group by 'Timestamp'
-  slice(1) %>%  # Take the first row from each group
+  slice_head(n = 1) %>%  # Take the first row from each group
   ungroup() %>%  # Ungroup the data
   select(Timestamp, Weighted_Price)  # Select 'Timestamp' and 'Weighted_Price' columns
 
@@ -740,7 +758,7 @@ data$Timestamp <- as.POSIXct(data$Timestamp, tz = "")  # This step removes timez
 data <- data %>%
   mutate(Timestamp = floor_date(Timestamp, unit = "hour")) %>%  # Floor 'Timestamp' to the nearest hour
   group_by(Timestamp) %>%  # Group by 'Timestamp'
-  slice(1) %>%  # Take the first row from each group
+  slice_head(n = 1) %>%  # Take the first row from each group
   ungroup()  # Ungroup the data
 
 # Fill missing values using forward fill (na.locf from zoo package)
@@ -760,12 +778,52 @@ color_pal <- c("#F8766D", "#D39200", "#93AA00", "#00BA38", "#00C19F", "#00B9E3",
 # Plot using ggplot2
 ggplot(data, aes(x = Timestamp, y = Weighted_Price)) +
   geom_line(color = color_pal[1]) +  # Adjust color based on your preference
-  labs(title = "BTC Weighted_Price Price (USD) by Hours") +
+  labs(title = "BTC Weighted_Price Price (USD) by Hours with NA filled with 0 as original analysis") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels if needed
   scale_x_datetime(date_labels = "%Y-%m-%d %H:%M") +  # Adjust date format on x-axis
   labs(x = "Timestamp", y = "Weighted_Price (USD)") +
   NULL  # Suppress the printing of the plot object in console
+data_na <- na.omit(data)
+data_na <- data_na %>%
+  filter(Weighted_Price > 0)
+
+ggplot(data_na, aes(x = Timestamp, y = Weighted_Price)) +
+  geom_line(color = color_pal[1]) +  # Adjust color based on your preference
+  labs(title = "BTC Weighted_Price Price (USD) by Hours with NA omited") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels if needed
+  scale_x_datetime(date_labels = "%Y-%m-%d %H:%M") +  # Adjust date format on x-axis
+  labs(x = "Timestamp", y = "Weighted_Price (USD)") +
+  NULL  # Suppress the printing of the plot object in console
+
+
+library(ggplot2)
+library(gridExtra)
+
+
+# Set the size of the plotting window (for example, in inches)
+x11(width = 25, height = 16) # Use quartz() on macOS or X11() on Linux
+# Create the first plot
+plot1 <- ggplot(data_na, aes(x = Timestamp, y = Weighted_Price)) +
+  geom_line(color = color_pal[1]) +  # Adjust color based on your preference
+  labs(title = "BTC Weighted_Price Price (USD) by Hours with NA omitted") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels if needed
+  scale_x_datetime(date_labels = "%Y-%m-%d %H:%M") +  # Adjust date format on x-axis
+  labs(x = "Timestamp", y = "Weighted_Price (USD)")
+
+# Create the second plot
+plot2 <- ggplot(data, aes(x = Timestamp, y = Weighted_Price)) +
+  geom_line(color = color_pal[1]) +  # Adjust color based on your preference
+  labs(title = "BTC Weighted_Price Price (USD) by Hours with NA filled with 0 as original analysis") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels if needed
+  scale_x_datetime(date_labels = "%Y-%m-%d %H:%M") +  # Adjust date format on x-axis
+  labs(x = "Timestamp", y = "Weighted_Price (USD)")
+
+# Arrange the two plots side by side
+grid.arrange(plot1, plot2, ncol = 2)
 
 ```
 
@@ -792,17 +850,46 @@ data_test <- data %>%
   filter(Timestamp > split_date) %>%  # Filter rows where Timestamp is after the split date
   select(Timestamp, Weighted_Price)  # Select only the Timestamp and Weighted_Price columns
 
+# Split data into training set (before or on split_date) and select relevant columns
+data_train_na <- data %>% 
+  filter(Timestamp <= split_date, Weighted_Price > 0) %>%  # Filter rows where Timestamp is on or before the split date
+  select(Timestamp, Weighted_Price) %>% # Select only the Timestamp and Weighted_Price columns
+  na.omit()
+
+# Split data into testing set (after split_date) and select relevant columns
+data_test_na <- data %>% 
+  filter(Timestamp > split_date,Weighted_Price > 0) %>%  # Filter rows where Timestamp is after the split date
+  select(Timestamp, Weighted_Price) %>% # Select only the Timestamp and Weighted_Price columns
+  na.omit()
+
+x11(width = 25, height = 16) # Use quartz() on macOS or X11() on Linux
+
 # Plot the data using ggplot2
-ggplot() +
-  geom_line(data = data_test, aes(x = Timestamp, y = Weighted_Price, color = "Test Set")) +  # Plot the testing set with a line
+plot12 <- ggplot() +
+  geom_line(data = data_test, aes(x = Timestamp, y = Weighted_Price, color = "Test Set with")) +  # Plot the testing set with a line
   geom_line(data = data_train, aes(x = Timestamp, y = Weighted_Price, color = "Training Set")) +  # Plot the training set with a line
-  labs(title = "BTC Weighted_Price Price (USD) by Hours") +  # Add a title to the plot
+  labs(title = "BTC Weighted_Price Price (USD) by Hours with NA and zero values") +  # Add a title to the plot
   theme_minimal() +  # Use a minimal theme for the plot
   scale_x_date(date_labels = "%Y-%m-%d %H:%M", date_breaks = "1 day") +  # Format the x-axis with dates and set breaks at every day
   labs(x = "Timestamp", y = "Weighted_Price (USD)") +  # Label the x and y axes
   scale_color_manual(values = c("Test Set" = "#F8766D", "Training Set" = "#00B9E3"))  # Set custom colors for the lines representing the test and training sets
 
+plot12
 
+# Plot the data using ggplot2
+plot11 <- ggplot() +
+  geom_line(data = data_test_na, aes(x = Timestamp, y = Weighted_Price, color = "Test Set with")) +  # Plot the testing set with a line
+  geom_line(data = data_train_na, aes(x = Timestamp, y = Weighted_Price, color = "Training Set")) +  # Plot the training set with a line
+  labs(title = "BTC Weighted_Price Price (USD) by Hours without NA and zero values") +  # Add a title to the plot
+  theme_minimal() +  # Use a minimal theme for the plot
+  scale_x_date(date_labels = "%Y-%m-%d %H:%M", date_breaks = "1 day") +  # Format the x-axis with dates and set breaks at every day
+  labs(x = "Timestamp", y = "Weighted_Price (USD)") +  # Label the x and y axes
+  scale_color_manual(values = c("Test Set" = "#F8766D", "Training Set" = "#00B9E3"))  # Set custom colors for the lines representing the test and training sets
+
+plot11
+data
+# Arrange the two plots side by side
+grid.arrange(plot11, plot12, ncol = 2)
 ```
 
 ```{r}
@@ -866,7 +953,7 @@ cat("Training MAE:", train_mae, "\n")
 
 ```
 
-## prediciotn
+## prediction
 
 ```{r}
 # Load necessary libraries
@@ -874,11 +961,11 @@ library(xgboost)  # For XGBoost model
 library(ggplot2)  # For plotting
 
 # Convert 'Timestamp' column to numeric format (seconds since the Unix epoch) if necessary
-data_train$Timestamp <- as.numeric(as.POSIXct(data_train$Timestamp))
+data_train_na$Timestamp <- as.numeric(as.POSIXct(data_train_na$Timestamp))
 
 # Convert the data frame to matrix format for XGBoost
-X_train <- as.matrix(data_train[, c("Timestamp", "Weighted_Price")])  # Select 'Timestamp' and 'Weighted_Price' columns and convert to matrix
-y_train <- data_train$Weighted_Price  # Extract the target variable 'Weighted_Price'
+X_train <- as.matrix(data_train_na[, c("Timestamp", "Weighted_Price")])  # Select 'Timestamp' and 'Weighted_Price' columns and convert to matrix
+y_train <- data_train_na$Weighted_Price  # Extract the target variable 'Weighted_Price'
 
 # Create DMatrix, a special data structure in XGBoost for training
 dtrain <- xgb.DMatrix(data = X_train, label = y_train)  # Create a DMatrix with data and labels
@@ -909,11 +996,11 @@ model <- xgb.train(
 predictions <- predict(model, dtrain)
 
 # Convert 'Timestamp' back to POSIXct format for plotting
-data_train$Timestamp <- as.POSIXct(data_train$Timestamp, origin="1970-01-01", tz="UTC")
+data_train_na$Timestamp <- as.POSIXct(data_train_na$Timestamp, origin="1970-01-01", tz="UTC")
 
 # Combine actual and predicted values into a single data frame
 results <- data.frame(
-  Timestamp = data_train$Timestamp,
+  Timestamp = data_train_na$Timestamp,
   Actual = y_train,
   Predicted = predictions
 )
@@ -944,19 +1031,19 @@ library(ggplot2)  # For plotting
 library(dplyr)    # For data manipulation
 
 # Convert 'Timestamp' column to numeric format (seconds since the Unix epoch) if necessary
-data$Timestamp <- as.numeric(as.POSIXct(data$Timestamp))
+data_na$Timestamp <- as.numeric(as.POSIXct(data_na$Timestamp))
 
 # Split data into training and testing sets
 split_date <- as.numeric(as.POSIXct("2018-06-25"))
-data_train <- data %>% filter(Timestamp <= split_date)
-data_test <- data %>% filter(Timestamp > split_date)
+data_train_na <- data_na %>% filter(Timestamp <= split_date)
+data_test_na <- data_na %>% filter(Timestamp > split_date)
 
 # Convert to matrix format for XGBoost
-X_train <- as.matrix(data_train[, c("Timestamp", "Weighted_Price")])
-y_train <- data_train$Weighted_Price
+X_train <- as.matrix(data_train_na[, c("Timestamp", "Weighted_Price")])
+y_train <- data_train_na$Weighted_Price
 
-X_test <- as.matrix(data_test[, c("Timestamp", "Weighted_Price")])
-y_test <- data_test$Weighted_Price
+X_test <- as.matrix(data_test_na[, c("Timestamp", "Weighted_Price")])
+y_test <- data_test_na$Weighted_Price
 
 # Create DMatrix for training and testing
 dtrain <- xgb.DMatrix(data = X_train, label = y_train)
@@ -996,13 +1083,13 @@ data_test$Timestamp <- as.POSIXct(data_test$Timestamp, origin="1970-01-01", tz="
 
 # Combine actual and predicted values into a single data frame
 results_train <- data.frame(
-  Timestamp = data_train$Timestamp,
+  Timestamp = data_train_na$Timestamp,
   Actual = y_train,
   Predicted = predictions_train
 )
 
 results_test <- data.frame(
-  Timestamp = data_test$Timestamp,
+  Timestamp = data_test_na$Timestamp,
   Actual = y_test,
   Predicted = predictions_test
 )
@@ -1080,7 +1167,7 @@ library(zoo)  # For the na.locf function (Last Observation Carried Forward)
 library(lubridate)  # For handling date/time data
 
 # Assuming 'data' is your data frame in R with 'Timestamp' and 'Weighted_Price'
-data <- data %>%
+data <- data_na %>%
   mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
 
 # Step 2: Group by hourly frequency and take the first value within each hour
@@ -1097,53 +1184,57 @@ data <- data %>%
   mutate(Weighted_Price = na.locf(Weighted_Price))  # Fill missing values by carrying the last observation forward
 
 # Print the resulting data frame
-print(data)  # Output the cleaned and processed data frame
+head(data)  # Output the cleaned and processed data frame
 
 
 ```
 
+
 ```{r}
+# Load necessary packages
 library(ggplot2)
+library(plotly)
 
-# Define color palette
-color_pal <- c("#F8766D", "#D39200", "#93AA00", "#00BA38", "#00C19F", "#00B9E3", "#619CFF", "#DB72FB")
+# Group and summarize by hour, ensuring no missing values
+data_hourly <- data %>%
+  group_by(Timestamp = floor_date(Timestamp, "hour")) %>%
+  summarize(Weighted_Price = mean(Weighted_Price, na.rm = TRUE)) %>%
+  ungroup()
 
-
-
-# Plot using ggplot2
-ggplot(data, aes(x = Timestamp, y = Weighted_Price)) +
-  geom_line(color = color_pal[1]) +  # Adjust color_pal index as needed
-  labs(title = "BTC Weighted_Price Price (USD) by Hours") +
+# Create the ggplot2 plot
+plt_hrsly <- ggplot(data_hourly, aes(x = Timestamp, y = Weighted_Price)) +
+  geom_line(color = "#F8766D") +
+  labs(title = "BTC Weighted_Price Price (USD) by Hours", x = "Timestamp", y = "Price") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for better readability
-  scale_x_datetime(date_breaks = "1 hour", date_labels = "%Y-%m-%d %H:%M")  # Set breaks and format for datetime x-axis
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_datetime(date_labels = "%d-%b %H:%M", date_breaks = "96 hours") +  # Set date breaks to every 96 hours (4 days)
+  scale_color_manual(values = c("#F8766D"))
+
+# Convert the ggplot2 plot to a plotly plot
+plotly_hrsly <- ggplotly(plt_hrsly)
+
+# Print the plotly plot
+plotly_hrsly
 
 ```
 
-```{r}
-# Assuming 'data' is your dataset with 'Timestamp' as a column
 
+
+
+```{r}
 # Convert 'Timestamp' to POSIXct (datetime) format if not already in that format
 data$Timestamp <- as.POSIXct(data$Timestamp, format = "%d-%b-%Y")
-
 # Define split_date in POSIXct format
 split_date <- as.POSIXct("2018-06-25")
-
 # Create data_train and data_test
 data_train <- data[data$Timestamp <= split_date, ]
 data_test <- data[data$Timestamp > split_date, ]
-
-
 ```
 
 ```{r}
 library(dplyr)
 library(ggplot2)
 library(lubridate)
-
-# Assuming 'data' is your dataframe with 'Timestamp' (POSIXct) and 'Weighted_Price'
-
-
 
 # Group and summarize by hour, ensuring no missing values
 data_hourly <- data %>%
@@ -1152,13 +1243,19 @@ data_hourly <- data %>%
   ungroup()
 
 # Plotting with ggplot2
-ggplot(data_hourly, aes(x = Timestamp, y = Weighted_Price)) +
+plt_hrsly2 <- ggplot(data_hourly, aes(x = Timestamp, y = Weighted_Price)) +
   geom_line(color = "#F8766D") +
   labs(title = "BTC Weighted_Price Price (USD) by Hours", x = "Timestamp", y = "Price") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_x_datetime(date_labels = "%d-%b %H:%M", date_breaks = "1 hour") +
+  scale_x_datetime(date_labels = "%d-%b %H:%M", date_breaks = "96 hours") +  # Set date breaks to every 96 hours (4 days)
   scale_color_manual(values = c("#F8766D"))
+
+# Convert ggplot2 plot to plotly plot
+plotly_hrsly2 <- ggplotly(plt_hrsly2)
+
+# Print the plotly plot
+plotly_hrsly2
 
 ```
 
@@ -1169,8 +1266,6 @@ ggplot(data_hourly, aes(x = Timestamp, y = Weighted_Price)) +
 # Load required libraries
 library(prophet)
 library(dplyr)
-
-# Assuming 'data_train' is your dataframe with columns 'Timestamp' and 'Weighted_Price'
 
 # Convert data_train to proper format and rename columns
 data_train <- data_train %>%
@@ -1188,7 +1283,6 @@ summary(model_fit$extra_regressors)
 summary(model)
 
 head(predict(model_fit))
-
 ```
 
 ```{r}
@@ -1196,18 +1290,22 @@ head(predict(model_fit))
 library(prophet)
 library(dplyr)
 
-# Setup and train model
-model <- prophet()  # Create a new Prophet model object
-model_fit <- fit.prophet(model, data_train)  # Fit the model to the training data
-
 # Optionally, make future predictions
 future <- make_future_dataframe(model_fit, periods = 365)  # Forecasting for the next 365 days
 forecast <- predict(model_fit, future)
-
 # Plotting predicted vs actual and future forecasted values
 plot(model_fit, forecast)
+```
+
+### interactive plot widget
+
+```{r}
+# Create a basic plot using ggplot2
+plot_prophet <- prophet_plot_components(model_fit, forecast)
+plot_prophet
 
 ```
+
 
 #### Prophet RMSE MAE
 
@@ -1384,8 +1482,6 @@ summary(arima_model)
 ## monnthly data
 
 ```{r}
-# Assuming 'data' is your dataframe with columns 'Timestamp' and 'Weighted_Price'
-
 # Convert 'Timestamp' to Date format (if it's POSIXct)
 data$Timestamp <- as.Date(data$Timestamp)
 

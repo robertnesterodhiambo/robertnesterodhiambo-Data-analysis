@@ -27,7 +27,7 @@ Our project is structured into two key sections:
 **1. Data Exploration** - Analyzing and visualizing Bitcoin price data.
 - Identifying trends and patterns in historical price movements.
 
-**2. Time Series Analysis and Forecasting** - **Forecasting Methods:** - **LSTM (Long Short-Term Memory):** Leveraging deep learning to capture complex temporal dependencies.
+**2. Time Series Analysis and Forecasting** - **Forecasting Methods:** - **LSTM (Long   Short-Term Memory):** Leveraging deep learning to capture complex temporal dependencies.
 - **XGBoost:** Harnessing gradient boosting to predict Bitcoin price fluctuations.
 - **Facebook Prophet:** Using a versatile tool for forecasting with seasonality and holidays.
 - **ARIMA (AutoRegressive Integrated Moving Average):** Employing a traditional statistical approach for time series forecasting.
@@ -52,7 +52,7 @@ This file has the daily data from 2014 first January to 2018 eleventh November h
 
 ```{r, message=FALSE}
 # Set the directory path where the data is located
-data_dir <- "~/Git/Data"
+data_dir <- "C:/Users/HP/RRproject_BTC/BTC_data"
 
 # List files in the directory specified by data_dir
 dir_contents <- list.files(data_dir)
@@ -90,10 +90,10 @@ dateparse <- function(time_in_secs) {
 }
 
 # Expand the tilde to the home directory and specify the file path
-file_path <- "~/Git/Data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv"
+file_path <- "C:/Users/HP/RRproject_BTC/BTC_data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv"
 
 # Read the CSV file into a data frame named 'data'
-data <- read_csv("~/Git/Data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv")
+data <- read_csv("C:/Users/HP/RRproject_BTC/BTC_data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv")
 
 # Convert the 'Timestamp' column from numeric Unix timestamps to POSIXct date-time objects
 data <- data %>%
@@ -178,9 +178,7 @@ the interactive plot takes in arguments of lable for 1month 6month and 12months 
 
 #### Comparson of the python plot and R plot
 
-![python output](newplot2.png)
-
-![R output](newplot.png)
+![python output](images/clipboard-4093958283.png)
 
 The python output does not distinguish the open closed and weighted_price clearly in the plot.
 Although ht plots interactively matches that of R programming, we see a superiority of the R language in handling the visualizations in a more vasetile manner by creating multiple facets for each column while still maintaining the same x and y axis.
@@ -225,9 +223,7 @@ this can only be notice when hovering over the plots and the interactivity becom
 
 #### Comparison with python plot
 
-![python fig2](newplot2.png)
-
-![](newplot(1).png)
+![python fig2](images/clipboard-2840284354.png)
 
 These two plot are similar theought hence both languages would suit the job for this code.
 
@@ -280,9 +276,7 @@ There is a cluster of Volumes at specific prices.
 
 #### comparison with python plot
 
-![Volume plot from python](newplotvol.png)
-
-![volume plot in R](newplotvol.png)
+![](images/clipboard-2935226500.png)
 
 These two plots are simmilar making both languages easier to handle for this kind of plot.
 
@@ -380,7 +374,7 @@ Here's the mathematical formulation of the LSTM model:
 This segment is same as the previous codes
 
 ```{r, message=FALSE}
-data <- read_csv("~/Git/Data/bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv")  # Read CSV data into 'data' dataframe
+data <- read_csv("C:/Users/HP/RRproject_BTC/BTC_data/bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv")  # Read CSV data into 'data' dataframe
 data <- data %>% 
   mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))  # Convert 'Timestamp' to POSIXct with UTC timezone
 
@@ -685,7 +679,7 @@ dateparse <- function(time_in_secs) {
 }
 
 # Replace with your actual file path to the CSV file
-file_path <- '~/Git/Data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv'
+file_path <- 'C:/Users/HP/RRproject_BTC/BTC_data/coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv'
 
 # Read the CSV file into a data frame
 data <- read.csv(file_path)
@@ -886,7 +880,7 @@ cat("Training MAE:", train_mae, "\n")
 
 ```
 
-## Prediction
+## Prediction 
 
 ```{r}
 # Load necessary libraries
@@ -1092,6 +1086,8 @@ Therefore, for this specific task and data:
 
 -   **R** would be the better choice given the lower error metrics, indicating a better fit to the data.
 
+
+
 # PROPHET FORECASTING
 
 ```{r}
@@ -1233,6 +1229,7 @@ plot(model_fit, forecast)
 
 ```
 
+
 #### Prophet RMSE MAE
 
 ```{r}
@@ -1263,71 +1260,66 @@ cat("RMSE:", rmse_value, "\n")
 
 ```
 
-#### MAE MSE explanations
+#### MAE MSE  explanations
 
-The Prophet model's MAE (625.8949) indicates an average prediction error of about 625.89 units, showing how much predictions deviate from actual values on average.
-The RMSE (1025.923) highlights a larger deviation, emphasizing that some predictions have significant errors.
-Both metrics help assess the model's accuracy.
+The Prophet model's MAE (625.8949) indicates an average prediction error of about 625.89 units, showing how much predictions deviate from actual values on average. The RMSE (1025.923) highlights a larger deviation, emphasizing that some predictions have significant errors. Both metrics help assess the model's accuracy.
 
 #### Comparison
 
-The model trained with Prophet in R has an MAE of 625.8949 and an RMSE of 1025.923, while the Prophet model in Python has an MAE of 1678.49 and an MSE of 3654149.48.
-Since both MAE and RMSE are significantly lower for the Prophet model, it indicates better prediction accuracy and fewer large errors.
-Thus, the Prophet model in R is the better choice for this data set.
+The model trained with Prophet in R has an MAE of 625.8949 and an RMSE of 1025.923, while the Prophet model in Python has an MAE of 1678.49 and an MSE of 3654149.48. Since both MAE and RMSE are significantly lower for the Prophet model, it indicates better prediction accuracy and fewer large errors. Thus, the Prophet model in R is the better choice for this data set.
 
-# Arima
 
-## daily data
+
+
+
+
+
+
+#  Arima
+
+##  daily data
 
 ```{r}
 # Filter data_train to start from '2014-12-01' and convert to time series format (ts)
-ts_data <- data_train %>%
-  filter(Timestamp >= as.POSIXct("2014-12-01")) %>%  # Filter rows where Timestamp is on or after Dec 1, 2014
-  arrange(Timestamp) %>%                            # Arrange rows by Timestamp in ascending order
-  pull(Weighted_Price) %>%                          # Extract values from Weighted_Price column as a vector
-  ts(start = c(year(as.Date("2014-12-01")), month(as.Date("2014-12-01"))), frequency = 365)  # Convert to time series (daily frequency)
+ts_data <- data %>%
+  filter(Timestamp >= as.POSIXct("2014-12-01")) %>%
+  arrange(Timestamp) %>%
+  pull(Weighted_Price) %>%
+  ts(start = c(year(as.Date("2014-12-01")), month(as.Date("2014-12-01"))), frequency = 365)
 
-# Plot the decomposed time series
 plot(decompose(ts_data))
 
 # Decompose the time series to extract its components
 decomp <- decompose(ts_data)
 
-# Extract the seasonal component
+# Extract the seasonal, trend, and random (or residual) components
 seasonal <- decomp$seasonal
+trend <- decomp$trend
+random <- decomp$random
 
-# Uncomment to extract trend and random components
-# trend <- decomp$trend
-# random <- decomp$random
-
-# Show the seasonal component
+# Show the components
 seasonal
+#trend
+#random
 
 # Remove seasonal and trend components from the original time series data
-detrended <- ts_data - seasonal  # Subtract seasonal component from original time series
-# Uncomment the following line to also subtract trend component
-# detrended <- detrended - trend
-
-# Plot the detrended time series
-autoplot(detrended, title = "Time Series without Seasonality")
-
+detrended <- ts_data - seasonal - trend
+autoplot(detrended, title = "ts without seasonality and trend")
 ```
 
-## LJUNG BOX
+##  LJUNG BOX
+
 
 The Box-Ljung test indicates significant autocorrelation in the time series data, rejecting the null hypothesis of no autocorrelation.
 
 ```{r}
 # Perform Ljung-Box test for autocorrelation
 ljung_box <- Box.test(ts_data, lag = 20, type = "Ljung-Box")
-
-# Print the results of the Ljung-Box test
 print(ljung_box)
-
 
 ```
 
-## PACF
+##  PACF
 
 ```{r}
 # Differentiate the time series data
@@ -1343,7 +1335,7 @@ plot(pacf_plot, main = "Partial Autocorrelation Function (PACF) of Differentiate
 
 ```
 
-## ACF
+##  ACF
 
 ```{r}
 # Differentiate the time series data
@@ -1359,7 +1351,7 @@ plot(acf_plot, main = "Autocorrelation Function (ACF) of Differentiated Time Ser
 
 ```
 
-## staionerity testt
+##  staionerity testt
 
 The Augmented Dickey-Fuller test statistic is -2.8671 with a p-value of 0.2113, indicating insufficient evidence to reject the null hypothesis of non-stationarity in the time series data.
 
@@ -1370,10 +1362,11 @@ print(adf_test)
 
 ```
 
-## ARIMA MODEL
 
-The ARIMA(0,1,0) model for 'ts_data' uses first-order differencing.
-It has RMSE of 295.0036 and MAE of 125.1681, indicating moderate predictive accuracy and low residual autocorrelation (ACF1 = -0.0183).
+##   ARIMA MODEL
+
+
+The ARIMA(0,1,0) model for 'ts_data' uses first-order differencing. It has RMSE of 295.0036 and MAE of 125.1681, indicating moderate predictive accuracy and low residual autocorrelation (ACF1 = -0.0183).
 
 ```{r}
 # Fit ARIMA model
@@ -1396,7 +1389,7 @@ summary(arima_model)
 
 ```
 
-## monnthky data
+##   monnthky data
 
 ```{r}
 # Assuming 'data' is your dataframe with columns 'Timestamp' and 'Weighted_Price'
@@ -1417,7 +1410,10 @@ ts_data_month <- ts(monthly_data$Weighted_Price, start = c(min(monthly_data$year
 print(ts_data_month)
 ```
 
-### plot and summary
+
+
+
+###   plot and summary
 
 ```{r}
 # Example: Plotting the time series
@@ -1429,7 +1425,7 @@ summary(ts_data_month)
 
 To perform decomposition, ACF, PACF, ADF test, stationarity test, ARIMA modeling, forecasting, and plotting for your monthly time series data `ts_data_month`, here's a structured approach in R:
 
-#### 1. Decomposition
+####  1. Decomposition
 
 ```{r}
 # Perform decomposition
@@ -1439,13 +1435,7 @@ decomp <- decompose(ts_data_month)
 plot(decomp)
 ```
 
-#### 2. ACF (Autocorrelation Function) and PACF (Partial Autocorrelation Function)
-
-
-The PACF plot suggests that an autoregressive model of order 1 (AR(1)) might be appropriate for this time series since only the first lag shows a significant partial autocorrelation.
-If higher-order lags had shown significant partial autocorrelation, it would suggest considering a higher-order AR model.
-In summary, this PACF plot indicates that the time series likely has a significant autocorrelation at lag 1, suggesting the use of an AR(1) model for further analysis.
-
+####  2. ACF (Autocorrelation Function) and PACF (Partial Autocorrelation Function)
 
 ```{r}
 # ACF plot
@@ -1457,7 +1447,7 @@ pacf_plot <- pacf(ts_data_month, lag.max = 5)
 plot(pacf_plot, main = "Partial Autocorrelation Function (PACF)")
 ```
 
-#### 3. Augmented Dickey-Fuller (ADF) Test for Stationarity
+####  3. Augmented Dickey-Fuller (ADF) Test for Stationarity
 
 ```{r}
 library(forecast)
@@ -1468,7 +1458,7 @@ adf_test <- ur.df(ts_data_month, lags = 1, type = "drift")  # Adjust lags as nee
 summary(adf_test)
 ```
 
-#### 4. Stationarity Test
+####  4. Stationarity Test
 
 ```{r}
 # KPSS test (alternative to ADF test)
@@ -1476,7 +1466,7 @@ kpss_test <- kpss.test(ts_data_month)
 print(kpss_test)
 ```
 
-#### 5. ARIMA Modeling
+####  5. ARIMA Modeling
 
 ```{r}
 # Fit ARIMA model
@@ -1484,7 +1474,7 @@ arima_model <- auto.arima(ts_data_month)
 summary(arima_model)
 ```
 
-#### 6. Forecasting
+####  6. Forecasting
 
 ```{r}
 # Forecast using ARIMA model
@@ -1494,3 +1484,4 @@ print(forecast_values)
 # Plot forecasted values
 plot(forecast_values, main = "Forecasted Values")
 ```
+
