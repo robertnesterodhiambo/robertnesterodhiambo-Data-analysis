@@ -77,11 +77,11 @@ lapply(packages, require, character.only = TRUE)
 
 -   **The data importation utliises read_csv function from readr library. our Data ahas a Timestamp which will be converteed to readbale from with the code line `mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))`**
 
--   the lineinterprates the Timestamp to human readable form.
+-   the line interprates the Timestamp to human readable form.
     We set the format to UTC then give it a sample date to use like in our case 1970-01-01.
     and set the path to our file
 
--   here we end the code by displaying the firt 6 rows of data
+-   here we end the code by displaying the fisrt 6 rows of data
 
 ```{r, message=FALSE}
 # Define a function to parse timestamps from seconds since the Unix epoch
@@ -106,9 +106,9 @@ head(data)
 
 ### Summary statistics
 
-The summary statistics ddiplays the minimum valuue and maximum value which explains the range.
-the 1st median meand and third quartile range are also in play they elaborate the interquatile ranges.
-the summary also highlights the total number of missing variables ineach columns.
+Summary statistics display the minimum and maximum values, explaining the range.
+They also include the 1st quartile (Q1), median (Q2), and third quartile (Q3), which elaborate on the interquartile range.
+The summary also highlights the total number of missing variables in each column.
 
 ```{r}
 summary(data)
@@ -204,7 +204,7 @@ head(data)
 
 ### Getting weekly data
 
--   the code bleow groups the data by weeks where we create weekly groupings of every 7 days from the date `2015-01-01 00:00:00` to `2018-11-11 00:00:00`. after this we display the weekly data created and stored as weekly_rows
+-   the code below groups the data by weeks where we create weekly groupings of every 7 days from the date `2015-01-01 00:00:00` to `2018-11-11 00:00:00`. after this we display the weekly data created and stored as weekly_rows
 
 ```{r}
 # Create valid date range
@@ -433,7 +433,6 @@ Here's the mathematical formulation of the LSTM model:
 
 This segment is same as the previous codes here now we start omitting the missing values to help in making the analysis more concrete.
 
-
 ```{r, message=FALSE}
 data <- read_csv("~/Git/Data/bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv")  # Read CSV data into 'data' dataframe
 data <- data %>% 
@@ -540,138 +539,138 @@ ggplot(joined_data, aes(x = Timestamp)) +  # Define x-axis as 'Timestamp'
 
 ### We will use a Vanilla LSTM here for forecasting. The model is trained on pre 25-Jun-2018 data.
 
-
 #### Python R copmariosn
 
-Sure, here’s a side-by-side comparison of the R and Python code with comments highlighting the differences and similarities.
-
-| **R Code**                                                                 | **Python Code**                                                       |
-|---------------------------------------------------------------------------|-----------------------------------------------------------------------|
-| r                                                                       | python                                                             |
-| # Load required libraries                                                 | # Import necessary libraries                                          |
-| library(ggplot2)                                                          | import pandas as pd                                                   |
-| library(dplyr)                                                            | import numpy as np                                                    |
-| library(zoo)                                                              | from sklearn.preprocessing import MinMaxScaler                        |
-|                                                                           | from keras.models import Sequential                                   |
-| # Data Preprocessing                                                      | from keras.layers import Dense, LSTM, Dropout, Activation              |
-| data <- na.omit(data)                                                     |                                                                       |
-| data$hour <- as.POSIXct(format(data$Timestamp, "%Y-%m-%d %H:00:00"), tz = "UTC")| data = data.dropna()                                              |
-| data <- data[!duplicated(data$hour), ]                                    | data['hour'] = data['Timestamp'].dt.floor('H')                        |
-| fill_missing <- function(values) {                                        | data = data.loc[~data['hour'].duplicated()]                           |
-|   last_value <- NA                                                        |                                                                       |
-|   filled_values <- numeric(length(values))                                |                                                                       |
-|   for (i in seq_along(values)) {                                          |                                                                       |
-|     if (is.na(values[i])) {                                               | fill_missing = lambda s: s.fillna(method='ffill')                     |
-|       filled_values[i] <- last_value                                      |                                                                       |
-|     } else {                                                              | data['Weighted_Price'] = data['Weighted_Price'].apply(fill_missing)   |
-|       filled_values[i] <- values[i]                                       |                                                                       |
-|       last_value <- values[i]                                             | split_date = '25-Jun-2018'                                            |
-|     }                                                                     | data_train = data[data['hour'] <= split_date]                         |
-|   }                                                                       | data_test = data[data['hour'] > split_date]                           |
-|   return(filled_values)                                                   |                                                                       |
-| }                                                                         | training_set = data_train['Weighted_Price'].values.reshape(-1, 1)      |
-| data$Weighted_Price <- fill_missing(data$Weighted_Price)                  |                                                                       |
-|                                                                           | sc = MinMaxScaler()                                                   |
-| split_date <- as.POSIXct("2018-06-25", tz = "UTC")                        | training_set = sc.fit_transform(training_set)                         |
-| data_train <- data[data$hour <= split_date, "Weighted_Price", drop = FALSE]| X_train = training_set[:-1]                                          |
-| data_test <- data[data$hour > split_date, "Weighted_Price", drop = FALSE] | y_train = training_set[1:]                                            |
-|                                                                           | X_train = X_train.reshape(len(X_train), 1, 1)                         |
-| scale_data <- function(values) {                                          |                                                                       |
-|   mean_val <- mean(values, na.rm = TRUE)                                  |                                                                       |
-|   std_val <- sd(values, na.rm = TRUE)                                     |                                                                       |
-|   scaled_values <- (values - mean_val) / std_val                          |                                                                       |
-|   list(scaled_values = scaled_values, mean = mean_val, std = std_val)     |                                                                       |
-| }                                                                         |                                                                       |
-|                                                                           | # Importing the Keras libraries and packages                          |
-| scaled_train <- scale_data(data_train$Weighted_Price)                     | model = Sequential()                                                  |
-| scaled_test <- scale_data(data_test$Weighted_Price)                       | model.add(LSTM(128, activation="sigmoid", input_shape=(1, 1)))        |
-| training_set <- scaled_train$scaled_values                                | model.add(Dropout(0.2))                                               |
-| testing_set <- scaled_test$scaled_values                                  | model.add(Dense(1))                                                   |
-|                                                                           | model.compile(loss='mean_squared_error', optimizer='adam')             |
-| X_train <- training_set[-length(training_set)]                            | model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2)      |
-| y_train <- training_set[-1]                                               |                                                                       |
-| y_train <- matrix(y_train, ncol = 1)                                      |                                                                       |
-| X_train <- array(X_train, dim = c(length(X_train), 1, 1))                 |                                                                       |
-|                                                                           |                                                                       |
-| # LSTM Model Definition                                                   |                                                                       |
-| sigmoid <- function(x) {                                                  |                                                                       |
-|   1 / (1 + exp(-x))                                                       |                                                                       |
-| }                                                                         |                                                                       |
-|                                                                           |                                                                       |
-| tanh_act <- function(x) {                                                 |                                                                       |
-|   tanh(x)                                                                 |                                                                       |
-| }                                                                         |                                                                       |
-|                                                                           |                                                                       |
-| initialize_weights <- function(input_size, output_size) {                 |                                                                       |
-|   matrix(rnorm(input_size * output_size), nrow = input_size, ncol = output_size) |                                                         |
-| }                                                                         |                                                                       |
-|                                                                           |                                                                       |
-| SimpleLSTM <- function(input_shape, units) {                              |                                                                       |
-|   list(                                                                   |                                                                       |
-|     units = units,                                                        |                                                                       |
-|     Wf = initialize_weights(input_shape[2], units),                      |                                                                       |
-|     Wi = initialize_weights(input_shape[2], units),                      |                                                                       |
-|     Wc = initialize_weights(input_shape[2], units),                      |                                                                       |
-|     Wo = initialize_weights(input_shape[2], units),                      |                                                                       |
-|     bf = rep(0, units),                                                   |                                                                       |
-|     bi = rep(0, units),                                                   |                                                                       |
-|     bc = rep(0, units),                                                   |                                                                       |
-|     bo = rep(0, units),                                                   |                                                                       |
-|     Wy = initialize_weights(units, 1),                                    |                                                                       |
-|     by = 0                                                                |                                                                       |
-|   )                                                                       |                                                                       |
-| }                                                                         |                                                                       |
-|                                                                           |                                                                       |
-| forward <- function(model, x) {                                           |                                                                       |
-|   h_prev <- rep(0, model$units)                                           |                                                                       |
-|   c_prev <- rep(0, model$units)                                           |                                                                       |
-|   for (t in 1:dim(x)[1]) {                                                |                                                                       |
-|     xt <- x[t, , , drop = FALSE]                                          |                                                                       |
-|     f_t <- sigmoid(xt %*% model$Wf + model$bf)                            |                                                                       |
-|     i_t <- sigmoid(xt %*% model$Wi + model$bi)                            |                                                                       |
-|     c_tilde_t <- tanh_act(xt %*% model$Wc + model$bc)                     |                                                                       |
-|     c_t <- f_t * c_prev + i_t * c_tilde_t                                 |                                                                       |
-|     o_t <- sigmoid(xt %*% model$Wo + model$bo)                            |                                                                       |
-|     h_t <- o_t * tanh_act(c_t)                                            |                                                                       |
-|     h_prev <- h_t                                                         |                                                                       |
-|     c_prev <- c_t                                                         |                                                                       |
-|   }                                                                       |                                                                       |
-|   y <- h_t %*% model$Wy + model$by                                        |                                                                       |
-|   y                                                                      |                                                                       |
-| }                                                                         |                                                                       |
-|                                                                           |                                                                       |
-| train <- function(model, X, y, epochs, lr) {                              |                                                                       |
-|   for (epoch in 1:epochs) {                                               |                                                                       |
-|     loss <- 0                                                             |                                                                       |
-|     for (i in 1:dim(X)[1]) {                                              |                                                                       |
-|       output <- forward(model, X[i, , , drop = FALSE])                    |                                                                       |
-|       error <- output - y[i, ]                                            |                                                                       |
-|       loss <- loss + sum(error^2)                                         |                                                                       |
-|       # Backpropagation would be added here                               |                                                                       |
-|     }                                                                     |                                                                       |
-|     if (epoch %% 10 == 0) {                                               |                                                                       |
-|       cat("Epoch", epoch, "Loss:", loss, "\n")                            |                                                                       |
-|     }                                                                     |                                                                       |
-|   }                                                                       |                                                                       |
-| }                                                                         |                                                                       |
-|                                                                           |                                                                       |
-| # Prediction Function                                                     |                                                                       |
-| predict_lstm <- function(model, X) {                                      |                                                                       |
-|   predictions <- numeric(dim(X)[1])                                       |                                                                       |
-|   for (i in 1:dim(X)[1]) {                                                |                                                                       |
-|     predictions[i] <- forward(model, X[i, , , drop = FALSE])              |                                                                       |
-|   }                                                                       |                                                                       |
-|   return(predictions)                                                     |                                                                       |
-| }                                                                         |                                                                       |
-|                                                                           |                                                                       |
-| input_shape <- c(1, 1)                                                    |                                                                       |
-| units <- 128                                                              |                                                                       |
-| model <- SimpleLSTM(input_shape, units)                                   |                                                                       |
-| train(model, X_train, y_train, epochs = 100, lr = 0.001)                  |                                                                       |
-| ```                                                                       | ```                                                                   |
+| **R Code**  | **Python Code**                                           |
+|-------------------------------------|-----------------------------------|
+| r                                                          |python                                                                       |                                                           |
+| \# Load required libraries                                                                                                                 | \# Import necessary libraries                             |
+| library(ggplot2)                                                                                                                           | import pandas as pd                                       |
+| library(dplyr)                                                                                                                             | import numpy as np                                        |
+| library(zoo)                                                                                                                               | from sklearn.preprocessing import MinMaxScaler            |
+|                                                                                                                                            | from keras.models import Sequential                       |
+| \# Data Preprocessing                                                                                                                      | from keras.layers import Dense, LSTM, Dropout, Activation |
+| data \<- na.omit(data)                                                                                                                     |                                                           |
+| data$hour <- as.POSIXct(format(data$Timestamp, "%Y-%m-%d %H:00:00"), tz = "UTC")                                                           | data = data.dropna()                                      |
+| data \<- data[!duplicated(data$hour), ]                         | data['hour'] = data['Timestamp'].dt.floor('H')                |          
+ | fill_missing <- function(values) {                             | fill_missing = lambda s: s.fillna(method='ffill')            |           
+ |   last_value <- NA                                            | data['Weighted_Price'] = data['Weighted_Price'].apply(fill_missing) |     
+ |   filled_values <- numeric(length(values))                    |                                                               |           
+ |   for (i in seq_along(values)) {                              | split_date = '25-Jun-2018'                                    |           
+ |     if (is.na(values[i])) {                                   | data_train = data[data['hour'] <= split_date]                  |          
+ |       filled_values[i] <- last_value                          | data_test = data[data['hour'] > split_date]                    |          
+ |     } else {                                                  |                                                               |           
+ |       filled_values[i] <- values[i]                           |                                                               |           
+ |       last_value <- values[i]                                 |                                                               |           
+ |     }                                                         |                                                               |           
+ |   }                                                           |                                                               |           
+ |   return(filled_values)                                       |                                                               |           
+ | }                                                             |                                                               |           
+ | data$Weighted_Price \<- fill_missing(data$Weighted_Price)       |                                                               |         
+ |                                                               | sc = MinMaxScaler()                                           |           
+ | split_date <- as.POSIXct("2018-06-25", tz = "UTC")            | training_set = data_train['Weighted_Price'].values.reshape(-1, 1) |       
+ | data_train <- data[data$hour \<= split_date, "Weighted_Price", drop = FALSE]                                                              |                                                           |
+| data_test \<- data[data$hour > split_date, "Weighted_Price", drop = FALSE]  | X_train = training_set[:-1]                                | 
+ |                                                               | y_train = training_set[1:]                                   |            
+ | scale_data <- function(values) {                              | X_train = X_train.reshape(len(X_train), 1, 1)                 |           
+ |   mean_val <- mean(values, na.rm = TRUE)                      |                                                               |           
+ |   std_val <- sd(values, na.rm = TRUE)                         |                                                               |           
+ |   scaled_values <- (values - mean_val) / std_val              |                                                               |           
+ |   list(scaled_values = scaled_values, mean = mean_val, std = std_val) |                                                         |         
+ | }                                                             |                                                               |           
+ |                                                               | # Importing the Keras libraries and packages                 |            
+ | scaled_train <- scale_data(data_train$Weighted_Price)                                                                                     | model = Sequential()                                      |
+| scaled_test \<- scale_data(data_test$Weighted_Price)            | model.add(LSTM(128, activation="sigmoid", input_shape=(1, 1))) |         
+ | training_set <- scaled_train$scaled_values                                                                                                | model.add(Dropout(0.2))                                   |
+| testing_set \<- scaled_test$scaled_values                      | model.add(Dense(1))                                          |            
+ |                                                               | model.compile(loss='mean_squared_error', optimizer='adam')    |           
+ | X_train <- training_set[-length(training_set)]                | model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2) |       
+ | y_train <- training_set[-1]                                   |                                                               |           
+ | y_train <- matrix(y_train, ncol = 1)                          |                                                               |           
+ | X_train <- array(X_train, dim = c(length(X_train), 1, 1))      |                                                               |          
+ |                                                               |                                                               |           
+ | # LSTM Model Definition                                        |                                                               |          
+ | sigmoid <- function(x) {                                       |                                                               |          
+ |   1 / (1 + exp(-x))                                            |                                                               |          
+ | }                                                             |                                                               |           
+ |                                                               |                                                               |           
+ | tanh_act <- function(x) {                                      |                                                               |          
+ |   tanh(x)                                                      |                                                               |          
+ | }                                                             |                                                               |           
+ |                                                               |                                                               |           
+ | initialize_weights <- function(input_size, output_size) {      |                                                               |          
+ |   matrix(rnorm(input_size * output_size), nrow = input_size, ncol = output_size) |                                               |        
+ | }                                                             |                                                               |           
+ |                                                               |                                                               |           
+ | SimpleLSTM <- function(input_shape, units) {                   |                                                               |          
+ |   list(                                                       |                                                               |           
+ |     units = units,                                            |                                                               |           
+ |     Wf = initialize_weights(input_shape[2], units),            |                                                               |          
+ |     Wi = initialize_weights(input_shape[2], units),            |                                                               |          
+ |     Wc = initialize_weights(input_shape[2], units),            |                                                               |          
+ |     Wo = initialize_weights(input_shape[2], units),            |                                                               |          
+ |     bf = rep(0, units),                                       |                                                               |           
+ |     bi = rep(0, units),                                       |                                                               |           
+ |     bc = rep(0, units),                                       |                                                               |           
+ |     bo = rep(0, units),                                       |                                                               |           
+ |     Wy = initialize_weights(units, 1),                         |                                                               |          
+ |     by = 0                                                    |                                                               |           
+ |   )                                                           |                                                               |           
+ | }                                                             |                                                               |           
+ |                                                               |                                                               |           
+ | forward <- function(model, x) {                               |                                                               |           
+ |   h_prev <- rep(0, model$units)                                                                                                           |                                                           |
+| c_prev \<- rep(0, model$units)                               |                                                               |             
+ |   for (t in 1:dim(x)[1]) {                                     |                                                               |          
+ |     xt <- x[t, , , drop = FALSE]                               |                                                               |          
+ |     f_t <- sigmoid(xt %*% model$Wf + model$bf)                 |                                                               |          
+ |     i_t <- sigmoid(xt %*% model$Wi + model$bi)                 |                                                               |          
+ |     c_tilde_t <- tanh_act(xt %*% model$Wc + model$bc)          |                                                               |          
+ |     c_t <- f_t * c_prev + i_t * c_tilde_t                      |                                                               |          
+ |     o_t <- sigmoid(xt %*% model$Wo + model$bo)                 |                                                               |          
+ |     h_t <- o_t * tanh_act(c_t)                                 |                                                               |          
+ |     h_prev <- h_t                                             |                                                               |           
+ |     c_prev <- c_t                                             |                                                               |           
+ |   }                                                           |                                                               |           
+ |   y <- h_t %*% model$Wy + model\$by                                                                                                       |                                                           |
+| y                                                                                                                                          |                                                           |
+| }                                                                                                                                          |                                                           |
+|                                                                                                                                            |                                                           |
+| train \<- function(model, X, y, epochs, lr) {                                                                                              |                                                           |
+| for (epoch in 1:epochs) {                                                                                                                  |                                                           |
+| loss \<- 0                                                                                                                                 |                                                           |
+| for (i in 1:dim(X)[1]) {                                                                                                                   |                                                           |
+| output \<- forward(model, X[i, , , drop = FALSE])                                                                                          |                                                           |
+| error \<- output - y[i, ]                                                                                                                  |                                                           |
+| loss \<- loss + sum(error\^2)                                                                                                              |                                                           |
+| \# Backpropagation would be added here                                                                                                     |                                                           |
+| }                                                                                                                                          |                                                           |
+| if (epoch %% 10 == 0) {                                                                                                                    |                                                           |
+| cat("Epoch", epoch, "Loss:", loss, "\n")                                                                                                   |                                                           |
+| }                                                                                                                                          |                                                           |
+| }                                                                                                                                          |                                                           |
+| }                                                                                                                                          |                                                           |
+|                                                                                                                                            |                                                           |
+| \# Prediction Function                                                                                                                     |                                                           |
+| predict_lstm \<- function(model, X) {                                                                                                      |                                                           |
+| predictions \<- numeric(dim(X)[1])                                                                                                         |                                                           |
+| for (i in 1:dim(X)[1]) {                                                                                                                   |                                                           |
+| predictions[i] \<- forward(model, X[i, , , drop = FALSE])                                                                                  |                                                           |
+| }                                                                                                                                          |                                                           |
+| return(predictions)                                                                                                                        |                                                           |
+| }                                                                                                                                          |                                                           |
+|                                                                                                                                            |                                                           |
+| input_shape \<- c(1, 1)                                                                                                                    |                                                           |
+| units \<- 128                                                                                                                              |                                                           |
+| model \<- SimpleLSTM(input_shape, units)                                                                                                   |                                                           |
+| train(model, X_train, y_train, epochs = 100, lr = 0.001)                                                                                   |                                                           |
+| `|`                                                                                                                                        |                                                           |
 
 ### Comments on Differences
-In R here we used self made functions and in python libraries were utilised. Utilising libraries in r would have meant creating virtual python environament to utilise Keras libraries. This would have meant utilising same pyhton code again.
+
+In R here we used self made functions and in python libraries were utilised.
+Utilising libraries in r would have meant creating virtual python environament to utilise Keras libraries.
+This would have meant utilising same python code again.
 
 ```{r}
 library(ggplot2)
@@ -1049,9 +1048,8 @@ plot11
 # Arrange the two plots side by side
 grid.arrange(plot11, plot12, ncol = 2)
 ```
-#### Model 
 
-
+#### Model
 
 ```{r}
 library(xgboost)
@@ -1114,47 +1112,34 @@ cat("Training MAE:", train_mae, "\n")
 
 ```
 
+### model info
 
-### model info 
-
-1. **Handle**: 
-   - Memory pointer to the model object.
-
-2. **Raw Data Length**: 
-   - Size of the raw model data in bytes: 242841.
-
-3. **Best Iteration**: 
-   - Iteration with the best performance: 100.
-
-4. **Best Number of Trees**: 
-   - Number of trees at best iteration: 100.
-
-5. **Best Score**: 
-   - Best evaluation metric value: 87.26642.
-
-6. **Best Message**: 
-   - Information about the best iteration: `"[100]\ttrain-rmse:87.266420"`.
-
-7. **Number of Iterations**: 
-   - Total training iterations: 100.
-
-8. **Evaluation Log**: 
-   - Log of RMSE for each iteration, showing error decrease.
-
-9. **Function Call**: 
-   - Call used to create the model, including key parameters like `params`, `data`, `nrounds`, etc.
-
-10. **Parameters**: 
-    - Key parameters: `objective` ("reg:squarederror"), `min_child_weight` (10), `booster` ("gbtree"), `colsample_bytree` (0.3), `learning_rate` (0.1), `max_depth` (5), `alpha` (10), `validate_parameters` (TRUE).
-
-11. **Callbacks**: 
-    - Functions for logging and early stopping during training.
-
-12. **Feature Names**: 
-    - Features used in the model: `["Timestamp", "Weighted_Price"]`.
-
-13. **Number of Features**: 
-    - Total features: 2.
+1.  **Handle**:
+    -   Memory pointer to the model object.
+2.  **Raw Data Length**:
+    -   Size of the raw model data in bytes: 242841.
+3.  **Best Iteration**:
+    -   Iteration with the best performance: 100.
+4.  **Best Number of Trees**:
+    -   Number of trees at best iteration: 100.
+5.  **Best Score**:
+    -   Best evaluation metric value: 87.26642.
+6.  **Best Message**:
+    -   Information about the best iteration: `"[100]\ttrain-rmse:87.266420"`.
+7.  **Number of Iterations**:
+    -   Total training iterations: 100.
+8.  **Evaluation Log**:
+    -   Log of RMSE for each iteration, showing error decrease.
+9.  **Function Call**:
+    -   Call used to create the model, including key parameters like `params`, `data`, `nrounds`, etc.
+10. **Parameters**:
+    -   Key parameters: `objective` ("reg:squarederror"), `min_child_weight` (10), `booster` ("gbtree"), `colsample_bytree` (0.3), `learning_rate` (0.1), `max_depth` (5), `alpha` (10), `validate_parameters` (TRUE).
+11. **Callbacks**:
+    -   Functions for logging and early stopping during training.
+12. **Feature Names**:
+    -   Features used in the model: `["Timestamp", "Weighted_Price"]`.
+13. **Number of Features**:
+    -   Total features: 2.
 
 ```{r}
 
@@ -1182,8 +1167,6 @@ print(model_info_df)
 
 
 ```
-
-
 
 ## prediciotn
 
