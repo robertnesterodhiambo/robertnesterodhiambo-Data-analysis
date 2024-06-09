@@ -40,15 +40,15 @@ For those new to Bitcoin, you can learn more about its fundamentals [here](https
 
 # Checking out the dataset in my data folder
 
-From the code belowe we set a default data folder and we run thhe code and it lists the data files in the folder for wour case its
+From the code below  we set a default data folder we run the code and list the data files in the folder for our case It
 
 -   "bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv"
 
-This file has the daily datafrom 2012 first Jannuary to 2018 eleventh November hourly makret prices for BTC
+This file has the daily data from 2012 first of January to 2018 eleventh of November hourly market prices for BTC
 
 -   "coinbaseUSD_1-min_data_2014-12-01_to_2018-11-11.csv"
 
-This file has the daily datafrom 2014 first Jannuary to 2018 eleventh November hourly makret prices for BTC
+This file has the daily data from 2014 first of January to 2018 eleventh of November hourly market prices for BTC
 
 ```{r, message=FALSE}
 # Set the directory path where the data is located
@@ -61,6 +61,8 @@ dir_contents <- list.files(data_dir)
 print(dir_contents)
 
 ```
+
+
 
 # Environment preparation
 
@@ -75,13 +77,13 @@ lapply(packages, require, character.only = TRUE)
 
 ## Data importation
 
--   **The data importation utliises read_csv function from readr library. our Data ahas a Timestamp which will be converteed to readbale from with the code line `mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))`**
+-   **The data importation utilizes the read_csv function from the readr library. our Data has a Timestamp which will be converted to readable form with the code line `mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))`**
 
--   the line interprates the Timestamp to human readable form.
-    We set the format to UTC then give it a sample date to use like in our case 1970-01-01.
-    and set the path to our file
+-   The line interprets the Timestamp in a human-readable form.
+    We set the format to UTC and then give it a sample date to use like in our case 1970-01-01.
+    and set the path to our file.
 
--   here we end the code by displaying the fisrt 6 rows of data
+-   Here we end the code by displaying the fisrt 6 rows of data.
 
 ```{r, message=FALSE}
 # Define a function to parse timestamps from seconds since the Unix epoch
@@ -100,7 +102,7 @@ data <- data %>%
   mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
 
 # Display the first few rows of the 'data' data frame
-head(data)
+#head(data)
 
 ```
 
@@ -118,7 +120,7 @@ summary(data)
 
 ### Data handling Comparison with python
 
-Sure, here's a table showing the equivalent R and Python code side by side, along with comments highlighting the differences.
+
 
 | **`R Code`**                                                                      | **`Python Code`**                                                                      |
 |-------------------------------------|-----------------------------------|
@@ -177,9 +179,9 @@ Sure, here's a table showing the equivalent R and Python code side by side, alon
 
 ### handling missing values
 
--   From the code below we fill missing values in Open High Low and Close columns and replace NAs with previous value from the one above it.
+-   From the code below we fill in missing values in the Open High Low and Close columns and replace NAs with the previous value from the one above it.
 
--   This approach in the beginning helps in maintaining the continuity of data without losing important rows of the data other columns.
+-   This approach, in the beginning, helps to maintain the continuity of data without losing important rows of the data in other columns.
 
 ```{r}
 # Fill NA values with zeroes for volume/trade-related fields using dplyr's mutate function
@@ -199,12 +201,14 @@ data <- data %>%
   mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
 
 # Display the first few rows of the updated dataframe 'data'
-head(data)
+#head(data)
 ```
+
+
 
 ### Getting weekly data
 
--   the code below groups the data by weeks where we create weekly groupings of every 7 days from the date `2015-01-01 00:00:00` to `2018-11-11 00:00:00`. after this we display the weekly data created and stored as weekly_rows
+-   The code below groups the data by weeks where we create weekly groupings every 7 days from the date `2015-01-01 00:00:00` to `2018-11-11 00:00:00`. after this, we display the weekly data created and stored as weekly_rows
 
 ```{r}
 # Create valid date range
@@ -223,7 +227,7 @@ weekly_rows <- filtered_data %>%
   ungroup()                  # Remove grouping for further operations
 
 # Display the first few rows of weekly_rows dataframe
-head(weekly_rows)
+#head(weekly_rows)
 
 ```
 
@@ -231,17 +235,15 @@ head(weekly_rows)
 
 ### Lets visualize Historical Bitcoin Market Volume (2015-2018)-Yearly
 
-in this code below we utilise plotly function from plotly package to create an interactive plot.
-the interactive plot takes in arguments of lable for 1month 6month and 12months to make the widgets more interactive.
+In the code below we utilise the plotly function from the plotly package to create an interactive plot.
+the interactive plot takes in arguments of labels for 1 month 6month and 12 months to make the widgets more interactive.
 
-#### Comparson of the python plot and R plot
+#### Comparison of the python plot and R plot
 
 ![python output](newplot2.png) ![R output](newplot.png)
 
-The python output doesent distinguish the open closed and weighted_price clearlyy in the plot.
-ALthtought ht plots interactively mathes that of R programming, we see a asuperiority of the R language in handling the visualizations in a more vasetile manner by creating multiple facaets for each column while still maintaining the same x and y axis.
-
-the plots on the other hand show a rising trend in bitcoin and a drop in 2018 onwards.
+The Python output doesn't distinguish the open-closed and weighted_price clearly in the plot.
+Although ht plots interactively match that of R programming, we see a superiority of the R language in handling the visualizations in a more versatile manner by creating multiple facets for each column while still maintaining the same x and y axis. The plots on the other hand show a rising trend in bitcoin and a drop in 2018 onwards.
 
 ```{r}
 # Create the traces for each line plot
@@ -276,14 +278,14 @@ fig1
 
 ### Lets visualize Historical Bitcoin Prices (2015-2018) - Monthly
 
-this code functions exactly as the previous one, The plot shows a spike in prices every october - december for each year.
-this can only be notice when hovering over the plots and the interactivity becomes active.
+This code functions exactly as the previous one, The plot shows a spike in prices every October - December for each year.
+This can only be noticed when hovering over the plots and the interactivity becomes active.
 
 #### Comparison with python plot
 
 ![python fig2](newplot2.png) ![](newplot(1).png)
 
-These two plot are similar theought hence both languages would suit the job for this code.
+These two plots are similar throught hence both languages would suit the job for this code.
 
 ```{r}
 # Create the trace for Volume (Currency)
@@ -310,6 +312,8 @@ fig2 <- trace1 %>% layout(
 # Plot the figure
 fig2
 ```
+
+
 
 ### BTC Volume
 
@@ -460,9 +464,10 @@ data <- data %>%
   fill(Weighted_Price)  
 
 # Print the first few rows of the dataframe
-head(data)  # Display the first few rows of 'data'
-
+#head(data)  # Display the first few rows of 'data'
 ```
+
+
 
 **For the train and test, we take '25-Jun-2018' as the split date. There was a considerable dip in Bitcoin prices between the June-July period 2018. If we check the historical prices the seasonal market started going up from this date after reaching the lowest, though the price reached much lower \$5972 on June 29th 2018. After reaching the historic 20K mark on December 18th, there were several dips and market price was recorrected every time. Read more about [Bitcoin dips.](http://https://news.bitcoin.com/data-reveals-reasons-behind-bitcoins-big-dip/)**
 
@@ -485,8 +490,8 @@ data_train <- data %>%
   mutate(Timestamp = as.character(Timestamp))  # Convert Timestamp to character for writing to CSV
 
 # Print head of training and testing sets
-head(data_train)  # Display the first few rows of 'data_train'
-head(data_test)   # Display the first few rows of 'data_test'
+#head(data_train)  # Display the first few rows of 'data_train'
+#head(data_test)   # Display the first few rows of 'data_test'
 
 ```
 
@@ -541,136 +546,11 @@ ggplot(joined_data, aes(x = Timestamp)) +  # Define x-axis as 'Timestamp'
 
 #### Python R copmariosn
 
-| **R Code**  | **Python Code**                                           |
-|-------------------------------------|-----------------------------------|
-| r                                                          |python                                                                       |                                                           |
-| \# Load required libraries                                                                                                                 | \# Import necessary libraries                             |
-| library(ggplot2)                                                                                                                           | import pandas as pd                                       |
-| library(dplyr)                                                                                                                             | import numpy as np                                        |
-| library(zoo)                                                                                                                               | from sklearn.preprocessing import MinMaxScaler            |
-|                                                                                                                                            | from keras.models import Sequential                       |
-| \# Data Preprocessing                                                                                                                      | from keras.layers import Dense, LSTM, Dropout, Activation |
-| data \<- na.omit(data)                                                                                                                     |                                                           |
-| data$hour <- as.POSIXct(format(data$Timestamp, "%Y-%m-%d %H:00:00"), tz = "UTC")                                                           | data = data.dropna()                                      |
-| data \<- data[!duplicated(data$hour), ]                         | data['hour'] = data['Timestamp'].dt.floor('H')                |          
- | fill_missing <- function(values) {                             | fill_missing = lambda s: s.fillna(method='ffill')            |           
- |   last_value <- NA                                            | data['Weighted_Price'] = data['Weighted_Price'].apply(fill_missing) |     
- |   filled_values <- numeric(length(values))                    |                                                               |           
- |   for (i in seq_along(values)) {                              | split_date = '25-Jun-2018'                                    |           
- |     if (is.na(values[i])) {                                   | data_train = data[data['hour'] <= split_date]                  |          
- |       filled_values[i] <- last_value                          | data_test = data[data['hour'] > split_date]                    |          
- |     } else {                                                  |                                                               |           
- |       filled_values[i] <- values[i]                           |                                                               |           
- |       last_value <- values[i]                                 |                                                               |           
- |     }                                                         |                                                               |           
- |   }                                                           |                                                               |           
- |   return(filled_values)                                       |                                                               |           
- | }                                                             |                                                               |           
- | data$Weighted_Price \<- fill_missing(data$Weighted_Price)       |                                                               |         
- |                                                               | sc = MinMaxScaler()                                           |           
- | split_date <- as.POSIXct("2018-06-25", tz = "UTC")            | training_set = data_train['Weighted_Price'].values.reshape(-1, 1) |       
- | data_train <- data[data$hour \<= split_date, "Weighted_Price", drop = FALSE]                                                              |                                                           |
-| data_test \<- data[data$hour > split_date, "Weighted_Price", drop = FALSE]  | X_train = training_set[:-1]                                | 
- |                                                               | y_train = training_set[1:]                                   |            
- | scale_data <- function(values) {                              | X_train = X_train.reshape(len(X_train), 1, 1)                 |           
- |   mean_val <- mean(values, na.rm = TRUE)                      |                                                               |           
- |   std_val <- sd(values, na.rm = TRUE)                         |                                                               |           
- |   scaled_values <- (values - mean_val) / std_val              |                                                               |           
- |   list(scaled_values = scaled_values, mean = mean_val, std = std_val) |                                                         |         
- | }                                                             |                                                               |           
- |                                                               | # Importing the Keras libraries and packages                 |            
- | scaled_train <- scale_data(data_train$Weighted_Price)                                                                                     | model = Sequential()                                      |
-| scaled_test \<- scale_data(data_test$Weighted_Price)            | model.add(LSTM(128, activation="sigmoid", input_shape=(1, 1))) |         
- | training_set <- scaled_train$scaled_values                                                                                                | model.add(Dropout(0.2))                                   |
-| testing_set \<- scaled_test$scaled_values                      | model.add(Dense(1))                                          |            
- |                                                               | model.compile(loss='mean_squared_error', optimizer='adam')    |           
- | X_train <- training_set[-length(training_set)]                | model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2) |       
- | y_train <- training_set[-1]                                   |                                                               |           
- | y_train <- matrix(y_train, ncol = 1)                          |                                                               |           
- | X_train <- array(X_train, dim = c(length(X_train), 1, 1))      |                                                               |          
- |                                                               |                                                               |           
- | # LSTM Model Definition                                        |                                                               |          
- | sigmoid <- function(x) {                                       |                                                               |          
- |   1 / (1 + exp(-x))                                            |                                                               |          
- | }                                                             |                                                               |           
- |                                                               |                                                               |           
- | tanh_act <- function(x) {                                      |                                                               |          
- |   tanh(x)                                                      |                                                               |          
- | }                                                             |                                                               |           
- |                                                               |                                                               |           
- | initialize_weights <- function(input_size, output_size) {      |                                                               |          
- |   matrix(rnorm(input_size * output_size), nrow = input_size, ncol = output_size) |                                               |        
- | }                                                             |                                                               |           
- |                                                               |                                                               |           
- | SimpleLSTM <- function(input_shape, units) {                   |                                                               |          
- |   list(                                                       |                                                               |           
- |     units = units,                                            |                                                               |           
- |     Wf = initialize_weights(input_shape[2], units),            |                                                               |          
- |     Wi = initialize_weights(input_shape[2], units),            |                                                               |          
- |     Wc = initialize_weights(input_shape[2], units),            |                                                               |          
- |     Wo = initialize_weights(input_shape[2], units),            |                                                               |          
- |     bf = rep(0, units),                                       |                                                               |           
- |     bi = rep(0, units),                                       |                                                               |           
- |     bc = rep(0, units),                                       |                                                               |           
- |     bo = rep(0, units),                                       |                                                               |           
- |     Wy = initialize_weights(units, 1),                         |                                                               |          
- |     by = 0                                                    |                                                               |           
- |   )                                                           |                                                               |           
- | }                                                             |                                                               |           
- |                                                               |                                                               |           
- | forward <- function(model, x) {                               |                                                               |           
- |   h_prev <- rep(0, model$units)                                                                                                           |                                                           |
-| c_prev \<- rep(0, model$units)                               |                                                               |             
- |   for (t in 1:dim(x)[1]) {                                     |                                                               |          
- |     xt <- x[t, , , drop = FALSE]                               |                                                               |          
- |     f_t <- sigmoid(xt %*% model$Wf + model$bf)                 |                                                               |          
- |     i_t <- sigmoid(xt %*% model$Wi + model$bi)                 |                                                               |          
- |     c_tilde_t <- tanh_act(xt %*% model$Wc + model$bc)          |                                                               |          
- |     c_t <- f_t * c_prev + i_t * c_tilde_t                      |                                                               |          
- |     o_t <- sigmoid(xt %*% model$Wo + model$bo)                 |                                                               |          
- |     h_t <- o_t * tanh_act(c_t)                                 |                                                               |          
- |     h_prev <- h_t                                             |                                                               |           
- |     c_prev <- c_t                                             |                                                               |           
- |   }                                                           |                                                               |           
- |   y <- h_t %*% model$Wy + model\$by                                                                                                       |                                                           |
-| y                                                                                                                                          |                                                           |
-| }                                                                                                                                          |                                                           |
-|                                                                                                                                            |                                                           |
-| train \<- function(model, X, y, epochs, lr) {                                                                                              |                                                           |
-| for (epoch in 1:epochs) {                                                                                                                  |                                                           |
-| loss \<- 0                                                                                                                                 |                                                           |
-| for (i in 1:dim(X)[1]) {                                                                                                                   |                                                           |
-| output \<- forward(model, X[i, , , drop = FALSE])                                                                                          |                                                           |
-| error \<- output - y[i, ]                                                                                                                  |                                                           |
-| loss \<- loss + sum(error\^2)                                                                                                              |                                                           |
-| \# Backpropagation would be added here                                                                                                     |                                                           |
-| }                                                                                                                                          |                                                           |
-| if (epoch %% 10 == 0) {                                                                                                                    |                                                           |
-| cat("Epoch", epoch, "Loss:", loss, "\n")                                                                                                   |                                                           |
-| }                                                                                                                                          |                                                           |
-| }                                                                                                                                          |                                                           |
-| }                                                                                                                                          |                                                           |
-|                                                                                                                                            |                                                           |
-| \# Prediction Function                                                                                                                     |                                                           |
-| predict_lstm \<- function(model, X) {                                                                                                      |                                                           |
-| predictions \<- numeric(dim(X)[1])                                                                                                         |                                                           |
-| for (i in 1:dim(X)[1]) {                                                                                                                   |                                                           |
-| predictions[i] \<- forward(model, X[i, , , drop = FALSE])                                                                                  |                                                           |
-| }                                                                                                                                          |                                                           |
-| return(predictions)                                                                                                                        |                                                           |
-| }                                                                                                                                          |                                                           |
-|                                                                                                                                            |                                                           |
-| input_shape \<- c(1, 1)                                                                                                                    |                                                           |
-| units \<- 128                                                                                                                              |                                                           |
-| model \<- SimpleLSTM(input_shape, units)                                                                                                   |                                                           |
-| train(model, X_train, y_train, epochs = 100, lr = 0.001)                                                                                   |                                                           |
-| `|`                                                                                                                                        |                                                           |
-
 ### Comments on Differences
 
-In R here we used self made functions and in python libraries were utilised.
-Utilising libraries in r would have meant creating virtual python environament to utilise Keras libraries.
-This would have meant utilising same python code again.
+In R here we used self-made functions and in Python libraries were utilized.
+Utilizing libraries in r would have meant creating a virtual python environment to utilize Keras libraries.
+This would have meant utilizing the same python code again.
 
 ```{r}
 library(ggplot2)
@@ -792,8 +672,10 @@ predict_lstm <- function(model, X) {
 input_shape <- c(1, 1)
 units <- 128
 model <- SimpleLSTM(input_shape, units)
-train(model, X_train, y_train, epochs = 100, lr = 0.001)
+train(model, X_train, y_train, epochs = 10, lr = 0.001)
 ```
+
+
 
 ```{r}
 # Prepare test data for prediction
@@ -827,7 +709,7 @@ ggplot(plot_data, aes(x = data$Timestamp[1:length(plot_data$Actual)] )) +
 
 #### comparison with ppython
 
-![](images/clipboard-2750774787.png)
+![](/home/dragon/Pictures/lstm.png)
 
 ## XGBOOST
 
@@ -899,7 +781,7 @@ data <- data %>%
 
 
 # Display the first few rows of the updated dataframe 'data'
-head(data)
+#head(data)
 ```
 
 ```{r}
@@ -923,7 +805,7 @@ data <- data %>%
 data$Weighted_Price <- na.locf(data$Weighted_Price)
 
 # Print or return processed data
-head(data)
+#head(data)
 ```
 
 ```{r}
@@ -981,9 +863,11 @@ plot2 <- ggplot(data, aes(x = Timestamp, y = Weighted_Price)) +
   labs(x = "Timestamp", y = "Weighted_Price (USD)")
 
 # Arrange the two plots side by side
-grid.arrange(plot1, plot2, ncol = 2)
+#grid.arrange(plot1, plot2, ncol = 2)
 
 ```
+
+
 
 ## test and train data
 
@@ -1026,11 +910,11 @@ plot12 <- ggplot() +
   geom_line(data = data_train, aes(x = Timestamp, y = Weighted_Price, color = "Training Set")) +  # Plot the training set with a line
   labs(title = "BTC Weighted_Price Price (USD) by Hours with NA and zero values") +  # Add a title to the plot
   theme_minimal() +  # Use a minimal theme for the plot
-  scale_x_date(date_labels = "%Y-%m-%d %H:%M", date_breaks = "1 day") +  # Format the x-axis with dates and set breaks at every day
+  scale_x_date(date_labels = "%Y-%m-%d %H:%M", date_breaks = "250 day") +  # Format the x-axis with dates and set breaks at every day
   labs(x = "Timestamp", y = "Weighted_Price (USD)") +  # Label the x and y axes
   scale_color_manual(values = c("Test Set" = "#F8766D", "Training Set" = "#00B9E3"))  # Set custom colors for the lines representing the test and training sets
 
-plot12
+(plot12)
 
 # Plot the data using ggplot2
 plot11 <- ggplot() +
@@ -1038,7 +922,7 @@ plot11 <- ggplot() +
   geom_line(data = data_train_na, aes(x = Timestamp, y = Weighted_Price, color = "Training Set")) +  # Plot the training set with a line
   labs(title = "BTC Weighted_Price Price (USD) by Hours without NA and zero values") +  # Add a title to the plot
   theme_minimal() +  # Use a minimal theme for the plot
-  scale_x_date(date_labels = "%Y-%m-%d %H:%M", date_breaks = "1 day") +  # Format the x-axis with dates and set breaks at every day
+  scale_x_date(date_labels = "%Y-%m-%d %H:%M", date_breaks = "250 day") +  # Format the x-axis with dates and set breaks at every day
   labs(x = "Timestamp", y = "Weighted_Price (USD)") +  # Label the x and y axes
   scale_color_manual(values = c("Test Set" = "#F8766D", "Training Set" = "#00B9E3"))  # Set custom colors for the lines representing the test and training sets
 
@@ -1046,7 +930,7 @@ plot11
 
 
 # Arrange the two plots side by side
-grid.arrange(plot11, plot12, ncol = 2)
+#grid.arrange(plot11, plot12, ncol = 2)
 ```
 
 #### Model
@@ -1144,26 +1028,26 @@ cat("Training MAE:", train_mae, "\n")
 ```{r}
 
 # Extract the components, excluding the handle
-model_info <- list(
-  Raw_data_length = length(model.boost$raw),
-  Best_iteration = model.boost$best_iteration,
-  Best_ntreelimit = model.boost$best_ntreelimit,
-  Best_score = model.boost$best_score,
-  Best_msg = model.boost$best_msg,
-  Niter = model.boost$niter,
-  Evaluation_log = paste(capture.output(print(model.boost$evaluation_log)), collapse = "\n"),
-  Call = deparse(model.boost$call),
-  Params = paste(capture.output(print(model.boost$params)), collapse = "\n"),
-  Callbacks = paste(capture.output(print(model.boost$callbacks)), collapse = "\n"),
-  Feature_names = paste(model.boost$feature_names, collapse = ", "),
-  Nfeatures = model.boost$nfeatures
-)
+#model_info <- list(
+ # Raw_data_length = length(model.boost$raw),
+  #Best_iteration = model.boost$best_iteration,
+  #Best_ntreelimit = model.boost$best_ntreelimit,
+  #Best_score = model.boost$best_score,
+  #Best_msg = model.boost$best_msg,
+  #Niter = model.boost$niter,
+  ##Evaluation_log = paste(capture.output(print(model.boost$evaluation_log)), collapse = "\n"),
+  #Call = deparse(model.boost$call),
+  #Params = paste(capture.output(print(model.boost$params)), collapse = "\n"),
+  ##Callbacks = paste(capture.output(print(model.boost$callbacks)), collapse = "\n"),
+  ##Feature_names = paste(model.boost$feature_names, collapse = ", "),
+  #Nfeatures = model.boost$nfeatures
+#)
 
 # Convert the list to a data frame
-model_info_df <- as.data.frame(model_info, stringsAsFactors = FALSE)
+#model_info_df <- as.data.frame(model_info, stringsAsFactors = FALSE)
 
 # Print the data frame
-print(model_info_df)
+#print(model_info_df)
 
 
 ```
@@ -1231,14 +1115,17 @@ p <- ggplot(results, aes(x = Timestamp)) +
   theme_minimal()  # Apply a minimal theme
 
 p
-ggplotly(p) #interactive plot widget
+#ggplotly(p) #interactive plot widget
 ```
+
+
+
 
 ### forecasting ahead
 
 #### FORECAST IN PYTHON COMPARISON
 
-![python forecast](images/clipboard-3729395982.png)
+![python forecast](/home/dragon/Pictures/forecast.png)
 
 ```{r}
 # Load necessary libraries
@@ -1324,6 +1211,8 @@ ggplot() +
 
 ```
 
+
+
 #### XGBOOST MODEL EXPLINATONS
 
 ##### IN R
@@ -1375,6 +1264,8 @@ Therefore, for this specific task and data:
 
 -   **R** would be the better choice given the lower error metrics, indicating a better fit to the data.
 
+
+
 # PROPHET FORECASTING
 
 ```{r}
@@ -1382,7 +1273,7 @@ library(dplyr)  # For data manipulation
 library(zoo)  # For the na.locf function (Last Observation Carried Forward)
 library(lubridate)  # For handling date/time data
 
-# Assuming 'data' is your data frame in R with 'Timestamp' and 'Weighted_Price'
+
 data <- data_na %>%
   mutate(Timestamp = as.POSIXct(Timestamp, origin = "1970-01-01", tz = "UTC"))
 
@@ -1400,10 +1291,12 @@ data <- data %>%
   mutate(Weighted_Price = na.locf(Weighted_Price))  # Fill missing values by carrying the last observation forward
 
 # Print the resulting data frame
-print(data)  # Output the cleaned and processed data frame
-
-
+#print(data)  # Output the cleaned and processed data frame
 ```
+
+
+
+
 
 ```{r}
 library(ggplot2)
@@ -1411,16 +1304,17 @@ library(ggplot2)
 # Define color palette
 color_pal <- c("#F8766D", "#D39200", "#93AA00", "#00BA38", "#00C19F", "#00B9E3", "#619CFF", "#DB72FB")
 
-
-
 # Plot using ggplot2
 ggplot(data, aes(x = Timestamp, y = Weighted_Price)) +
   geom_line(color = color_pal[1]) +  # Adjust color_pal index as needed
   labs(title = "BTC Weighted_Price Price (USD) by Hours") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for better readability
-  scale_x_datetime(date_breaks = "1 hour", date_labels = "%Y-%m-%d %H:%M")  # Set breaks and format for datetime x-axis
+  scale_x_datetime(date_breaks = "960 hour", date_labels = "%Y-%m-%d %H:%M")  # Set breaks and format for datetime x-axis
 ```
+
+
+
 
 ```{r}
 # Assuming 'data' is your dataset with 'Timestamp' as a column
@@ -1434,9 +1328,11 @@ split_date <- as.POSIXct("2018-06-25")
 # Create data_train and data_test
 data_train <- data[data$Timestamp <= split_date, ]
 data_test <- data[data$Timestamp > split_date, ]
-
-
 ```
+
+
+
+
 
 ```{r}
 library(dplyr)
@@ -1455,10 +1351,10 @@ plt_hrsly <- ggplot(data_hourly, aes(x = Timestamp, y = Weighted_Price)) +
   labs(title = "BTC Weighted_Price Price (USD) by Hours", x = "Timestamp", y = "Price") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_x_datetime(date_labels = "%d-%b %H:%M", date_breaks = "1 hour") +
+  scale_x_datetime(date_labels = "%d-%b %H:%M", date_breaks = "960 hour") +
   scale_color_manual(values = c("#F8766D"))
+plt_hrsly
 
-ggplotly(plt_hrsly)
 ```
 
 ## MODEL
@@ -1483,26 +1379,21 @@ future <- data.frame(ds = seq(min(data_train$ds), max(data_train$ds) + days(365)
 future$ds <- as.POSIXct(future$ds)
 summary(model_fit$extra_regressors)
 summary(model)
-
-head(predict(model_fit))
-
+#head(predict(model_fit))
 ```
+
 
 ```{r}
 # Load required libraries
 library(prophet)
 library(dplyr)
-
-
 # Optionally, make future predictions
 future <- make_future_dataframe(model_fit, periods = 365)  # Forecasting for the next 365 days
 forecast <- predict(model_fit, future)
-
 # Plotting predicted vs actual and future forecasted values
-
 plot(model_fit, forecast)
-
 ```
+
 
 #### Prophet RMSE MAE
 
@@ -1522,11 +1413,12 @@ mae_value <- mae(actual_vs_predicted$y, actual_vs_predicted$yhat)
 rmse_value <- rmse(actual_vs_predicted$y, actual_vs_predicted$yhat)
 
 # Print model summary and performance metrics
-summary(model_fit)
+#summary(model_fit)
 cat("MAE:", mae_value, "\n")
 cat("RMSE:", rmse_value, "\n")
 
 ```
+
 
 #### MAE MSE explainations
 
@@ -1540,11 +1432,14 @@ The model trained with Prophet in R has an MAE of 625.8949 and an RMSE of 1025.9
 Since both MAE and RMSE are significantly lower for the Prophet model, it indicates better prediction accuracy and fewer large errors.
 Thus, the Prophet model in R is the better choice for this dataset.
 
+
+
 # Arima
 
 ## daily data
 
 ```{r}
+library(ggplot2)
 # Filter data_train to start from '2014-12-01' and convert to time series format (ts)
 ts_data <- data %>%
   filter(Timestamp >= as.POSIXct("2014-12-01")) %>%
@@ -1564,8 +1459,10 @@ random <- decomp$random
 
 # Remove seasonal and trend components from the original time series data
 detrended <- ts_data - seasonal - trend
-autoplot(detrended, title = "ts without seasonality and trend")
+#autoplot(detrended, title = "ts without seasonality and trend")
 ```
+
+
 
 ## LJUNG BOX
 
@@ -1617,6 +1514,7 @@ plot(pacf_plot, main = "Partial Autocorrelation Function (PACF) of Differentiate
 
 ```
 
+
 ## ACF
 
 ```{r}
@@ -1629,8 +1527,6 @@ plot(diff_ts_data, main = "Differentiated Time Series")
 # ACF (Autocorrelation Function) plot of differentiated data
 acf_plot <- acf(diff_ts_data, lag.max = 5)
 plot(acf_plot, main = "Autocorrelation Function (ACF) of Differentiated Time Series")
-
-
 ```
 
 ## staionerity testt
@@ -1638,11 +1534,16 @@ plot(acf_plot, main = "Autocorrelation Function (ACF) of Differentiated Time Ser
 The Augmented Dickey-Fuller test statistic is -2.8671 with a p-value of 0.2113, indicating insufficient evidence to reject the null hypothesis of non-stationarity in the time series data.
 
 ```{r}
+library(tseries)
+
 # Augmented Dickey-Fuller Test for stationarity
 adf_test <- adf.test(ts_data)
-print(adf_test)
+adf_test
 
 ```
+
+
+
 
 ## ARIMA MODEL
 
@@ -1651,8 +1552,10 @@ It has RMSE of 295.0036 and MAE of 125.1681, indicating moderate predictive accu
 
 ```{r}
 # Fit ARIMA model
+library(forecast)
+
 arima_model <- auto.arima(ts_data)
-summary(arima_model)
+#summary(arima_model)
 # Forecast future values
 forecast_results <- forecast(arima_model, h = 365)  # Forecasting for 365 days into the future
 
@@ -1666,9 +1569,18 @@ if ("lower" %in% colnames(forecast_results) && "upper" %in% colnames(forecast_re
 }
 
 autoplot(forecast_results)
-summary(arima_model)
-
+#summary(arima_model)
 ```
+
+
+
+
+
+
+
+
+
+
 
 ## monnthly data
 
@@ -1686,7 +1598,7 @@ monthly_data <- data %>%
 ts_data_month <- ts(monthly_data$Weighted_Price, start = c(min(monthly_data$year), min(monthly_data$month)), frequency = 12)
 
 # Print the monthly time series data
-print(ts_data_month)
+#print(ts_data_month)
 ```
 
 ### plot and summary
@@ -1696,7 +1608,7 @@ print(ts_data_month)
 plot(ts_data_month, main = "Monthly Time Series Plot")
 
 # Example: Computing statistics
-summary(ts_data_month)
+#summary(ts_data_month)
 ```
 
 To perform decomposition, ACF, PACF, ADF test, stationarity test, ARIMA modeling, forecasting, and plotting for your monthly time series data `ts_data_month`, here's a structured approach in R:
@@ -1770,7 +1682,7 @@ print(kpss_test)
 ```{r}
 # Fit ARIMA model
 arima_model <- auto.arima(ts_data_month)
-summary(arima_model)
+#summary(arima_model)
 ```
 
 #### 6. Forecasting
@@ -1778,8 +1690,9 @@ summary(arima_model)
 ```{r}
 # Forecast using ARIMA model
 forecast_values <- forecast(arima_model, h = 12)  # Forecasting 12 months ahead
-print(forecast_values)
+#print(forecast_values)
 
 # Plot forecasted values
 plot(forecast_values, main = "Forecasted Values")
 ```
+
