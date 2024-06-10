@@ -18,6 +18,7 @@ editor_options:
 
 ------------------------------------------------------------------------
 
+
 Bitcoin, introduced in 2009 by the mysterious Satoshi Nakamoto, stands as the pioneering cryptocurrency.
 It operates on a decentralized peer-to-peer network, allowing secure and transparent transactions without the need for a central authority.
 Bitcoin's blockchain technology records every transaction in a public ledger, ensuring immutability and trustworthiness through cryptographic hashing.
@@ -29,12 +30,13 @@ Our project is structured into two key sections:
 
 **2. Time Series Analysis and Forecasting** - **Forecasting Methods:** - **LSTM (Long Short-Term Memory):** Leveraging deep learning to capture complex temporal dependencies.
 - **XGBoost:** Harnessing gradient boosting to predict Bitcoin price fluctuations.
-- **Facebook Prophet:** Using a versatile tool for forecasting with seasonality and holidays.
+- **Facebook Prophet:** Using a versatile tool for forecasting seasonality and holidays.
 - **ARIMA (AutoRegressive Integrated Moving Average):** Employing a traditional statistical approach for time series forecasting.
 
 This project draws inspiration from notable kernels and tutorials, including those focused on Prophet, XGBoost, and ARIMA models, tailored specifically for Bitcoin price prediction.
 
 For those new to Bitcoin, you can learn more about its fundamentals [here](https://www.coindesk.com/information/what-is-bitcoin).
+
 
 ------------------------------------------------------------------------
 
@@ -66,7 +68,7 @@ print(dir_contents)
 
 # Environment preparation
 
-## Getting pakages
+## Getting packages
 
 ```{r, message=FALSE}
 # Define the list of package names
@@ -83,7 +85,7 @@ lapply(packages, require, character.only = TRUE)
     We set the format to UTC and then give it a sample date to use like in our case 1970-01-01.
     and set the path to our file.
 
--   Here we end the code by displaying the fisrt 6 rows of data.
+-   Here we end the code by displaying the first 6 rows of data.
 
 ```{r, message=FALSE}
 # Define a function to parse timestamps from seconds since the Unix epoch
@@ -106,7 +108,7 @@ data <- data %>%
 
 ```
 
-### Summary statistics
+### Summary Statistics
 
 Summary statistics display the minimum and maximum values, explaining the range.
 They also include the 1st quartile (Q1), median (Q2), and third quartile (Q3), which elaborate on the interquartile range.
@@ -231,11 +233,11 @@ weekly_rows <- filtered_data %>%
 
 ```
 
-## Vzualizations
+## Vizualizations
 
-### Lets visualize Historical Bitcoin Market Volume (2015-2018)-Yearly
+### Lets vizualize Historical Bitcoin Market Volume (2015-2018)-Yearly
 
-In the code below we utilise the plotly function from the plotly package to create an interactive plot.
+In the code below we utilize the plotly function from the plotly package to create an interactive plot.
 the interactive plot takes in arguments of labels for 1 month 6month and 12 months to make the widgets more interactive.
 
 #### Comparison of the python plot and R plot
@@ -428,7 +430,7 @@ Here's the mathematical formulation of the LSTM model:
 -   $b_i, b_f, b_c, b_o$: Bias vectors for input, forget, cell, and output gates, respectively.
 -   $[h_{t-1}, x_t]$: Concatenation of previous hidden state $h_{t-1}$ and current input $x_t$.
 
-### Function Explanation
+### Function Explaination
 
 -   **Sigmoid Activation (σ)**: Scales input values between 0 and 1, controlling the flow of information through gates.
 -   **Hyperbolic Tangent (tanh)**: Squashes input values between -1 and 1, regulating the cell state update and output.
@@ -552,6 +554,8 @@ In R here we used self-made functions and in Python libraries were utilized.
 Utilizing libraries in r would have meant creating a virtual python environment to utilize Keras libraries.
 This would have meant utilizing the same python code again.
 
+Epochs are the number of times the data is being trained
+
 ```{r}
 library(ggplot2)
 
@@ -672,7 +676,7 @@ predict_lstm <- function(model, X) {
 input_shape <- c(1, 1)
 units <- 128
 model <- SimpleLSTM(input_shape, units)
-train(model, X_train, y_train, epochs = 10, lr = 0.001)
+train(model, X_train, y_train, epochs = 100, lr = 0.001)  # epochs are set to 100
 ```
 
 
@@ -707,7 +711,7 @@ ggplot(plot_data, aes(x = data$Timestamp[1:length(plot_data$Actual)] )) +
   theme_minimal()
 ```
 
-#### comparison with ppython
+#### comparison with python
 
 ![](/home/dragon/Pictures/lstm.png)
 
@@ -1213,7 +1217,7 @@ ggplot() +
 
 
 
-#### XGBOOST MODEL EXPLINATONS
+#### XGBOOST MODEL EXPLAINATONS
 
 ##### IN R
 
