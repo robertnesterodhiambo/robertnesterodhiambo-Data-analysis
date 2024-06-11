@@ -1543,7 +1543,7 @@ detrended <- ts_data - seasonal - trend
 #autoplot(detrended, title = "ts without seasonality and trend")
 ```
 
-# Commit 72& 73& 74 creating ts object & decomposing the data & detrending the data
+# Commit 72& 73& 74 ARIMA introduction creating ts object for ARIMA & decomposing the data & detrending the data
 
 
 ## LJUNG BOX
