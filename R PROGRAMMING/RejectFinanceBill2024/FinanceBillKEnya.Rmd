@@ -1,0 +1,111 @@
+---
+title: "Reject_FinanceBil_KEnya"
+author: "Bobo"
+date: "2024-06-22"
+output: html_document
+---
+
+```{r}
+library(leaflet)
+library(sf)
+library(rgdal)
+```
+
+
+```{r}
+
+# Load the downloaded GADM data for Kenya
+kenya_data <- readRDS("gadm36_KEN_2_sf.rds")
+kenya_data
+# Create the leaflet map
+leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = kenya_data,
+              color = "blue",
+              weight = 1,
+              smoothFactor = 0.5,
+              opacity = 1.0,
+              fillOpacity = 0.5,
+              popup = ~paste("Province:", NAME_1, "<br>", "County:", NAME_2)) %>%
+  addLegend(position = "bottomright", colors = c("blue"), labels = c("Counties"), title = "Kenya Map")
+
+```
+
+
+
+
+```{r}
+# Load necessary libraries
+library(sf)
+
+# Load the downloaded GADM data for Kenya
+kenya_data <- readRDS("gadm36_KEN_2_sf.rds")
+
+# Number of counties
+n_counties <- nrow(kenya_data)
+
+# Generate random values between 1 and 99
+set.seed(123) # For reproducibility
+random_corruption <- runif(n_counties, min = 1, max = 99)
+
+# Normalize the values so they sum to 100
+normalized_corruption <- random_corruption / sum(random_corruption) * 100
+
+# Add the corruption column to the data
+kenya_data$corruption <- normalized_corruption
+
+# Check if the column has been added correctly and sums to 100
+print(sum(kenya_data$corruption)) # Should print 100
+
+# Verify the first few rows
+head(kenya_data)
+
+```
+
+
+
+```{r}
+# Load necessary libraries
+library(leaflet)
+library(sf)
+
+# Load the downloaded GADM data for Kenya
+kenya_data <- readRDS("gadm36_KEN_2_sf.rds")
+
+# Generate random corruption percentages (as an example)
+set.seed(123)
+kenya_data$corruption <- runif(nrow(kenya_data), min = 1, max = 99)
+
+# Normalize the corruption values to range from 0 to 1 for heatmap intensity
+kenya_data$corruption_normalized <- (kenya_data$corruption - min(kenya_data$corruption)) / (max(kenya_data$corruption) - min(kenya_data$corruption))
+
+# Create the leaflet map
+leaflet(kenya_data) %>%
+  addTiles() %>%
+  addPolygons(
+    fillColor = ~colorNumeric("Reds", corruption_normalized)(corruption_normalized),
+    color = "white",
+    weight = 1,
+    smoothFactor = 0.5,
+    opacity = 1.0,
+    fillOpacity = 0.7,
+    popup = ~paste("Province:", NAME_1, "<br>", "County:", NAME_2, "<br>", "Corruption:", round(corruption, 2)),
+    label = ~paste(NAME_1, "-", NAME_2),
+    highlight = highlightOptions(
+      weight = 2,
+      color = "black",
+      fillOpacity = 0.7,
+      bringToFront = TRUE
+    )
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    pal = colorNumeric("Reds", domain = kenya_data$corruption_normalized),
+    values = ~corruption_normalized,
+    title = "Corruption Scale",
+    labFormat = labelFormat(suffix = "%")
+  ) %>%
+  setView(lng = 37.8, lat = 0.6, zoom = 6)
+
+```
+
