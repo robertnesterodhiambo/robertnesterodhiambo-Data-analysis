@@ -16,7 +16,10 @@ library(rgdal)
 
 # Load the downloaded GADM data for Kenya
 kenya_data <- readRDS("gadm36_KEN_2_sf.rds")
-kenya_data
+library(dplyr)
+kenya_data %>%
+  select(NAME_1,NAME_2) %>%
+  write.csv("counties.csv")
 # Create the leaflet map
 leaflet() %>%
   addTiles() %>%
