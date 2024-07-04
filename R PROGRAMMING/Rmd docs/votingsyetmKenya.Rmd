@@ -1,9 +1,20 @@
 ---
 title: "Voting System For General Elections"
-author: "Stephanie Amondi and Mitchelle Kerubo"
-date: "2024-07-04"
+author:
+   -  "Stephanie Amondi and Mitchelle Kerubo"
+   -  " Mitchelle Kerubo"
+   
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output: 
   word_document: 
     toc: true
+geometry: margin=1in
 ---
 
+\begin{center}
+  \huge\textbf{Young Scientist Kenya} \\
+  \vspace{0.5cm}
+  \Large\textbf{Category: Technology} \\
+  \vspace{0.5cm}
+  \large\textbf{School: Asumbi Girls High School} \\
+\end{center}
