@@ -2,12 +2,17 @@
 title: "Untitled"
 author: "Idriss"
 date: "`r Sys.Date()`"
-output: 
-  html_document: 
+output:
+  pdf_document:
+    toc: true
+    toc_depth: '5'
+  html_document:
     toc: true
     toc_depth: 5
     fig_caption: true
 ---
+
+\newpage
 
 # PORTFOLIO FINANCIAL ANALYSIS
 
@@ -233,6 +238,37 @@ ggplot(dji_returns_df, aes(x = daily.returns)) +
   geom_histogram(binwidth = 0.001, fill = "red", alpha = 0.7) +
   labs(title = "Histogram of DJI Daily Returns", x = "Daily Return", y = "Frequency") +
   theme_minimal()
+
+```
+
+##  Summary  Statistics
+
+```{r}
+# Summary statistics for SPY data
+print("Summary statistics for SPY data:")
+summary(spy_data)
+
+# Summary statistics for DJI data
+print("Summary statistics for DJI data:")
+summary(dji_data)
+
+# Calculate daily returns for SPY
+spy_returns <- dailyReturn(spy_data[, "SPY.Adjusted"])
+# Convert to data frame
+spy_returns_df <- data.frame(Date = index(spy_returns), Return = coredata(spy_returns))
+
+# Summary statistics for SPY returns
+print("Summary statistics for SPY returns:")
+summary(spy_returns_df)
+
+# Calculate daily returns for DJI
+dji_returns <- dailyReturn(dji_data[, "DJI.Adjusted"])
+# Convert to data frame
+dji_returns_df <- data.frame(Date = index(dji_returns), Return = coredata(dji_returns))
+
+# Summary statistics for DJI returns
+print("Summary statistics for DJI returns:")
+summary(dji_returns_df)
 
 ```
 
