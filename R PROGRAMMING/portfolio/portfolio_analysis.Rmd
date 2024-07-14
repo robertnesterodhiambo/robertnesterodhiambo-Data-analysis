@@ -399,3 +399,134 @@ chart.EfficientFrontier(ef, match.col = "StdDev", main = "Efficient Frontier")
 2. **Portfolio Variance (\(\sigma_p^2\)):** This measures the risk of the portfolio. It considers not just the individual volatilities of the assets but also how they move together (covariance).
 
 3. **Efficient Frontier:** The efficient frontier plot shows the set of optimal portfolios. Portfolios on the efficient frontier offer the highest expected return for a given level of risk. Portfolios below the frontier are sub-optimal because they do not provide enough return for their level of risk.
+
+
+
+## Capital Asset Pricing Model (CAPM) Explanation and Implementation
+
+**CAPM** is a model that describes the relationship between the risk of an asset and its expected return. The model is used to estimate an asset’s expected return based on its risk compared to the market.
+
+### Mathematical Explanation
+
+The CAPM formula is given by:
+
+\[
+E(R_i) = R_f + \beta_i (E(R_m) - R_f)
+\]
+
+Where:
+- \( E(R_i) \) = Expected return of the asset \(i\)
+- \( R_f \) = Risk-free rate
+- \( \beta_i \) = Beta of the asset \(i\), which measures the asset's sensitivity to market returns
+- \( E(R_m) \) = Expected return of the market
+
+**Beta (\(\beta_i\))** is calculated as:
+
+\[
+\beta_i = \frac{\text{Cov}(R_i, R_m)}{\text{Var}(R_m)}
+\]
+
+Where:
+- \(\text{Cov}(R_i, R_m)\) = Covariance between the returns of the asset \(i\) and the market
+- \(\text{Var}(R_m)\) = Variance of the market returns
+
+### Steps to Implement CAPM in R
+
+1. **Calculate Daily Returns**
+2. **Obtain Risk-Free Rate**
+3. **Calculate Beta (\(\beta_i\))**
+4. **Estimate Expected Returns Using CAPM**
+
+
+### Interpretation of Results:
+
+- **Expected Return for SPY:** The estimated return based on its sensitivity (beta) to the DJI index.
+- **Expected Return for DJI:** Based on the CAPM, the DJI index itself should match the market return, and its beta is assumed to be 1.
+
+This script calculates and displays the expected returns for SPY and DJI based on the CAPM formula. Adjust the risk-free rate and market return as needed for more accurate and current estimates.
+
+
+
+
+```{r}
+# Install and load necessary packages
+library(quantmod)
+library(PerformanceAnalytics)
+library(ggplot2)
+
+# Load data for SPY and DJI
+getSymbols("SPY", src = "yahoo", from = "2000-01-01", to = Sys.Date())
+getSymbols("^DJI", src = "yahoo", from = "2000-01-01", to = Sys.Date())
+
+# Calculate daily returns
+spy_returns <- dailyReturn(Ad(SPY))
+dji_returns <- dailyReturn(Ad(DJI))
+
+# Combine returns into one data frame
+returns_data <- na.omit(merge(spy_returns, dji_returns))
+colnames(returns_data) <- c("SPY", "DJI")
+
+# Risk-free rate (annualized)
+R_f_annual <- 0.02
+# Convert to daily risk-free rate
+R_f <- (1 + R_f_annual)^(1/252) - 1
+
+# Calculate beta for SPY relative to DJI
+covariance <- cov(returns_data$SPY, returns_data$DJI)
+variance_dji <- var(returns_data$DJI)
+beta_spy <- covariance / variance_dji
+
+# Calculate beta for DJI relative to itself (which should be 1)
+beta_dji <- 1
+
+# Calculate expected returns using CAPM
+expected_return_spy <- R_f + beta_spy * (mean(returns_data$DJI) - R_f)
+expected_return_dji <- R_f + beta_dji * (mean(returns_data$DJI) - R_f)
+
+# Display the results
+cat("Expected Return for SPY:", expected_return_spy, "\n")
+cat("Expected Return for DJI:", expected_return_dji, "\n")
+
+# Prepare data for plotting
+
+# Plot 1: Historical Returns of SPY and DJI
+ggplot(data = returns_data, aes(x = index(returns_data))) +
+  geom_line(aes(y = SPY, color = "SPY")) +
+  geom_line(aes(y = DJI, color = "DJI")) +
+  labs(title = "Historical Daily Returns of SPY and DJI",
+       x = "Date",
+       y = "Daily Return",
+       color = "Legend") +
+  theme_minimal()
+
+# Plot 2: CAPM Expected Returns vs Actual Returns
+actual_mean_returns <- colMeans(returns_data)
+expected_returns <- c(SPY = expected_return_spy, DJI = expected_return_dji)
+
+returns_comparison <- data.frame(
+  Asset = c("SPY", "DJI"),
+  Actual = actual_mean_returns,
+  Expected = expected_returns
+)
+
+# Reshape data for ggplot
+returns_comparison_melted <- reshape2::melt(returns_comparison, id.vars = "Asset")
+
+ggplot(returns_comparison_melted, aes(x = Asset, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Actual vs Expected Returns Based on CAPM",
+       x = "Asset",
+       y = "Return",
+       fill = "Return Type") +
+  theme_minimal()
+
+# Plot 3: Beta of SPY Relative to DJI
+beta_values <- data.frame(
+  Asset = c("SPY"),
+  Beta = beta_spy
+)
+
+
+
+```
+
