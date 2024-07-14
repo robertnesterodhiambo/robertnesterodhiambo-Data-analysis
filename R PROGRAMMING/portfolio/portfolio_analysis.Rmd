@@ -272,3 +272,130 @@ summary(dji_returns_df)
 
 ```
 
+
+
+# MODELs
+
+
+## Modern Portfolio Theory (MPT) Explanation
+
+Modern Portfolio Theory (MPT) is a framework for constructing a portfolio of assets that maximizes expected return for a given level of risk. It was introduced by Harry Markowitz in his paper "Portfolio Selection" published in 1952. The key concept behind MPT is diversification, which helps reduce the overall risk of the portfolio.
+
+#### Mathematical Explanation
+
+1. **Expected Return of a Portfolio (\(E(R_p)\)):**
+   \[
+   E(R_p) = \sum_{i=1}^{n} w_i E(R_i)
+   \]
+   Where:
+   - \( E(R_p) \) is the expected return of the portfolio.
+   - \( w_i \) is the weight of asset \(i\) in the portfolio.
+   - \( E(R_i) \) is the expected return of asset \(i\).
+
+2. **Variance of a Portfolio (\(\sigma_p^2\)):**
+   \[
+   \sigma_p^2 = \sum_{i=1}^{n} \sum_{j=1}^{n} w_i w_j \sigma_{ij}
+   \]
+   Where:
+   - \( \sigma_p^2 \) is the variance of the portfolio.
+   - \( \sigma_{ij} \) is the covariance between the returns of assets \(i\) and \(j\).
+
+3. **Efficient Frontier:**
+   The efficient frontier is the set of portfolios that offers the highest expected return for a defined level of risk (or the lowest risk for a given level of expected return).
+
+### Steps to Perform MPT in R
+
+To perform MPT on your data frames and visualize the efficient frontier, we can use the `PortfolioAnalytics` package. Below are the steps:
+
+#### 1. Install and Load Necessary Packages
+
+```{r}
+
+#install.packages("quantmod")
+#install.packages("PortfolioAnalytics")
+#install.packages("PerformanceAnalytics")
+#install.packages("ROI")
+#install.packages("ROI.plugin.quadprog")
+#install.packages("ROI.plugin.glpk")
+library(quantmod)
+library(PortfolioAnalytics)
+library(PerformanceAnalytics)
+library(ROI)
+library(ROI.plugin.quadprog)
+library(ROI.plugin.glpk)
+
+```
+
+#### 2. Get Data and Calculate Returns
+
+```{r}
+
+# Load data for SPY and DJI
+getSymbols("SPY", src = "yahoo", from = "2000-01-01", to = Sys.Date())
+getSymbols("^DJI", src = "yahoo", from = "2000-01-01", to = Sys.Date())
+
+# Calculate daily returns
+spy_returns <- dailyReturn(Ad(SPY))
+dji_returns <- dailyReturn(Ad(DJI))
+
+# Combine returns into one data frame
+returns_data <- na.omit(merge(spy_returns, dji_returns))
+colnames(returns_data) <- c("SPY", "DJI")
+
+
+```
+
+#### 3. Define Portfolio and Constraints
+```{r}
+
+# Define portfolio
+portfolio <- portfolio.spec(assets = colnames(returns_data))
+
+# Add constraints
+portfolio <- add.constraint(portfolio, type = "full_investment")
+portfolio <- add.constraint(portfolio, type = "box", min = 0.01, max = 0.99)
+
+# Add objectives
+portfolio <- add.objective(portfolio, type = "return", name = "mean")
+portfolio <- add.objective(portfolio, type = "risk", name = "StdDev")
+
+
+```
+
+
+#### 4. Optimize Portfolio
+
+```{r}
+
+# Optimize portfolio with tracing enabled
+opt_portfolio <- optimize.portfolio(returns_data, portfolio, optimize_method = "ROI", trace = TRUE)
+
+
+```
+
+
+#### 5. Plot Efficient Frontier
+
+```{r}
+
+# Check optimization results
+print(opt_portfolio)
+
+# Efficient frontier
+ef <- extractEfficientFrontier(opt_portfolio, match.col = "StdDev", n.portfolios = 100)
+
+# Plot efficient frontier
+chart.EfficientFrontier(ef, match.col = "StdDev", main = "Efficient Frontier")
+
+
+
+```
+
+
+### Interpretation of Results
+
+1. **Expected Return (\(E(R_p)\)):** This is the weighted average of the expected returns of the assets in the portfolio. It shows the return you can expect from the portfolio based on historical data.
+
+2. **Portfolio Variance (\(\sigma_p^2\)):** This measures the risk of the portfolio. It considers not just the individual volatilities of the assets but also how they move together (covariance).
+
+3. **Efficient Frontier:** The efficient frontier plot shows the set of optimal portfolios. Portfolios on the efficient frontier offer the highest expected return for a given level of risk. Portfolios below the frontier are sub-optimal because they do not provide enough return for their level of risk.
