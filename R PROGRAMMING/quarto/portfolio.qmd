@@ -19,3 +19,11 @@ pep <- getSymbols("pep", from = "2003-01-01", to = "2016-08-30", auto.assign = F
 head(cbind(ko, pep))
 ```
 
+
+```{r}
+# Take the adjusted price only
+ko <- Ad(ko)
+pep <- Ad(pep)
+head(cbind(ko, pep))
+```
+
