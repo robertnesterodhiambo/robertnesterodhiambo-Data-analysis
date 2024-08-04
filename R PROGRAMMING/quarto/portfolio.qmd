@@ -1,6 +1,6 @@
 ---
 title: "Portfolio"
-format: beamer
+format: html
 editor: visual
 ---
 
@@ -25,5 +25,268 @@ head(cbind(ko, pep))
 ko <- Ad(ko)
 pep <- Ad(pep)
 head(cbind(ko, pep))
+```
+
+First, we define 'ko_pep' as the ratio expressing the value of the share price of the Coca Cola company in terms of the share price of PepsiCo.
+
+```{r}
+ko_pep <- ko/pep
+head(ko_pep)
+```
+
+
+```{r}
+# Make a time series plot of ko_pep
+plot.zoo(ko_pep)
+  
+# Add as a reference, a horizontal line at 1
+abline(h=1)
+```
+For portfolio weights, there are options: 1. Set initial weight at initial date and never change it. So, the weight of individual stock price in the portfolio will constantly changing because the changes of the price itself. 2. Dynamic approach -> we constantly adjusting the weight of the individual asset.
+
+
+```{r}
+library(PerformanceAnalytics)
+ko_ret <- Return.calculate(ko)
+pep_ret <- Return.calculate(pep)
+head(cbind(ko_ret, pep_ret))
+
+# Remove the first row (NA)
+ko_ret <- ko_ret[(-1),]
+pep_ret <- pep_ret[(-1),]
+```
+
+Both pf_bh and pf_rebal contains useful information that we can extract.
+```{r}
+# Combine both returns into one variable
+rets <- cbind(ko_ret, pep_ret)
+
+# Create the weights, we divide our money half to each of the asset
+eq_weights <- c(0.5, 0.5)
+
+# Create a portfolio using buy and hold
+pf_bh <- Return.portfolio(R = rets, weights = eq_weights, verbose = TRUE)
+
+# Create a portfolio rebalancing monthly 
+pf_rebal <- Return.portfolio(R = rets, weights = eq_weights, rebalance_on = "months", verbose = TRUE)
+
+# Plot the time-series
+par(mfrow = c(2, 1), mar = c(2, 4, 2, 2))
+plot.zoo(pf_bh$returns)
+plot.zoo(pf_rebal$returns)
+```
+
+
+```{r}
+# Create eop_weight_bh
+eop_weight_bh <- pf_bh$EOP.Weight
+
+# Create eop_weight_rebal
+eop_weight_rebal <- pf_rebal$EOP.Weight
+
+# Plot end of period weights
+par(mfrow = c(2, 1), mar=c(2, 4, 2, 2))
+plot.zoo(eop_weight_bh$KO)
+plot.zoo(eop_weight_rebal$KO)
+```
+
+1. The buy and hold strategy, the weights is changes due to the fluctuaton of the prices. 2. The rebalance strategy, it always try to rebalance it to the initial set weights.
+
+Portfolio Return Analysis is both analyse the past performance and predict the future. How to choose the best portfolio? We should always consider the risk vs reward. Portfolio management is heavily utilized math, statistics, programming skills and intuition.
+
+How to quantify risk and reward? Reward -> portfolio mean return, it is the expectation return of a portfolio Risk -> portfolio volatility (variance and standard deviation), it is a measure how big the changes of prices againt the mean return
+
+Return is not linear. 50% loss then followed by 50% profit, we only obtain our money 75% from the initial value. final value = initial value * 0.5 * 1.5 = 0.75 * initial value That’s why we won’t use simple arithmatic when calculate returns. Instead we will used what we called geometric return.
+
+Now let’s try to analyze the sp500 index.
+
+
+```{r}
+# Fetch price
+sp500 <- getSymbols("^GSPC", from = "1985-01-01", to = "2017-12-30", src = "yahoo", auto.assign = FALSE)
+head(sp500)
+```
+
+```{r}
+# Convert the daily frequency of sp500 to monthly frequency: sp500_monthly
+sp500_monthly <- to.monthly(sp500)
+# Print the first six rows of sp500_monthly
+head(sp500_monthly)
+```
+
+
+```{r}
+# Create sp500_returns using Return.calculate using the closing prices
+sp500_returns <- Return.calculate(Cl(sp500_monthly))
+# Time series plot
+plot.ts(sp500_returns)
+```
+
+```{r}
+# Produce the year x month table
+table.CalendarReturns(sp500_returns)
+```
+
+
+
+```{r}
+# Remove first value because it is NA
+sp500_returns <- sp500_returns[(-1),]
+# Compute the mean monthly returns
+mean(sp500_returns)
+```
+
+```{r}
+# Compute the geometric mean of monthly returns
+mean.geometric(sp500_returns)
+```
+
+```{r}
+# Compute the standard deviation
+sd(sp500_returns)
+```
+
+*The (annualized) Sharpe ratio *Here we will define risk-free asset is something like Reksadana Pasar Uang, Deposito, or simply Bank Account. It is depends on you what you want to choose. Reksadana Pasar Uang (money market fund) actually not 100% risk-free. Depends on the composition of the fund, if the risk is small enought, we can safely ignore it.
+
+### Annualized mean and volatility
+
+```{r}
+table.AnnualizedReturns(sp500_returns)
+```
+
+Time-variation in portfolio performance So far we only view everything as static. In reality, asset price is affected by things like: cycle, news, psychological effect, political, unexpected pandemic, etc. That’s why we need to weight more the most recent observation and weight less (or discard) the most distant, it is called: Rolling estimation 
+
+```{r}
+# Plotting the 12-month rolling annualized mean
+chart.RollingPerformance(R = sp500_returns, width = 12, FUN = "Return.annualized")
+```
+
+```{r}
+# Plotting the 12-month rolling annualized standard deviation
+chart.RollingPerformance(R = sp500_returns, width = 12, FUN = "StdDev.annualized")
+```
+
+
+```{r}
+# Plotting the 12-month rolling annualized Sharpe ratio, assuming rf = 0
+chart.RollingPerformance(R = sp500_returns, width = 12, FUN = "SharpeRatio.annualized")
+```
+
+```{r}
+charts.RollingPerformance(R = sp500_returns, width = 12)
+```
+
+
+#### Using window to analyze specific date range
+
+
+to normal distribution? Is it correct to assume asset return on normal distribution? Of course no. It is almost illogical to use normal distribution on asset return.
+
+Non-normality of the return distribution Asset return tend to be skewed and fat-tailed. It is possible to see more negative retuns on the left tail of the distribution (see image above).
+
+```{r}
+# Use daily return
+sp500_ret_daily <- Return.calculate(Cl(sp500))
+
+# Fill in window for 2008
+sp500_2008 <- window(sp500_ret_daily, start = "2008-01-01", end = "2008-12-31")
+
+# Create window for 2014
+sp500_2014 <-window(sp500_ret_daily, start = "2014-01-01", end = "2014-12-31")
+
+# Plotting settings
+par(mfrow = c(1, 2) , mar=c(3, 2, 2, 2))
+names(sp500_2008) <- "sp500_2008"
+names(sp500_2014) <- "sp500_2014"
+
+# Plot histogram of 2008
+chart.Histogram(sp500_2008, methods = c("add.density", "add.normal"))
+
+# Plot histogram of 2014
+chart.Histogram(sp500_2014, methods = c("add.density", "add.normal"))
+```
+
+
+
+```{r}
+# Calculate both skewness and kurtosis in R are very easy
+skewness(sp500_ret_daily)
+kurtosis(sp500_ret_daily)
+SemiDeviation(sp500_returns)
+VaR(sp500_returns, p = 0.05)
+ES(sp500_returns, p = 0.05)
+table.Drawdowns(sp500_ret_daily)
+```
+
+
+```{r}
+chart.Drawdown(sp500_ret_daily)
+```
+
+```{r}
+# Create a scatter plot of returns
+chart.Scatter(ko_ret, pep_ret, xlab = "ko returns", ylab = "pep returns", main = "ko-pep returns")
+```
+
+```{r}
+# Find the correlation
+cor(ko_ret, pep_ret)
+```
+
+```{r}
+# Find and visualize the correlation using chart.Correlation
+chart.Correlation(cbind(ko_ret, pep_ret))
+```
+
+```{r}
+# Visualize the rolling estimates using chart.RollingCorrelation
+chart.RollingCorrelation(ko_ret, pep_ret, width = 22) # 22 trading days, about 1 calendar month
+```
+
+```{r}
+chart.RollingCorrelation(ko_ret, pep_ret, width = 252) # 252 trading days, about 1 calendar year
+```
+
+```{r}
+ko <- getSymbols("ko", from = "2003-01-01", to = "2016-08-30", auto.assign = FALSE)
+pep <- getSymbols("pep", from = "2003-01-01", to = "2016-08-30", auto.assign = FALSE)
+aapl <- getSymbols("aapl", from = "2003-01-01", to = "2016-08-30", auto.assign = FALSE)
+ge <- getSymbols("ge", from = "2003-01-01", to = "2016-08-30", auto.assign = FALSE)
+ret_ko <- Return.calculate(Ad(ko))
+ret_pep <- Return.calculate(Ad(pep))
+ret_aapl <- Return.calculate(Ad(aapl))
+ret_ge  <- Return.calculate(Ad(ge))
+# Remove NA value in the first row
+ret_ko <- ret_ko[(-1),]
+ret_pep <- ret_pep[(-1),]
+ret_aapl <- ret_aapl[(-1),]
+ret_ge  <- ret_ge[(-1),]
+return_multi <- cbind(ret_ko, ret_pep, ret_aapl, ret_ge) # you could insert as many return as you like
+
+# Create a vector of returns 
+means <- apply(return_multi, 2, "mean")
+  
+# Create a vector of standard deviation
+sds <- apply(return_multi, 2, "sd")
+
+# Create a scatter plot
+plot(sds, means)
+text(sds, means, labels = colnames(return_multi), cex = 0.7)
+abline(h = 0, lty = 3)
+```
+
+
+```{r}
+# Create a matrix with variances on the diagonal
+diag_cov <- diag(sds^2)
+
+# Create a covariance matrix of returns
+cov_matrix <- cov(return_multi)
+
+# Create a correlation matrix of returns
+cor_matrix <- cor(return_multi)
+
+# Verify covariances equal the product of standard deviations and correlation
+all.equal(cov_matrix[1,2], as.numeric(cor_matrix[1,2] * sds[1] * sds[2]))
 ```
 
