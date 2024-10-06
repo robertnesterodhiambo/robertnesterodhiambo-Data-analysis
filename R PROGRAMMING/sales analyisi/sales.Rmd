@@ -1,0 +1,268 @@
+---
+title: "Jewel CArt"
+output: pdf_document
+date: "`r Sys.Date()`"
+---
+
+# DAta Dwonloading and importation
+
+
+
+```{r}
+# Define the URLs
+urls <- c(
+  "https://excelbianalytics.com/wp/wp-content/uploads/2017/07/1000000%20Sales%20Records.zip",
+  "https://excelbianalytics.com/wp/wp-content/uploads/2017/07/1500000%20Sales%20Records.zip"
+)
+
+# Define the filenames to save the zip files locally
+file_names <- c("1000000_Sales_Records.zip", "1500000_Sales_Records.zip")
+
+# Download, extract, and import CSV files individually
+for (i in 1:length(urls)) {
+  # Download the zip file
+  download.file(urls[i], destfile = file_names[i], mode = "wb")
+  cat("Downloaded:", file_names[i], "\n")
+  
+  # Extract the downloaded zip file
+  unzip_dir <- paste0("extracted_", i)
+  unzip(file_names[i], exdir = unzip_dir)
+  cat("Extracted to folder:", unzip_dir, "\n")
+  
+  # Get the CSV file path (assuming only one CSV file per ZIP)
+  csv_file <- list.files(unzip_dir, pattern = "\\.csv$", full.names = TRUE)
+  
+  # Import the CSV file into R with a unique data frame name
+  if (length(csv_file) > 0) {
+    df_name <- paste0("sales_data_", i)  # e.g., "sales_data_1", "sales_data_2"
+    assign(df_name, read.csv(csv_file[1], stringsAsFactors = FALSE))
+    cat("Imported CSV file as data frame:", df_name, "\n")
+  } else {
+    cat("No CSV file found in", unzip_dir, "\n")
+  }
+}
+## incase above code is not working due to slow internet
+sales_data_1 <- read_csv("GIT/Data/1000000 Sales Records.csv")
+sales_data_2 <- read_csv("GIT/Data/1500000 Sales Records.csv")
+```
+
+## Dataframe view data1million
+
+```{r}
+head(sales_data_1)
+```
+
+## Dataframe view Data1.5million
+
+```{r}
+head(sales_data_2)
+```
+
+### Getting column Names and structure  and summary 
+
+```{r}
+colnames(sales_data_1)
+str(sales_data_1)
+str(sales_data_2)
+```
+
+### 1million data Structure
+
+
+```{r}
+summary(sales_data_1)
+```
+
+
+### 1.5 million data Structure
+
+```{r}
+summary(sales_data_2)
+```
+
+## Data shape 
+
+```{r}
+# Get the shape of sales_data_1
+shape_sales_data_1 <- dim(sales_data_1)
+
+# Get the shape of sales_data_2
+shape_sales_data_2 <- dim(sales_data_2)
+
+# Print the shapes
+print(paste("Shape of sales_data_1:", shape_sales_data_1[1], "rows and", shape_sales_data_1[2], "columns"))
+print(paste("Shape of sales_data_2:", shape_sales_data_2[1], "rows and", shape_sales_data_2[2], "columns"))
+
+```
+
+
+
+# Vizualization
+
+
+```{r}
+sales_data_1
+```
+
+
+### 1. Boxplots
+
+
+```{r}
+library(ggplot2)
+
+# Boxplot for Total Revenue in sales_data_1
+ggplot(sales_data_1, aes(x = `Item Type`, y = `Total Revenue`)) +
+  geom_boxplot() +
+  ggtitle("Boxplot of Total Revenue by Item Type (1M Records)") +
+  xlab("Item Type") +
+  ylab("Total Revenue") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Boxplot for Total Revenue in sales_data_2
+ggplot(sales_data_2, aes(x = `Item Type`, y = `Total Revenue`)) +
+  geom_boxplot() +
+  ggtitle("Boxplot of Total Revenue by Item Type (1.5M Records)") +
+  xlab("Item Type") +
+  ylab("Total Revenue") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### 2. Histograms
+
+```{r}
+# Histogram for Total Revenue in sales_data_1
+ggplot(sales_data_1, aes(x = `Total Revenue`)) +
+  geom_histogram(bins = 50, fill = "blue", alpha = 0.7) +
+  ggtitle("Histogram of Total Revenue (1M Records)") +
+  xlab("Total Revenue") +
+  ylab("Frequency")
+
+# Histogram for Total Revenue in sales_data_2
+ggplot(sales_data_2, aes(x = `Total Revenue`)) +
+  geom_histogram(bins = 50, fill = "red", alpha = 0.7) +
+  ggtitle("Histogram of Total Revenue (1.5M Records)") +
+  xlab("Total Revenue") +
+  ylab("Frequency")
+```
+
+### 3. Heatmaps
+
+```{r}
+library(reshape2)
+
+
+# Calculate the correlation matrix for sales_data_1
+cor_matrix_1 <- cor(sales_data_1[, sapply(sales_data_1, is.numeric)], use = "complete.obs")
+
+# Reshape the correlation matrix for heatmap
+cor_melted_1 <- melt(cor_matrix_1)
+
+# Heatmap for sales_data_1
+ggplot(cor_melted_1, aes(Var1, Var2, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "red", high = "green", mid = "white", 
+                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+                       name="Correlation") +
+  theme_minimal() +
+  ggtitle("Correlation Heatmap (1M Records)")
+
+# Calculate the correlation matrix for sales_data_2
+cor_matrix_2 <- cor(sales_data_2[, sapply(sales_data_2, is.numeric)], use = "complete.obs")
+
+# Reshape the correlation matrix for heatmap
+cor_melted_2 <- melt(cor_matrix_2)
+
+# Heatmap for sales_data_2
+ggplot(cor_melted_2, aes(Var1, Var2, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "green", 
+                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+                       name="Correlation") +
+  theme_minimal() +
+  ggtitle("Correlation Heatmap (1.5M Records)")
+```
+
+### 4. Scatterplots
+Scatterplots can help visualize relationships between two numeric variables.
+
+```{r}
+# Scatterplot for Total Revenue vs. Units Sold in sales_data_1
+ggplot(sales_data_1, aes(x = `Units Sold`, y = `Total Revenue`)) +
+  geom_point(alpha = 0.5) +
+  ggtitle("Total Revenue vs. Units Sold (1M Records)") +
+  xlab("Units Sold") +
+  ylab("Total Revenue")
+
+# Scatterplot for Total Revenue vs. Units Sold in sales_data_2
+ggplot(sales_data_2, aes(x = `Units Sold`, y = `Total Revenue`)) +
+  geom_point(alpha = 0.5) +
+  ggtitle("Total Revenue vs. Units Sold (1.5M Records)") +
+  xlab("Units Sold") +
+  ylab("Total Revenue")
+```
+
+### 5. Correlation Plots
+You can also visualize the correlation matrix using the `corrplot` package.
+
+```{r}
+library(corrplot)
+
+# Correlation plot for sales_data_1
+corrplot(cor_matrix_1, method = "circle", type = "upper", tl.col = "black", tl.srt = 45, 
+         title = "Correlation Plot (1M Records)")
+
+# Correlation plot for sales_data_2
+corrplot(cor_matrix_2, method = "circle", type = "upper", tl.col = "black", tl.srt = 45, 
+         title = "Correlation Plot (1.5M Records)")
+```
+
+
+# Models
+
+## Data preparation 
+
+```{r}
+# Load necessary packages
+library(dplyr)
+
+
+# Convert Order.Date and Ship.Date to Date type
+sales_data_1 <- sales_data_1 %>%
+  mutate(Order.Date = as.Date(`Order Date`, format="%m/%d/%Y"),
+         Ship.Date = as.Date(`Ship Date`, format="%m/%d/%Y"))
+
+sales_data_2 <- sales_data_2 %>%
+  mutate(Order.Date = as.Date(`Order Date`, format="%m/%d/%Y"  ),
+         Ship.Date = as.Date(`Ship Date`, format="%m/%d/%Y"))
+
+```
+
+### Linear REgresison
+
+```{r}
+# Linear regression for sales_data_1
+linear_model_1 <- lm(`Total Revenue` ~ `Units Sold`, data = sales_data_1)
+summary(linear_model_1)
+
+# Linear regression for sales_data_2
+linear_model_2 <- lm(`Total Revenue` ~ `Units Sold`, data = sales_data_2)
+summary(linear_model_2)
+
+```
+
+
+### Perform Multiple linear regression
+
+```{r}
+# Multiple regression for sales_data_1
+multiple_model_1 <- lm(`Total Revenue` ~ `Units Sold` + `Unit Price` + `Order Priority`, data = sales_data_1)
+summary(multiple_model_1)
+
+# Multiple regression for sales_data_2
+multiple_model_2 <- lm(`Total Revenue` ~ `Units Sold` + `Unit Price` + `Order Priority`, data = sales_data_2)
+summary(multiple_model_2)
+
+
+```
+
