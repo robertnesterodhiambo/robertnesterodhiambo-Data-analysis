@@ -266,3 +266,159 @@ summary(multiple_model_2)
 
 ```
 
+## Compare Results
+
+```{r}
+# Compare the results
+cat("Linear Model Summary for Sales Data 1:\n")
+print(summary(linear_model_1))
+
+cat("\nLinear Model Summary for Sales Data 2:\n")
+print(summary(linear_model_2))
+
+cat("\nMultiple Model Summary for Sales Data 1:\n")
+print(summary(multiple_model_1))
+
+cat("\nMultiple Model Summary for Sales Data 2:\n")
+print(summary(multiple_model_2))
+
+```
+
+## Logistics Regresison
+
+### Creating binary outputs
+
+```{r}
+# Create a binary outcome variable for sales_data_1
+sales_data_1 <- sales_data_1 %>%
+  mutate(Is_Profitable = ifelse(`Total Revenue` > mean(`Total Revenue`), 1, 0))
+
+# Create a binary outcome variable for sales_data_2
+sales_data_2 <- sales_data_2 %>%
+  mutate(Is_Profitable = ifelse(`Total Revenue` > mean(`Total Revenue`), 1, 0))
+
+```
+
+
+```{r}
+# Load necessary packages for logistic regression
+library(dplyr)
+library(caret)  # For confusionMatrix
+
+```
+
+
+### Model 
+
+```{r}
+# Logistic regression for sales_data_1
+logistic_model_1 <- glm(Is_Profitable ~ `Units Sold` + `Unit Price` + `Order Priority`, 
+                         data = sales_data_1, 
+                         family = binomial)
+
+# Logistic regression for sales_data_2
+logistic_model_2 <- glm(Is_Profitable ~ `Units Sold` + `Unit Price` + `Order Priority`, 
+                         data = sales_data_2, 
+                         family = binomial)
+
+```
+
+```{r}
+summary
+```
+
+
+
+####  Models Accuracy 
+
+```{r}
+# Predictions for sales_data_1
+predictions_1 <- ifelse(predict(logistic_model_1, type = "response") > 0.5, 1, 0)
+
+# Predictions for sales_data_2
+predictions_2 <- ifelse(predict(logistic_model_2, type = "response") > 0.5, 1, 0)
+
+# Create confusion matrices to assess accuracy
+confusion_matrix_1 <- confusionMatrix(as.factor(predictions_1), as.factor(sales_data_1$Is_Profitable))
+confusion_matrix_2 <- confusionMatrix(as.factor(predictions_2), as.factor(sales_data_2$Is_Profitable))
+
+# Display accuracy
+accuracy_1 <- confusion_matrix_1$overall['Accuracy']
+accuracy_2 <- confusion_matrix_2$overall['Accuracy']
+
+cat("Accuracy for Logistic Regression Model 1:", accuracy_1, "\n")
+cat("Accuracy for Logistic Regression Model 2:", accuracy_2, "\n")
+
+```
+
+## KNN
+```{r}
+mol <- colnames(sales_data_1)
+mol
+```
+
+```{r}
+# Load necessary libraries
+library(class)
+library(caret)  # For confusionMatrix and other functions
+
+
+# Preprocess the data for KNN
+preprocess_knn <- function(data) {
+  # Convert categorical variables to factors if needed
+  data$Order.Priority <- as.factor(data$`Order Priority`)
+  
+  # Create a binary response variable (e.g., profitable or not)
+  data$Is_Profitable <- ifelse(data$`Total Profit` > mean(data$`Total Profit`), 1, 0)  # Define profitable
+  
+  # Select only numeric columns for KNN (including response variable)
+  knn_data <- data[, c("Units Sold" , "Unit Price", "Unit Cost" , "Total Revenue", "Total Cost" , "Total Profit" , "Is_Profitable")]
+  
+  # Scale the data (except for the response variable)
+  knn_data_scaled <- scale(knn_data[, -ncol(knn_data)])  # Scale features only
+  
+  # Bind the scaled features with the response variable
+  knn_data_final <- data.frame(knn_data_scaled, Is_Profitable = knn_data$Is_Profitable)
+  return(knn_data_final)
+}
+
+# Preprocess both datasets
+knn_data_1 <- preprocess_knn(sales_data_1)
+knn_data_2 <- preprocess_knn(sales_data_2)
+
+# Split the data into training and testing sets (80% train, 20% test)
+set.seed(123)  # For reproducibility
+train_index_1 <- sample(1:nrow(knn_data_1), 0.8 * nrow(knn_data_1))
+train_index_2 <- sample(1:nrow(knn_data_2), 0.8 * nrow(knn_data_2))
+
+train_data_1 <- knn_data_1[train_index_1, ]
+test_data_1 <- knn_data_1[-train_index_1, ]
+
+train_data_2 <- knn_data_2[train_index_2, ]
+test_data_2 <- knn_data_2[-train_index_2, ]
+
+# Fit KNN Model
+k_value <- 5  # You can adjust the value of K
+
+# Predictions for sales_data_1
+predictions_1 <- knn(train = train_data_1[, -ncol(train_data_1)], 
+                     test = test_data_1[, -ncol(test_data_1)], 
+                     cl = train_data_1$Is_Profitable, 
+                     k = k_value)
+
+# Predictions for sales_data_2
+predictions_2 <- knn(train = train_data_2[, -ncol(train_data_2)], 
+                     test = test_data_2[, -ncol(test_data_2)], 
+                     cl = train_data_2$Is_Profitable, 
+                     k = k_value)
+
+# Evaluate the results
+confusion_matrix_1 <- confusionMatrix(as.factor(predictions_1), as.factor(test_data_1$Is_Profitable))
+confusion_matrix_2 <- confusionMatrix(as.factor(predictions_2), as.factor(test_data_2$Is_Profitable))
+
+# Print the accuracy
+cat("Accuracy for Sales Data 1:", confusion_matrix_1$overall['Accuracy'], "\n")
+cat("Accuracy for Sales Data 2:", confusion_matrix_2$overall['Accuracy'], "\n")
+
+```
+
