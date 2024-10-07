@@ -1,8 +1,12 @@
 ---
-title: "Jewel CArt"
-output: pdf_document
+title: "ML with Different Data sizes"
+author: "Frederick Jones"
+output:
+  html_document: 
+    toc: true
 date: "`r Sys.Date()`"
 ---
+
 
 # DAta Dwonloading and importation
 
@@ -10,40 +14,41 @@ date: "`r Sys.Date()`"
 
 ```{r}
 # Define the URLs
-urls <- c(
-  "https://excelbianalytics.com/wp/wp-content/uploads/2017/07/1000000%20Sales%20Records.zip",
-  "https://excelbianalytics.com/wp/wp-content/uploads/2017/07/1500000%20Sales%20Records.zip"
-)
-
-# Define the filenames to save the zip files locally
-file_names <- c("1000000_Sales_Records.zip", "1500000_Sales_Records.zip")
-
-# Download, extract, and import CSV files individually
-for (i in 1:length(urls)) {
-  # Download the zip file
-  download.file(urls[i], destfile = file_names[i], mode = "wb")
-  cat("Downloaded:", file_names[i], "\n")
-  
-  # Extract the downloaded zip file
-  unzip_dir <- paste0("extracted_", i)
-  unzip(file_names[i], exdir = unzip_dir)
-  cat("Extracted to folder:", unzip_dir, "\n")
-  
-  # Get the CSV file path (assuming only one CSV file per ZIP)
-  csv_file <- list.files(unzip_dir, pattern = "\\.csv$", full.names = TRUE)
-  
-  # Import the CSV file into R with a unique data frame name
-  if (length(csv_file) > 0) {
-    df_name <- paste0("sales_data_", i)  # e.g., "sales_data_1", "sales_data_2"
-    assign(df_name, read.csv(csv_file[1], stringsAsFactors = FALSE))
-    cat("Imported CSV file as data frame:", df_name, "\n")
-  } else {
-    cat("No CSV file found in", unzip_dir, "\n")
-  }
-}
+#urls <- c(
+#  "https://excelbianalytics.com/wp/wp-content/uploads/2017/07/1000000%20Sales%20Records.zip",
+#  "https://excelbianalytics.com/wp/wp-content/uploads/2017/07/1500000%20Sales%20Records.zip"
+#)
+#
+## Define the filenames to save the zip files locally
+#file_names <- c("1000000_Sales_Records.zip", "1500000_Sales_Records.zip")
+#
+## Download, extract, and import CSV files individually
+#for (i in 1:length(urls)) {
+#  # Download the zip file
+#  download.file(urls[i], destfile = file_names[i], mode = "wb")
+#  cat("Downloaded:", file_names[i], "\n")
+#  
+#  # Extract the downloaded zip file
+#  unzip_dir <- paste0("extracted_", i)
+#  unzip(file_names[i], exdir = unzip_dir)
+#  cat("Extracted to folder:", unzip_dir, "\n")
+#  
+#  # Get the CSV file path (assuming only one CSV file per ZIP)
+#  csv_file <- list.files(unzip_dir, pattern = "\\.csv$", full.names = TRUE)
+#  
+#  # Import the CSV file into R with a unique data frame name
+#  if (length(csv_file) > 0) {
+#    df_name <- paste0("sales_data_", i)  # e.g., "sales_data_1", "sales_data_2"
+#    assign(df_name, read.csv(csv_file[1], stringsAsFactors = FALSE))
+#    cat("Imported CSV file as data frame:", df_name, "\n")
+#  } else {
+#    cat("No CSV file found in", unzip_dir, "\n")
+#  }
+#}
 ## incase above code is not working due to slow internet
-sales_data_1 <- read_csv("GIT/Data/1000000 Sales Records.csv")
-sales_data_2 <- read_csv("GIT/Data/1500000 Sales Records.csv")
+library(readr)
+sales_data_1 <- read_csv("~/GIT/Data/1000000 Sales Records.csv")
+sales_data_2 <- read_csv("~/GIT/Data/1500000 Sales Records.csv")
 ```
 
 ## Dataframe view data1million
@@ -421,4 +426,132 @@ cat("Accuracy for Sales Data 1:", confusion_matrix_1$overall['Accuracy'], "\n")
 cat("Accuracy for Sales Data 2:", confusion_matrix_2$overall['Accuracy'], "\n")
 
 ```
+
+## Naive Bayes
+
+```{r}
+# Install necessary packages if you haven't already
+install.packages("e1071")
+install.packages("caret")
+install.packages("ggplot2")
+
+# Load the libraries
+library(e1071)
+library(caret)
+library(ggplot2)
+
+
+```
+
+```{r}
+# Add Is_Profitable column based on Total.Profit being greater than 0
+sales_data_1$Is_Profitable <- ifelse(sales_data_1$`Total Profit` > mean(sales_data_1$`Total Profit`), 1, 0)
+sales_data_2$Is_Profitable <- ifelse(sales_data_2$`Total Profit` > mean(sales_data_2$`Total Profit`), 1, 0)
+
+# Convert target variable to factor for both datasets
+sales_data_1$Is_Profitable <- as.factor(sales_data_1$Is_Profitable)
+sales_data_2$Is_Profitable <- as.factor(sales_data_2$Is_Profitable)
+
+# Split data into train and test sets for both datasets
+set.seed(123)  # For reproducibility
+trainIndex_1 <- createDataPartition(sales_data_1$Is_Profitable, p = 0.8, list = FALSE)
+train_data_1 <- sales_data_1[trainIndex_1, ]
+test_data_1 <- sales_data_1[-trainIndex_1, ]
+
+trainIndex_2 <- createDataPartition(sales_data_2$Is_Profitable, p = 0.8, list = FALSE)
+train_data_2 <- sales_data_2[trainIndex_2, ]
+test_data_2 <- sales_data_2[-trainIndex_2, ]
+
+```
+
+#### Model TRaining
+
+```{r}
+# Train Naive Bayes model on both datasets
+naive_model_1 <- naiveBayes(Is_Profitable ~ ., data = train_data_1)
+naive_model_2 <- naiveBayes(Is_Profitable ~ ., data = train_data_2)
+
+# Make predictions on test sets
+predictions_1 <- predict(naive_model_1, test_data_1)
+predictions_2 <- predict(naive_model_2, test_data_2)
+
+```
+
+#### Model Evaluation
+
+```{r}
+# Confusion matrix and accuracy for sales_data_1
+conf_matrix_1 <- confusionMatrix(predictions_1, test_data_1$Is_Profitable)
+accuracy_1 <- conf_matrix_1$overall['Accuracy']
+print(paste("Accuracy for Dataset 1: ", round(accuracy_1, 4)))
+print(conf_matrix_1)
+
+# Confusion matrix and accuracy for sales_data_2
+conf_matrix_2 <- confusionMatrix(predictions_2, test_data_2$Is_Profitable)
+accuracy_2 <- conf_matrix_2$overall['Accuracy']
+print(paste("Accuracy for Dataset 2: ", round(accuracy_2, 4)))
+print(conf_matrix_2)
+
+```
+
+
+```{r}
+# Function to plot confusion matrix
+plot_confusion_matrix <- function(conf_matrix, title) {
+  cm_df <- as.data.frame(conf_matrix$table)
+  
+  ggplot(cm_df, aes(x = Reference, y = Prediction, fill = Freq)) +
+    geom_tile() +
+    geom_text(aes(label = Freq), color = "white") +
+    labs(title = title, x = "Actual", y = "Predicted") +
+    scale_fill_gradient(low = "white", high = "blue") +
+    theme_minimal()
+}
+
+# Plot confusion matrices for both datasets
+plot_confusion_matrix(conf_matrix_1, "Confusion Matrix for Sales Data 1")
+plot_confusion_matrix(conf_matrix_2, "Confusion Matrix for Sales Data 2")
+
+```
+
+## Regression Tree
+
+```{r}
+library(rpart)
+library(rpart.plot)
+
+```
+
+
+```{r}
+# Fit regression tree for the first dataset
+reg_tree_1 <- rpart(`Total Profit` ~ ., data = sales_data_1, method = "anova")
+
+# Fit regression tree for the second dataset
+reg_tree_2 <- rpart(`Total Profit` ~ ., data = sales_data_2, method = "anova")
+
+```
+
+### Plotting Regression
+
+```{r}
+# Plot regression tree for sales_data_1
+rpart.plot(reg_tree_1, type = 2, extra = 1, main = "Regression Tree for Sales Data 1")
+
+# Plot regression tree for sales_data_2
+rpart.plot(reg_tree_2, type = 2, extra = 1, main = "Regression Tree for Sales Data 2")
+
+```
+
+#### Summary of the models
+
+```{r}
+# Summary of the first regression tree model
+summary(reg_tree_1)
+
+# Summary of the second regression tree model
+summary(reg_tree_2)
+
+```
+
 

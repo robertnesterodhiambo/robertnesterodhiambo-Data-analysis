@@ -1,0 +1,69 @@
+---
+output:
+  word_document: 
+    toc: true
+  html_document: default
+---
+# Week 3 Homework - Applying Good Design Principles using mtcars
+
+## Load the dataset
+```{r}
+
+data("mtcars")
+```
+
+
+## Step 1: Understand the relationship between horsepower and fuel efficiency
+```{r}
+summary(mtcars[, c("mpg", "hp")])
+```
+
+
+## Step 2: Create a scatter plot to visualize the relationship
+
+### Principle 1: Clarity - Scatter plot showing how mpg (fuel efficiency) relates to hp (horsepower)
+```{r}
+library(ggplot2)
+ggplot(mtcars, aes(x = hp, y = mpg, label = rownames(mtcars))) +
+  geom_point(color = "blue", size = 3) +
+  geom_text(vjust = -0.5, size = 3) +  # Add car names to the points
+  theme_minimal() +
+  labs(title = "Fuel Efficiency vs Horsepower", 
+       x = "Horsepower (hp)", 
+       y = "Miles per Gallon (mpg)") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+## Step 3: Simple Analysis
+
+### Principle 2: Simplicity - We filter cars with higher-than-average mpg and horsepower
+```{r}
+
+avg_mpg <- mean(mtcars$mpg)
+avg_hp <- mean(mtcars$hp)
+
+efficient_powerful_cars <- subset(mtcars, mpg > avg_mpg & hp > avg_hp)
+
+cat("\nCars that provide a balance of good fuel efficiency and power:\n")
+print(efficient_powerful_cars)
+```
+
+
+## Step 4: Visualize best cars
+
+### Principle 3: Consistency - A consistent format is used to highlight selected cars
+```{r}
+
+
+ggplot(efficient_powerful_cars, aes(x = hp, y = mpg, label = rownames(efficient_powerful_cars))) +
+  geom_point(color = "green", size = 4) +
+  geom_text(vjust = -0.5, size = 3) +  # Add car names
+  theme_minimal() +
+  labs(title = "High Efficiency & Power Cars", 
+       x = "Horsepower (hp)", 
+       y = "Miles per Gallon (mpg)") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+

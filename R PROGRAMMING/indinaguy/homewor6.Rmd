@@ -1,0 +1,65 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+# Week 6 Homework - mtcars dataset analysis
+
+## Step 1: Load the mtcars dataset
+
+```{r}
+data("mtcars")
+write.csv(mtcars,"mtcars.csv")
+getwd()
+```
+
+
+##  Step 2: Double the dataset by appending it to itself
+
+```{r}
+extended_mtcars <- rbind(mtcars, mtcars)
+
+# Print the dimensions to confirm that the data has been doubled
+cat("Original dataset dimensions: ", dim(mtcars), "\n")
+cat("Extended dataset dimensions: ", dim(extended_mtcars), "\n")
+```
+
+
+## Step 3: Perform summary statistics for the original and extended datasets
+
+```{r}
+# Original dataset summary
+cat("\nSummary statistics for the original dataset:\n")
+print(summary(mtcars))
+
+# Extended dataset summary
+cat("\nSummary statistics for the extended dataset:\n")
+print(summary(extended_mtcars))
+```
+
+
+## Step 4: Create visualizations to compare the original and extended datasets
+
+```{r}
+# Set plotting area to show two plots side by side
+par(mfrow = c(1, 2))
+
+# Plot histogram for 'mpg' (Miles Per Gallon) in the original dataset
+hist(mtcars$mpg, main = "Original Data (mpg)", 
+     xlab = "Miles per Gallon", col = "lightblue", 
+     border = "black", breaks = 10)
+
+# Plot histogram for 'mpg' (Miles Per Gallon) in the extended dataset
+hist(extended_mtcars$mpg, main = "Extended Data (mpg)", 
+     xlab = "Miles per Gallon", col = "lightgreen", 
+     border = "black", breaks = 10)
+```
+
+
+## Step 5: Explanation of differences
+```{r}
+cat("\nExplanation of Results:\n")
+cat("Since we duplicated the dataset, the distribution of 'mpg' values remains the same, but the number of observations has doubled. This means the histograms look similar, and summary statistics should reflect identical measures of central tendency and spread, but with doubled row counts.\n")
+
+```
+
