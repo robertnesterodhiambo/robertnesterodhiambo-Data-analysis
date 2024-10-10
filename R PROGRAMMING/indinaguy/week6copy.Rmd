@@ -1,0 +1,93 @@
+---
+output: 
+  word_document: 
+    toc: true
+---
+# Week 6 Homework Recap:
+1. **Take the previous assignment (Week 3)**, which involved working with the `Gapminders` dataset, and instead use the **Gapminder dataset**.
+2. **Add twice as much data** to the set.
+3. **Compare how this impacts the results** from the initial set.
+4. Provide **visualization** for the initial and updated results.
+5. **Explain** the differences or similarities in the results.
+
+## Step-by-Step R Code using Gapminder Dataset
+
+### 1. Install and Load Required Libraries
+
+```{r}
+# Install necessary packages
+#install.packages("gapminder")
+#install.packages("dplyr")
+#install.packages("ggplot2")
+
+# Load libraries
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+write.csv(gapminder,"week6.csv")
+```
+
+### 2. Explore the Gapminder Dataset
+
+```{r}
+# Explore the gapminder dataset
+head(gapminder)
+summary(gapminder)
+```
+
+The **Gapminder** dataset contains information on life expectancy, population, and GDP per capita for various countries from 1952 to 2007.
+
+### 3. Create Initial Dataset and Plot Initial Results
+
+
+
+```{r}
+# Filter initial dataset (Year 1952-1977 for comparison)
+initial_data <- gapminder %>%
+  filter(year <= 1977)
+
+# Create a scatter plot of GDP per capita vs Life Expectancy for initial data
+ggplot(initial_data, aes(x=gdpPercap, y=lifeExp, color=continent)) +
+  geom_point() +
+  scale_x_log10() +  # Log transformation to better visualize GDP
+  labs(title="GDP per Capita vs Life Expectancy (1952-1977)", 
+       x="GDP per Capita (log scale)", y="Life Expectancy") +
+  theme_minimal()
+```
+
+### 4. Add Twice as Much Data (Year 1952-2007)
+
+
+```{r}
+# Adding twice as much data (Year 1952-2007)
+extended_data <- gapminder
+
+# Compare the number of rows between the two datasets
+cat("Initial data rows: ", nrow(initial_data), "\n")
+cat("Extended data rows: ", nrow(extended_data), "\n")
+
+# Create a scatter plot of GDP per capita vs Life Expectancy for extended data
+ggplot(extended_data, aes(x=gdpPercap, y=lifeExp, color=continent)) +
+  geom_point() +
+  scale_x_log10() +  # Log transformation to better visualize GDP
+  labs(title="GDP per Capita vs Life Expectancy (1952-2007)", 
+       x="GDP per Capita (log scale)", y="Life Expectancy") +
+  theme_minimal()
+```
+
+### 5. Visualize and Compare the Results
+
+We now have two visualizations:
+- **Initial dataset** (1952-1977)
+- **Extended dataset** (1952-2007)
+
+
+
+### 6. Explanation of Results
+
+The additional data from 1977-2007 shows a clearer improvement in life expectancy, especially for countries with a higher GDP per capita. The earlier data (1952-1977) showed a more scattered relationship. This indicates that over time, the gap between countries with low and high GDP per capita in terms of life expectancy has widened, particularly in some continents.
+
+```{r}
+# Summary of the impact of added data
+cat("The initial dataset (1952-1977) shows a modest relationship between GDP per capita and life expectancy. As the dataset is extended to include more recent data (up to 2007), the relationship becomes clearer, showing that countries with higher GDP per capita have significantly higher life expectancy. The trend is more pronounced in continents like Europe and the Americas.")
+```

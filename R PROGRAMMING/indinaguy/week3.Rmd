@@ -43,7 +43,7 @@ ggplot(mtcars, aes(x = hp, y = mpg, label = rownames(mtcars))) +
 avg_mpg <- mean(mtcars$mpg)
 avg_hp <- mean(mtcars$hp)
 
-efficient_powerful_cars <- subset(mtcars, mpg > avg_mpg & hp > avg_hp)
+efficient_powerful_cars <- subset(mtcars, mpg > avg_mpg | hp > avg_hp)
 
 cat("\nCars that provide a balance of good fuel efficiency and power:\n")
 print(efficient_powerful_cars)

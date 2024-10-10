@@ -1,0 +1,31 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+```{r}
+# Install and load required packages
+#install.packages("gapminder")
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+write.csv(gapminder,"week3.csv")
+# Filter the data (1952-2007)
+gapminder_filtered <- gapminder %>%
+  filter(year >= 1952 & year <= 2007)
+
+# Plot life expectancy trends across continents
+ggplot(gapminder_filtered, aes(x=year, y=lifeExp, color=continent, group=country)) +
+  geom_line(aes(linetype=continent), alpha=0.6) +  # Line plot with linetypes for clarity
+  stat_summary(aes(group=continent), fun="mean", geom="line", size=1.2, linetype="solid") +  # Mean trends
+  labs(title="Life Expectancy Trends by Continent (1952-2007)", 
+       x="Year", y="Life Expectancy", 
+       subtitle="Data from the Gapminder dataset") +
+  theme_minimal() +  # Clean, simple theme
+  theme(legend.position="bottom", legend.title=element_blank())  # Consistent, minimal legend
+
+```
+
