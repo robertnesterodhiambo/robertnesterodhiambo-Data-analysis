@@ -9,6 +9,7 @@ output:
 # Install and load necessary packages
 install.packages("ggplot2")
 library(ggplot2)
+library(readxl)
 
 # Simulated Sales Data for 12 Months
 sales_data  <- read_excel("~/Downloads/ALEKHA DATA EX Sales_.xlsx")
@@ -38,7 +39,7 @@ ggplot(sales_data, aes(x = Sales, y = Month)) +
 
 ### 3. **Scatter Plot for "Sales by States"**
 
-Let’s assume you have a dataset named `sales_by_states` with columns `State`, `Sales_Amount`, and `Average_Price`:
+
 
 ```{r}
 # Simulated data for sales by states
@@ -95,9 +96,9 @@ ggplot(map_data, aes(long, lat, group = group, fill = Sales)) +
 
 ### 6. **Bubble Chart for Sales**
 
-```r
+```{r}
 # 6. Create a bubble chart for sales with state labels
-ggplot(sales_by_states, aes(x = Sales_Amount, y = Average_Price, size = Sales_Amount)) +
+ggplot(sales_by_states, aes(x = Sales, y = `Average Price`, size = Sales)) +
   geom_point(color = "blue", alpha = 0.6) +
   geom_text(aes(label = State), vjust = -1, size = 3) +  # Add state labels
   labs(title = "Patriots Sales with Data Labels for States", x = "Sales Amount", y = "Average Price") +
@@ -105,10 +106,3 @@ ggplot(sales_by_states, aes(x = Sales_Amount, y = Average_Price, size = Sales_Am
   theme_minimal() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())  # Remove unnecessary gridlines
 ```
-
-### Notes:
-1. Replace the simulated datasets with the actual ones (`sales_data`, `sales_by_states`, etc.).
-2. Make sure the column names in your actual dataset match what is used in the code.
-3. For the **Choropleth map**, ensure your dataset contains state names and sales data, which can be merged with `map_data("state")`.
-
-This R code should cover the core visualizations you need to create for Patriots Corporation's data analysis.
