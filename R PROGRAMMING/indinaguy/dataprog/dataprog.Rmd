@@ -1,29 +1,114 @@
 ---
-title: "Untitled"
-output: word_document
-date: "`r Sys.Date()`"
+output: 
+  pdf_document: 
+    toc: true
 ---
+### 1. **Creating a Column Chart with Sales by Month**
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+# Install and load necessary packages
+install.packages("ggplot2")
+library(ggplot2)
+
+# Simulated Sales Data for 12 Months
+sales_data  <- read_excel("~/Downloads/ALEKHA DATA EX Sales_.xlsx")
+
+# 1. Create the column chart
+ggplot(sales_data, aes(x = Month, y = Sales)) +
+  geom_col(fill = "blue") +
+  scale_y_continuous(limits = c(0, 50000)) +  # Set Fixed start and end to 0 and 50,000
+  labs(title = "Patriots Sales by Month", x = "Sales Month", y = "Sales Amount") +
+  theme(text = element_text(size = 11)) +  # Standardize font size
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())  # Remove unnecessary gridlines
 ```
 
-## R Markdown
+### 2. **Recreate the Chart with Sales Amount on the Horizontal Axis and Sales Month on the Vertical Axis**
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+# 2. Recreate the column chart with switched axes
+ggplot(sales_data, aes(x = Sales, y = Month)) +
+  geom_col(fill = "green") +
+  scale_x_continuous(limits = c(0, 50000)) +  # Set Fixed start and end to 0 and 50,000
+  labs(title = "Patriots Sales by Month", x = "Sales Amount", y = "Sales Month") +
+  theme(text = element_text(size = 11)) +  # Standardize font size
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())  # Remove unnecessary gridlines
 ```
 
-## Including Plots
+### 3. **Scatter Plot for "Sales by States"**
 
-You can also embed plots, for example:
+Let’s assume you have a dataset named `sales_by_states` with columns `State`, `Sales_Amount`, and `Average_Price`:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+# Simulated data for sales by states
+sales_by_states <- read_excel("~/Downloads/ALEKHA DATA EX Sales_.xlsx", 
+    sheet = "Sales by State")
+sales_by_states
+# 3. Create the scatter plot
+ggplot(sales_by_states, aes(x = Sales, y = `Average Price`)) +
+  geom_point(size = 3, color = "red") +
+  labs(title = "Patriots Sales by State", x = "Sales Amount", y = "Average Price") +
+  theme(text = element_text(size = 11)) +  # Standardize font size
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())  # Remove unnecessary gridlines
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### 4. **Scatter Plot with Data Labels for States**
+
+```{r}
+# 4. Scatter plot with state labels
+ggplot(sales_by_states, aes(x = Sales, y = `Average Price`)) +
+  geom_point(size = 3, color = "purple") +
+  geom_text(aes(label = State), vjust = -1, hjust = 0.5, size = 3) +  # Add state labels
+  labs(title = "Patriots Sales with Data Labels for States", x = "Sales Amount", y = "Average Price") +
+  theme(text = element_text(size = 11)) +  # Standardize font size
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())  # Remove unnecessary gridlines
+```
+
+### 5. **Choropleth Map**
+
+
+
+```{r}
+# Install and load necessary packages for mapping
+#install.packages("maps")
+library(maps)
+
+# Assuming sales_by_states has a column 'State' and 'Sales_Amount'
+states_map <- map_data("state")
+
+# Merge sales data with map data
+sales_by_states$region <- tolower(sales_by_states$State)  # Convert state names to lowercase
+map_data <- merge(states_map, sales_by_states, by = "region", all.x = TRUE)
+
+# Create the Choropleth map
+ggplot(map_data, aes(long, lat, group = group, fill = Sales)) +
+  geom_polygon(color = "white") +
+  coord_fixed(1.3) +
+  labs(title = "Patriots Choropleth Map Sales", fill = "Sales Amount") +
+  theme(text = element_text(size = 11)) +  # Standardize font size
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())  # Remove unnecessary gridlines
+```
+
+### 6. **Bubble Chart for Sales**
+
+```r
+# 6. Create a bubble chart for sales with state labels
+ggplot(sales_by_states, aes(x = Sales_Amount, y = Average_Price, size = Sales_Amount)) +
+  geom_point(color = "blue", alpha = 0.6) +
+  geom_text(aes(label = State), vjust = -1, size = 3) +  # Add state labels
+  labs(title = "Patriots Sales with Data Labels for States", x = "Sales Amount", y = "Average Price") +
+  theme(text = element_text(size = 11)) +  # Standardize font size
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())  # Remove unnecessary gridlines
+```
+
+### Notes:
+1. Replace the simulated datasets with the actual ones (`sales_data`, `sales_by_states`, etc.).
+2. Make sure the column names in your actual dataset match what is used in the code.
+3. For the **Choropleth map**, ensure your dataset contains state names and sales data, which can be merged with `map_data("state")`.
+
+This R code should cover the core visualizations you need to create for Patriots Corporation's data analysis.
