@@ -1,0 +1,69 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+```{r}
+library(readxl)
+Sales<- read_excel("~/Downloads/Sales and Costs(1)(1).xlsx")
+head(Sales)
+```
+
+
+```{r}
+# 1. Mean Material Cost
+mean_material_cost <- mean(Sales$`Materials Costs`, na.rm = TRUE)
+
+# 2. Variance of Labor Costs
+variance_labor_cost <- var(Sales$`Labor Costs`, na.rm = TRUE)
+
+# 3. Covariance of Labor Costs and Materials Costs
+covariance_labor_material <- cov(Sales$`Labor Costs`, Sales$`Materials Costs`, use = "complete.obs")
+
+# 4. Total Sales
+total_sales <- sum(Sales$Sales, na.rm = TRUE)
+
+# Additional Descriptive Statistics:
+
+# 5. Median of Sales
+median_sales <- median(Sales$Sales, na.rm = TRUE)
+
+# 6. Standard Deviation of Materials Costs
+sd_material_cost <- sd(Sales$`Materials Costs`, na.rm = TRUE)
+
+# Print results
+cat("Mean Material Cost:", mean_material_cost, "\n")
+cat("Variance of Labor Costs:", variance_labor_cost, "\n")
+cat("Covariance of Labor and Materials Costs:", covariance_labor_material, "\n")
+cat("Total Sales:", total_sales, "\n")
+cat("Median of Sales:", median_sales, "\n")
+cat("Standard Deviation of Materials Costs:", sd_material_cost, "\n")
+
+```
+
+
+
+1. **Mean Material Cost**: **23,682.16**  
+   This represents the average cost of materials across all entries in your dataset. It provides a central value that summarizes the material costs.
+
+2. **Variance of Labor Costs**: **88,604,994**  
+   Variance measures the spread or variability of labor costs in your dataset. A high variance indicates that labor costs vary significantly from their mean. Since the value is large, it suggests wide differences in labor costs among the data entries.
+
+3. **Covariance of Labor and Materials Costs**: **3,178,946**  
+   Covariance indicates the direction of the relationship between labor costs and material costs. A positive covariance here suggests that as labor costs increase, material costs also tend to increase. However, covariance does not indicate the strength or consistency of this relationship.
+
+4. **Total Sales**: **357,500,286**  
+   This is the sum of all sales values in the dataset. It represents the total revenue generated from all sales.
+
+5. **Median of Sales**: **1,426,194**  
+   The median is the middle value of the sales data when arranged in order. This is less affected by extreme values (outliers) compared to the mean. It indicates that half of the sales are below this value, and half are above.
+
+6. **Standard Deviation of Materials Costs**: **3,390.915**  
+   Standard deviation measures how spread out the material costs are around the mean. A standard deviation of 3,390.915 indicates that most material costs fall within 3,390.915 units above or below the mean material cost.
+
+### Summary
+- The **mean** and **median** provide measures of central tendency for costs and sales. 
+- The **variance** and **standard deviation** highlight the variability in labor and material costs. 
+- The **covariance** suggests a potential positive relationship between labor and material costs.
+- The **total sales** offers an aggregate measure of revenue across all entries. 
+

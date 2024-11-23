@@ -1,0 +1,6 @@
+```{r}
+load("/home/dragon/Downloads/car_ads_fp.rdata")
+head(carAd)
+str(carAd)
+```
+
