@@ -38,7 +38,7 @@ cat("Covariance of Labor and Materials Costs:", covariance_labor_material, "\n")
 cat("Total Sales:", total_sales, "\n")
 cat("Median of Sales:", median_sales, "\n")
 cat("Standard Deviation of Materials Costs:", sd_material_cost, "\n")
-
+getwd()
 ```
 
 
